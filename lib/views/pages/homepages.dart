@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:presentech/themes/themes.dart';
+import 'package:presentech/views/themes/themes.dart';
 
 class Homepages extends StatefulWidget {
   const Homepages({super.key});
@@ -15,12 +15,12 @@ class _HomepagesState extends State<Homepages> {
       backgroundColor: Colors.white,
       appBar: AppBar(),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             ListTile(
-              title: Text("PT Venturo", style: AppTextStyle.heading1,),
-              subtitle: Text("text posisi", style: AppTextStyle.normal,),
+              title: Text("PT Venturo", style: AppTextStyle.heading1),
+              subtitle: Text("text posisi", style: AppTextStyle.normal),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -32,18 +32,25 @@ class _HomepagesState extends State<Homepages> {
                     gradient: LinearGradient(
                       colors: [
                         AppColors.colorPrimary,
-                        AppColors.colorSecondary
-                      ])
+                        AppColors.colorSecondary,
+                      ],
+                    ),
                   ),
                   child: Card(
+                    color: Colors.white,
                     child: Container(
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(20.0),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text("Jadwal anda hari ini", style: AppTextStyle.heading1.copyWith(color: AppColors.greenPrimary)),
-                            SizedBox(height: 5,),
+                            Text(
+                              "Jadwal anda hari ini",
+                              style: AppTextStyle.heading1.copyWith(
+                                color: AppColors.greenPrimary,
+                              ),
+                            ),
+                            SizedBox(height: 5),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -55,25 +62,23 @@ class _HomepagesState extends State<Homepages> {
                                         color: AppColors.greenPrimary,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
-                                      child: Icon(Icons.arrow_right_alt, color: Colors.white, size: 16),
+                                      child: Icon(
+                                        Icons.arrow_right_alt,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
                                     ),
                                     const SizedBox(width: 6),
-                                    Text(
-                                      "08.00",
-                                      style: AppTextStyle.heading2,
-                                    ),
+                                    Text("08.00", style: AppTextStyle.heading2),
                                   ],
                                 ),
-                                
+
                                 const SizedBox(width: 16),
-                                
-                                Text(
-                                  "—",
-                                  style: AppTextStyle.heading2,
-                                ),
-                                
+
+                                Text("—", style: AppTextStyle.heading2),
+
                                 const SizedBox(width: 16),
-                                
+
                                 Row(
                                   children: [
                                     Container(
@@ -82,19 +87,25 @@ class _HomepagesState extends State<Homepages> {
                                         color: Colors.red,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
-                                      child: const Icon(Icons.arrow_right_alt, color: Colors.white, size: 16),
+                                      child: const Icon(
+                                        Icons.arrow_right_alt,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
                                     ),
                                     const SizedBox(width: 6),
-                                    Text(
-                                      "16.00",
-                                      style: AppTextStyle.heading1,
-                                    ),
+                                    Text("16.00", style: AppTextStyle.heading1),
                                   ],
                                 ),
                               ],
                             ),
                             SizedBox(height: 5),
-                            Text("Status anda hari ini : Sudah absen", style:  AppTextStyle.normal.copyWith(color: AppColors.greenPrimary),)
+                            Text(
+                              "Status anda hari ini : Sudah absen",
+                              style: AppTextStyle.normal.copyWith(
+                                color: AppColors.greenPrimary,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -103,23 +114,45 @@ class _HomepagesState extends State<Homepages> {
                 ),
               ),
             ),
-            SizedBox(height: 10,),
+            SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Riwayat absensi", style: AppTextStyle.heading1,),
-                Text("View All", style: AppTextStyle.normal.copyWith(color: AppColors.colorPrimary),)
+                Text("Riwayat absensi", style: AppTextStyle.heading1),
+                Text(
+                  "View All",
+                  style: AppTextStyle.normal.copyWith(
+                    color: AppColors.colorPrimary,
+                  ),
+                ),
               ],
             ),
             Expanded(
               child: ListView.builder(
+                itemCount: 3,
                 itemBuilder: (context, index) {
-                  return ListTile (
-                    tileColor: AppColors.greyprimary,
-                    title: Text("Tanggal", style: AppTextStyle.heading2,),
-                    subtitle: Text("data", style: AppTextStyle.normal,),
-                    trailing: Icon(Icons.done),
-                    horizontalTitleGap: 5.0,
+                  return Card(
+                    shadowColor: Colors.transparent,
+                    color: AppColors.greyprimary,
+                    margin: EdgeInsets.only(bottom: 15),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            title: Text(
+                              "Data 1",
+                              style: AppTextStyle.heading2.copyWith(color: Colors.black)
+                            ),
+                            subtitle: Text(
+                              "Data",
+                              style: AppTextStyle.normal.copyWith(color: Colors.grey)
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 },
               ),

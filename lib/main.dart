@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:presentech/pages/homepages.dart';
+import 'package:presentech/views/pages/loginpages.dart';
+import 'package:presentech/views/pages/register_pages.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const Homepages(),
+      home: const RegisterPages(),
     );
   }
 }

@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:presentech/views/pages/loginpages.dart';
-import 'package:presentech/views/pages/register_pages.dart';
+import 'package:get/get.dart';
+import 'package:presentech/controller/auth_controller.dart';
+import 'package:presentech/controller/auth_gate.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://jpksiqtapxasaqutkrhh.supabase.co',
+    anonKey: 'sb_publishable_wqoOP-oikiB31asXOuWkng_r9Mb_p59',
+  );
+
+  Get.put(AuthController());
+  runApp(MyApp());
 }
+
+final supabase = Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -12,7 +24,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -32,7 +44,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const RegisterPages(),
+      home: const AuthGate(),
     );
   }
 }

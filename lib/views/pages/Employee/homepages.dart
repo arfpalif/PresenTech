@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:presentech/controller/auth_controller.dart';
+import 'package:presentech/views/pages/loginpages.dart';
 import 'package:presentech/views/themes/themes.dart';
 
-class Homepages extends StatefulWidget {
-  const Homepages({super.key});
+class UserHomepages extends StatefulWidget {
+  const  UserHomepages({super.key});
 
   @override
-  State<Homepages> createState() => _HomepagesState();
+  State<UserHomepages> createState() => _UserHomepagesState();
 }
 
-class _HomepagesState extends State<Homepages> {
+class _UserHomepagesState extends State<UserHomepages> {
+  final _authController = AuthController();
+
+  void signOut() async{
+    await _authController.signOut();
+    Get.offAll(const Loginpages());
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,6 +31,9 @@ class _HomepagesState extends State<Homepages> {
               title: Text("PT Venturo", style: AppTextStyle.heading1),
               subtitle: Text("text posisi", style: AppTextStyle.normal),
             ),
+            ElevatedButton(onPressed: (){
+                signOut();
+            }, child: Text("Sign Out")),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Card(

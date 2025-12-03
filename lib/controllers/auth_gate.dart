@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/controller/auth_controller.dart';
-import 'package:presentech/views/pages/Employee/homepages.dart';
-import 'package:presentech/views/pages/HR/Homepage.dart';
-import 'package:presentech/views/pages/register_pages.dart';
+import 'package:presentech/controllers/auth_controller.dart';
+import 'package:presentech/views/pages/employee/employee_homepage.dart';
+import 'package:presentech/views/pages/hrd/hrd_homepage.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -21,14 +20,10 @@ class AuthGate extends StatelessWidget {
         );
       }
 
-      if (authC.role.value == 'none'){
-        return RegisterPages();
-      }
-
       if(authC.role.value == 'hrd'){
         return HrdHomepage();
       }
-      return UserHomepages();
+      return EmployeeHomepage();
     });
     
     // return StreamBuilder(

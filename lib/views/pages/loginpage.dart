@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:presentech/controller/auth_controller.dart';
-import 'package:presentech/controller/auth_gate.dart';
+import 'package:presentech/controllers/auth_controller.dart';
+import 'package:presentech/controllers/auth_gate.dart';
+import 'package:presentech/views/components/Gradient_btn.dart';
 import 'package:presentech/views/pages/register_pages.dart';
 import 'package:presentech/views/themes/themes.dart';
 
-class Loginpages extends StatefulWidget {
-  const Loginpages({super.key});
+class Loginpage extends StatefulWidget {
+  const Loginpage({super.key});
 
   @override
-  State<Loginpages> createState() => _LoginpagesState();
+  State<Loginpage> createState() => _LoginpageState();
 }
 
-class _LoginpagesState extends State<Loginpages> {
+class _LoginpageState extends State<Loginpage> {
   final _authController = Get.put(AuthController());
   final _emailController = TextEditingController();
   final _passWordController = TextEditingController();
-  final _nameController = TextEditingController();
   String? selectedValue = 'One';
 
   List<String> options = ['HRD', 'employee'];
@@ -79,26 +79,13 @@ class _LoginpagesState extends State<Loginpages> {
                 ),
               ),
               SizedBox(height: 30),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      5,
-                    ), // Adjust the value for desired roundness
-                  ),
-                  backgroundColor: AppColors.colorSecondary,
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                onPressed: () {
-                  login();
-                },
-                child: Text(
-                  "Sign Up",
-                  style: AppTextStyle.normal.copyWith(color: Colors.white),
-                ),
-              ),
+              AppGradientButton(
+                text: "Login", 
+                onPressed: (){
+                login();
+              }),
               SizedBox(height: 20),
-              new GestureDetector(
+              GestureDetector(
                 onTap: () {
                   Get.offAll(RegisterPages());
                 },

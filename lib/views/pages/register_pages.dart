@@ -1,12 +1,11 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:presentech/controller/auth_controller.dart';
+import 'package:presentech/controllers/auth_controller.dart';
 import 'package:get/get.dart';
-import 'package:presentech/views/pages/Employee/homepages.dart';
-import 'package:presentech/views/pages/HR/Homepage.dart';
-import 'package:presentech/views/pages/loginpages.dart';
+import 'package:presentech/views/components/Gradient_btn.dart';
+import 'package:presentech/views/pages/employee/employee_homepage.dart';
+import 'package:presentech/views/pages/hrd/hrd_homepage.dart';
+import 'package:presentech/views/pages/loginpage.dart';
 import 'package:presentech/views/themes/themes.dart';
 
 class RegisterPages extends StatefulWidget {
@@ -65,11 +64,11 @@ class _RegisterPagesState extends State<RegisterPages> {
           Get.offAll(const HrdHomepage());
         }
         else{
-          Get.offAll(const UserHomepages());
+          Get.offAll(const EmployeeHomepage());
         }
         
       } else {
-        Get.snackbar("Gagal register", "Gagal registrasi karena : $e");
+        Get.snackbar("Gagal register", "Gagal registrasi");
       }
     } catch (e) {
       if (Navigator.canPop(context)) Navigator.of(context).pop();
@@ -83,107 +82,113 @@ class _RegisterPagesState extends State<RegisterPages> {
       body: Container(
         color: Colors.white,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.00),
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset("src/images/ic_signup.svg"),
-                SizedBox(height: 20),
-                Text("Daftar Akun", style: AppTextStyle.heading1,),
-                SizedBox(height: 20),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Email",
-                    style: AppTextStyle.normal,
-                  ),
-                ),
-                TextFormField(
-                  keyboardType: TextInputType.emailAddress,
-                  controller: _emailController,
-                  obscureText: false,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.email),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height - 32,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  SvgPicture.asset("src/images/ic_signup.svg"),
+                  SizedBox(height: 20),
+                  Text("Daftar Akun", style: AppTextStyle.heading1,),
+                  SizedBox(height: 20),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Email",
+                      style: AppTextStyle.normal,
                     ),
                   ),
-                ),
-                SizedBox(height: 30),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Password",
-                    style: AppTextStyle.normal,
-                  ),
-                ),
-                TextFormField(
-                  keyboardType: TextInputType.text,
-                  controller: _passWordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.password),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(width: 0.1),
+                  TextFormField(
+                    keyboardType: TextInputType.emailAddress,
+                    controller: _emailController,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.email),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 20),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Nama",
-                    style: AppTextStyle.normal,
-                  ),
-                ),
-                TextFormField(
-                  keyboardType: TextInputType.text,
-                  controller: _nameController,
-                  obscureText: false,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.person),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(width: 0.1),
+                  SizedBox(height: 30),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Password",
+                      style: AppTextStyle.normal,
                     ),
                   ),
-                ),
-                SizedBox(height: 20),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text("Select role", style: AppTextStyle.normal),
-                ),
-                DropdownButton<String>(
-                  value: selectedValue,
-                  hint: const Text("Pilih Role"),
-                  isExpanded: true, 
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedValue = newValue;
-                    });
-                  },
-                  items: [
-                    DropdownMenuItem(value: "hrd", child: Text("hrd")),
-                    DropdownMenuItem(value: "employee", child: Text("employee")),
-                  ],
-                ),
-                SizedBox(height: 10,),
-                AppGradientButton(
-                  text: "Sign Up",
-                  onPressed: () {
-                    register();
-                  },
-                ),
-                SizedBox(height: 20,),
-                new GestureDetector(
-                  onTap: (){
-                    Get.offAll(Loginpages());
-                  },
-                  child:Text("Sudah memiliki akun ? Login", style: AppTextStyle.normal.copyWith(fontSize: 12),) ,
-                )
-              ],
+                  TextFormField(
+                    keyboardType: TextInputType.text,
+                    controller: _passWordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.password),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(width: 0.1),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Nama",
+                      style: AppTextStyle.normal,
+                    ),
+                  ),
+                  TextFormField(
+                    keyboardType: TextInputType.text,
+                    controller: _nameController,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.person),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(width: 0.1),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("Select role", style: AppTextStyle.normal),
+                  ),
+                  DropdownButton<String>(
+                    value: selectedValue,
+                    hint: const Text("Pilih Role"),
+                    isExpanded: true,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedValue = newValue;
+                      });
+                    },
+                    items: [
+                      DropdownMenuItem(value: "hrd", child: Text("hrd")),
+                      DropdownMenuItem(value: "employee", child: Text("employee")),
+                    ],
+                  ),
+                  SizedBox(height: 10,),
+                  AppGradientButton(
+                    text: "Sign Up",
+                    onPressed: () {
+                      register();
+                    },
+                  ),
+                  SizedBox(height: 20,),
+                  GestureDetector(
+                    onTap: (){
+                      Get.offAll(Loginpage());
+                    },
+                    child: Text("Sudah memiliki akun ? Login", style: AppTextStyle.normal.copyWith(fontSize: 12),),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

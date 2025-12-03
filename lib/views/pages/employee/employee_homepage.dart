@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/controller/auth_controller.dart';
-import 'package:presentech/views/pages/loginpages.dart';
+import 'package:presentech/controllers/auth_controller.dart';
+import 'package:presentech/views/pages/loginpage.dart';
 import 'package:presentech/views/themes/themes.dart';
 
-class UserHomepages extends StatefulWidget {
-  const  UserHomepages({super.key});
+class EmployeeHomepage extends StatefulWidget {
+  const  EmployeeHomepage({super.key});
 
   @override
-  State<UserHomepages> createState() => _UserHomepagesState();
+  State<EmployeeHomepage> createState() => _EmployeeHomepageState();
 }
 
-class _UserHomepagesState extends State<UserHomepages> {
+class _EmployeeHomepageState extends State<EmployeeHomepage> {
   final _authController = AuthController();
 
   void signOut() async{
     await _authController.signOut();
-    Get.offAll(const Loginpages());
+    Get.offAll(const Loginpage());
   }
   @override
   Widget build(BuildContext context) {
@@ -52,7 +52,7 @@ class _UserHomepagesState extends State<UserHomepages> {
                     color: Colors.white,
                     child: Container(
                       child: Padding(
-                        padding: const EdgeInsets.all(20.0),
+                        padding: const EdgeInsets.all(30.0),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [

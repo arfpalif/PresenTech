@@ -11,11 +11,17 @@ class _EmployeePermissionState extends State<EmployeePermission> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Text("Halaman permission")
-          ],
+      appBar: AppBar(
+        title: Text("Halaman permission"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Text("Halaman permission")
+            ],
+          ),
         ),
       ),
     );

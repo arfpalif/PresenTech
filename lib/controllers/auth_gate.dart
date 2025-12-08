@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/controllers/auth_controller.dart';
-import 'package:presentech/views/pages/employee/employee_homepage.dart';
-import 'package:presentech/views/pages/hrd/hrd_homepage.dart';
+import 'package:presentech/views/widgets/employee_bottom_nav.dart';
+import 'package:presentech/views/widgets/hrd_bottom_nav.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -19,11 +19,10 @@ class AuthGate extends StatelessWidget {
           ),
         );
       }
-
-      if(authC.role.value == 'hrd'){
-        return HrdHomepage();
+      if(authC.role.value.toLowerCase() == 'hrd'){
+        return HrdBottomNav();
       }
-      return EmployeeHomepage();
+      return EmployeeBottomNav();
     });
     
     // return StreamBuilder(

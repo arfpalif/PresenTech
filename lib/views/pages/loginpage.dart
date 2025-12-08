@@ -15,7 +15,7 @@ class Loginpage extends StatefulWidget {
 }
 
 class _LoginpageState extends State<Loginpage> {
-  final _authController = Get.put(AuthController());
+  final _authController = Get.find<AuthController>();
   final _emailController = TextEditingController();
   final _passWordController = TextEditingController();
   String? selectedValue = 'One';
@@ -29,14 +29,10 @@ class _LoginpageState extends State<Loginpage> {
       if (res.session != null || res.user != null) {
         Get.offAll(const AuthGate());
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Login gagal")));
+        Get.snackbar("Error", "Password tidak valid");
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error $e")));
+      Get.snackbar("Error", "Gagal login karena $e");
     }
   }
 
@@ -51,6 +47,9 @@ class _LoginpageState extends State<Loginpage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset("src/images/ic_signup.svg"),
+              SizedBox(height: 20),
+              Text("Login", style: AppTextStyle.heading1.copyWith(color: Colors.black),),
+              SizedBox(height: 20,),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text("Email", style: AppTextStyle.normal),
@@ -61,7 +60,6 @@ class _LoginpageState extends State<Loginpage> {
                 obscureText: false,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
                 ),
               ),
               SizedBox(height: 30),
@@ -75,7 +73,7 @@ class _LoginpageState extends State<Loginpage> {
                 obscureText: true,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.password),
-                  border: OutlineInputBorder(),
+                  
                 ),
               ),
               SizedBox(height: 30),

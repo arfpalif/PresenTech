@@ -109,9 +109,7 @@ class _RegisterPagesState extends State<RegisterPages> {
                     obscureText: false,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.email),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                      
                     ),
                   ),
                   SizedBox(height: 30),
@@ -128,10 +126,7 @@ class _RegisterPagesState extends State<RegisterPages> {
                     obscureText: true,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.password),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(width: 0.1),
-                      ),
+                      
                     ),
                   ),
                   SizedBox(height: 20),
@@ -148,10 +143,7 @@ class _RegisterPagesState extends State<RegisterPages> {
                     obscureText: false,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.person),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(width: 0.1),
-                      ),
+                      
                     ),
                   ),
                   SizedBox(height: 20),

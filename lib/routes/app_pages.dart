@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:presentech/controllers/auth_controller.dart';
+// AuthController is registered in main.dart; no direct import needed here
 import 'package:presentech/views/pages/employee/employee_homepage.dart';
 import 'package:presentech/views/pages/employee/employee_permission.dart';
 import 'package:presentech/views/pages/employee/employee_task.dart';
@@ -17,14 +17,12 @@ class AppPages {
       name: Routes.LOGIN,
       page: () => Loginpage(),
       binding: BindingsBuilder((){
-        Get.put(AuthController());
       }),
     ),
     GetPage(
       name: Routes.REGISTER,
       page: () => RegisterPages(),
       binding: BindingsBuilder((){
-        Get.put(AuthController());
       }),
     ),
 
@@ -35,7 +33,6 @@ class AppPages {
 
       }),
     ),
-    
     GetPage(
       name: Routes.employee_izin,
       page: () => EmployeePermission(),
@@ -69,7 +66,7 @@ class AppPages {
       name: Routes.HRD_ABSEN,
       page: () => HrdAttedance(),
       binding: BindingsBuilder((){
-        
+
       }),
     ),
   ];

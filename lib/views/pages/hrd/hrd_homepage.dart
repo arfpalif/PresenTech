@@ -20,17 +20,20 @@ class _HrdHomepageState extends State<HrdHomepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center, 
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text("Ini user HRD"),
-          SizedBox(height: 10,),
-          AppGradientButton(
-            text: "Logout", 
-            onPressed: signOut
-          ),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center, 
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text("Ini user HRD"),
+            SizedBox(height: 10,),
+            AppGradientButton(
+              text: "Logout", 
+              onPressed: signOut
+            ),
+          ],
+        ),
       ),
     );
   }

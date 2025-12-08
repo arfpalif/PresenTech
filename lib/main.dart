@@ -3,9 +3,6 @@ import 'package:get/get.dart';
 import 'package:presentech/controllers/auth_controller.dart';
 import 'package:presentech/controllers/auth_gate.dart';
 import 'package:presentech/controllers/navigation_controller.dart';
-import 'package:presentech/views/pages/hrd/hrd_homepage.dart';
-import 'package:presentech/views/pages/hrd/hrd_location.dart';
-import 'package:presentech/views/pages/hrd/hrd_reports.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -17,38 +14,10 @@ Future<void> main() async {
   );
 
   Get.put(AuthController());
+  Get.put(NavigationController());
   runApp(MyApp());
 }
-class BottomNavScreen extends StatelessWidget {
-  final NavigationController navController = Get.find();
 
-  final List<Widget> screens = [
-    HrdHomepage(),
-    HrdReports(),
-    HrdLocation(),
-  ];
-
-  BottomNavScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Obx(() => IndexedStack(
-        index: navController.currentIndex.value,
-        children: screens,
-      )),
-      bottomNavigationBar: Obx(() => BottomNavigationBar(
-        currentIndex: navController.currentIndex.value,
-        onTap: navController.changePage,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
-        ],
-      )),
-    );
-  }
-}
 final supabase = Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
@@ -75,7 +44,11 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primaryColor: Colors.white,
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: Colors.white,
+        cardColor: Colors.white,
+        canvasColor: Colors.white, dialogTheme: DialogThemeData(backgroundColor: Colors.white),
       ),
       home: const AuthGate(),
     );

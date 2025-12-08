@@ -24,16 +24,18 @@ class AuthController extends GetxController {
         return;
       }
 
-      final userId = session.user.id;
+        // Ensure UI shows loading while we fetch the user's role
+        isLoading.value = true;
+        final userId = session.user.id;
 
-      final result = await supa
+        final result = await supa
           .from('users')
           .select('role')
           .eq('id', userId)
           .single();
 
-      isLoading.value = false;
-      role.value = result['role'];
+        role.value = result['role'];
+        isLoading.value = false;
     });
   }
 
@@ -106,7 +108,11 @@ class AuthController extends GetxController {
   }
 
   Future<void> signOut() async {
+    // Immediately mark loading and clear role so UI won't show stale pages
+    isLoading.value = true;
+    role.value = 'none';
     await _Supabase.auth.signOut();
+    isLoading.value = false;
   }
 
   

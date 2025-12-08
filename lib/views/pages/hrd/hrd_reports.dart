@@ -10,6 +10,21 @@ class HrdReports extends StatefulWidget {
 class _HrdReportsState extends State<HrdReports> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("reports page"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("reports page")
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/controllers/auth_controller.dart';
-import 'package:presentech/controllers/auth_gate.dart';
-import 'package:presentech/controllers/navigation_controller.dart';
+import 'package:presentech/features/employee/auth/controller/auth_controller.dart';
+import 'package:presentech/features/employee/auth/controller/auth_gate.dart';
+import 'package:presentech/features/employee/homepage/controller/navigation_controller.dart';
+import 'package:presentech/features/views/themes/themes.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -47,8 +48,17 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.white,
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.white,
+        ),
         cardColor: Colors.white,
         canvasColor: Colors.white, dialogTheme: DialogThemeData(backgroundColor: Colors.white),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          selectedItemColor: AppColors.redPrimary,
+          unselectedItemColor: Colors.grey,
+          backgroundColor: Colors.white,
+          type: BottomNavigationBarType.fixed
+        )
       ),
       home: const AuthGate(),
     );

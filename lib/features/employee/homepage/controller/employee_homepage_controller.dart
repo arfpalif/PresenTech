@@ -45,7 +45,7 @@ class EmployeeHomepageController extends GetxController {
     return office;
   }
 
-  Future<String> getUser() async {
+  Future<void> getUser() async {
     final session = supabase.auth.currentUser;
     final userId = session?.id;
 
@@ -56,16 +56,17 @@ class EmployeeHomepageController extends GetxController {
 
     final response = await supabase
         .from("users")
-        .select('name')
+        .select('name, profile_picture')
         .eq("id", userId)
         .maybeSingle();
 
-    if(response == null){
+    if (response == null) {
       throw Exception("Error");
     }
 
     print("user row => ${response['name']}");
 
-    return name.value = response['name'];
+    name.value = response['name'];
+    profilePic.value = response['profile_picture'];
   }
 }

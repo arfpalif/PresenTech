@@ -39,60 +39,61 @@ class _LoginpageState extends State<Loginpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset("src/images/ic_signup.svg"),
-              SizedBox(height: 20),
-              Text("Login", style: AppTextStyle.heading1.copyWith(color: Colors.black),),
-              SizedBox(height: 20,),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text("Email", style: AppTextStyle.normal),
-              ),
-              TextField(
-                keyboardType: TextInputType.emailAddress,
-                controller: _emailController,
-                obscureText: false,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.email),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset("src/images/ic_signup.svg"),
+                SizedBox(height: 20),
+                Text("Login", style: AppTextStyle.heading1.copyWith(color: Colors.black),),
+                SizedBox(height: 20,),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text("Email", style: AppTextStyle.normal),
                 ),
-              ),
-              SizedBox(height: 30),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text("Password", style: AppTextStyle.normal),
-              ),
-              TextField(
-                keyboardType: TextInputType.text,
-                controller: _passWordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.password),
-                  
+                TextField(
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
+                  obscureText: false,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.email),
+                  ),
                 ),
-              ),
-              SizedBox(height: 30),
-              AppGradientButton(
-                text: "Login", 
-                onPressed: (){
-                login();
-              }),
-              SizedBox(height: 20),
-              GestureDetector(
-                onTap: () {
-                  Get.offAll(RegisterPages());
-                },
-                child: Text(
-                  "Sudah memiliki akun ? Login",
-                  style: AppTextStyle.normal.copyWith(fontSize: 12),
+                SizedBox(height: 30),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text("Password", style: AppTextStyle.normal),
                 ),
-              ),
-            ],
+                TextField(
+                  keyboardType: TextInputType.text,
+                  controller: _passWordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.password),
+                    
+                  ),
+                ),
+                SizedBox(height: 30),
+                AppGradientButton(
+                  text: "Login", 
+                  onPressed: (){
+                  login();
+                }),
+                SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
+                    Get.offAll(RegisterPages());
+                  },
+                  child: Text(
+                    "Sudah memiliki akun ? Login",
+                    style: AppTextStyle.normal.copyWith(fontSize: 12),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -15,7 +15,7 @@ class AppGradientButton extends StatelessWidget {
     required this.onPressed,
     this.gradientColors,
     this.borderRadius = 5,
-    this.height = 50,
+    this.height = 40,
     this.textStyle,
   });
 
@@ -75,7 +75,7 @@ class AppGradientButtonGreen extends StatelessWidget {
     required this.onPressed,
     this.gradientColors,
     this.borderRadius = 5,  
-    this.height = 50,
+    this.height = 40,
     this.textStyle,
   });
 
@@ -135,7 +135,7 @@ class AppGradientButtonRed extends StatelessWidget {
     required this.onPressed,
     this.gradientColors,
     this.borderRadius = 5,  
-    this.height = 50,
+    this.height = 40,
     this.textStyle,
   });
 
@@ -195,7 +195,7 @@ class AppGradientButtonYellow extends StatelessWidget {
     required this.onPressed,
     this.gradientColors,
     this.borderRadius = 5,  
-    this.height = 50,
+    this.height = 40,
     this.textStyle,
   });
 

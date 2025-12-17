@@ -1,47 +1,47 @@
 import 'dart:convert';
 
-List<UserModel> UserModelFromJson(String str) =>
-    List<UserModel>.from(json.decode(str).map((x) => UserModel.fromJson(x)));
+List<Employee> employeeFromJson(String str) =>
+    List<Employee>.from(json.decode(str).map((x) => Employee.fromJson(x)));
 
-String UserModelToJson(List<UserModel> data) =>
+String employeeToJson(List<Employee> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class UserModel {
-  int idx;
+class Employee {
   String id;
   String createdAt;
   String email;
   String role;
   int officeId;
-  String profile_picture;
+  String name;
+  String profilePicture;
 
-  UserModel({
-    required this.idx,
+  Employee({
     required this.id,
     required this.createdAt,
     required this.email,
     required this.role,
     required this.officeId,
-    required this.profile_picture
+    required this.name,
+    required this.profilePicture,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    idx: json["idx"],
+  factory Employee.fromJson(Map<String, dynamic> json) => Employee(
     id: json["id"],
     createdAt: json["created_at"],
     email: json["email"],
     role: json["role"],
     officeId: json["office_id"],
-    profile_picture: json["profile_picture"]
+    name: json["name"],
+    profilePicture: json["profile_picture"],
   );
 
   Map<String, dynamic> toJson() => {
-    "idx": idx,
     "id": id,
     "created_at": createdAt,
     "email": email,
     "role": role,
     "office_id": officeId,
-    "profile_picture": profile_picture
+    "name": name,
+    "profile_picture": profilePicture,
   };
 }

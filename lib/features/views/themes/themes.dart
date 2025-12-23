@@ -11,7 +11,12 @@ class Themes extends StatelessWidget {
 }
 
 class AppTextStyle {
-    static TextStyle heading1 = TextStyle(
+  static TextStyle title = TextStyle(
+    fontFamily: 'Poppins',
+    fontSize: 16.0,
+    fontWeight: FontWeight.w600,
+  );
+  static TextStyle heading1 = TextStyle(
     fontFamily: 'Poppins',
     fontSize: 14.0,
     fontWeight: FontWeight.w600,
@@ -24,8 +29,12 @@ class AppTextStyle {
     fontSize: 12.0,
     fontWeight: FontWeight.normal,
   );
-  
+  static TextStyle smallText = GoogleFonts.poppins(
+    fontSize: 10.0,
+    fontWeight: FontWeight.normal,
+  );
 }
+
 class AppColors {
   static const colorPrimary = Color(0xff3B82F6);
   static const colorSecondary = Color(0xff1E40AF);
@@ -37,4 +46,3 @@ class AppColors {
   static const yellowPrimary = Color(0xffFFB703);
   static const yellowSecondary = Color(0xffFB8500);
 }
-

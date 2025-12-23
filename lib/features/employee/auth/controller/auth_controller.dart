@@ -12,6 +12,7 @@ class AuthController extends GetxController {
     super.onInit();
     handleAuthState();
   }
+
   void handleAuthState() {
     final supa = Supabase.instance.client;
 
@@ -24,21 +25,20 @@ class AuthController extends GetxController {
         return;
       }
 
-        isLoading.value = true;
-        final userId = session.user.id;
+      isLoading.value = true;
+      final userId = session.user.id;
 
-        final result = await supa
+      final result = await supa
           .from('users')
           .select('role')
           .eq('id', userId)
           .single();
 
-        role.value = result['role'];
-        isLoading.value = false;
+      role.value = result['role'];
+      isLoading.value = false;
     });
   }
 
- 
   Future<AuthResponse> login(String email, String password) async {
     final response = await _Supabase.auth.signInWithPassword(
       email: email,
@@ -79,16 +79,12 @@ class AuthController extends GetxController {
     }
   }
 
-  void handleRegister() async {
-    
-  }
+  void handleRegister() async {}
 
-  Future<bool> checkEmail(String email) async{
-    final response = await _Supabase
-      .from('users')
-      .select()
-      .eq('email', email)
-      .maybeSingle();
+  Future<bool> checkEmail(String email) async {
+    final response = await _Supabase.from(
+      'users',
+    ).select().eq('email', email).maybeSingle();
     return response == null;
   }
 
@@ -100,19 +96,16 @@ class AuthController extends GetxController {
     return _Supabase.auth.currentSession != null;
   }
 
-  String? getUserEmail(){
+  String? getUserEmail() {
     final session = _Supabase.auth.currentSession;
     final email = session?.user.email;
     return email;
   }
 
   Future<void> signOut() async {
-    // Immediately mark loading and clear role so UI won't show stale pages
     isLoading.value = true;
     role.value = 'none';
     await _Supabase.auth.signOut();
     isLoading.value = false;
   }
-
-  
 }

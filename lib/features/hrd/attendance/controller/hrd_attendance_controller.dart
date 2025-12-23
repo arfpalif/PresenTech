@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:presentech/features/employee/absence/model/absence.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -9,6 +8,9 @@ class HrdAttendanceController extends GetxController {
   final supabase = Supabase.instance.client;
   var statusAbsen = "".obs;
   var selectedFilter = Rxn<AbsenceFilter>();
+  RxInt telat = 0.obs;
+  RxInt hadir = 0.obs;
+  RxInt alfa = 0.obs;
 
   RxList<Absence> absences = <Absence>[].obs;
   RxBool isLoading = false.obs;
@@ -32,59 +34,42 @@ class HrdAttendanceController extends GetxController {
     return absence;
   }
 
-  Future<Map<String, dynamic>> getOffice() async {
-    final user = await supabase.from("users").select("office_id").maybeSingle();
-
-    final officeId = user?['office_id'];
-
-    if (user == null || officeId == null) {
-      Get.snackbar("Error", "User tidak termasuk dalam office apapun");
-      throw Exception("User dont have office");
-    }
-
-    final office = await supabase
-        .from("offices")
-        .select()
-        .eq("id", officeId)
-        .maybeSingle();
-    print("office row => $office");
-
-    if (office == null) {
-      Get.snackbar("Error", "Tidak ada office");
-      throw Exception("Error");
-    }
-    return office;
-  }
-
-  Future<Position> getCurrentLocation() async {
-    bool service = await Geolocator.isLocationServiceEnabled();
-    if (!service) {
-      return Future.error("Location should be enabled");
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error("Error, could not get location");
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error("Error forever, could not get location");
-    } else {
-      return await Geolocator.getCurrentPosition();
-    }
-  }
-
   Future<void> fetchAbsence() async {
     try {
       final response = await supabase
           .from('absences')
-          .select()
+          .select('id, created_at, date, clock_in, clock_out, status, user_id, users(name)')
           .order('created_at', ascending: false);
       absences.value = response
           .map<Absence>((item) => Absence.fromJson(item))
           .toList();
+    } catch (e) {
+      print("Error fetch Absence: $e");
+    } finally {}
+  }
+
+  Future<void> fetchAbsenceToday() async {
+    try {
+      final response = await supabase
+          .from('absences')
+          .select('id, created_at, date, clock_in, clock_out, status, user_id, users(name)')
+          .order('created_at', ascending: false);
+      absences.value = response
+          .map<Absence>((item) => Absence.fromJson(item))
+          .toList();
+
+      telat.value = absences
+          .where((absence) => absence.status == 'telat')
+          .length;
+          
+      hadir.value = absences
+          .where((absence) => absence.status == 'hadir')
+          .length;
+
+      alfa.value = absences
+          .where((absence) => absence.status == 'alfa')
+          .length;
+      
     } catch (e) {
       print("Error fetch Absence: $e");
     } finally {}
@@ -109,7 +94,7 @@ class HrdAttendanceController extends GetxController {
       if (selectedFilter.value == null) {
         final response = await supabase
             .from('absences')
-            .select()
+            .select('id, created_at, date, clock_in, clock_out, status, user_id, users(name)')
             .eq('user_id', userId)
             .order('created_at', ascending: false);
 
@@ -137,7 +122,7 @@ class HrdAttendanceController extends GetxController {
 
       final response = await supabase
           .from('absences')
-          .select()
+          .select('id, created_at, date, clock_in, clock_out, status, user_id, users(name)')
           .eq('user_id', userId)
           .gte('created_at', startDate.toIso8601String())
           .lte('created_at', now.toIso8601String())

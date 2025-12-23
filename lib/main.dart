@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:presentech/configs/binding/initial_binding.dart';
 import 'package:presentech/features/employee/auth/controller/auth_controller.dart';
 import 'package:presentech/features/employee/auth/controller/auth_gate.dart';
 import 'package:presentech/features/employee/homepage/controller/navigation_controller.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Flutter Demo',
+      initialBinding: InitialBinding(),
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -48,17 +50,22 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.white,
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.white,
-        ),
+        appBarTheme: AppBarTheme(backgroundColor: Colors.white),
         cardColor: Colors.white,
-        canvasColor: Colors.white, dialogTheme: DialogThemeData(backgroundColor: Colors.white),
+        canvasColor: Colors.white,
+        dialogTheme: DialogThemeData(backgroundColor: Colors.white),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          selectedItemColor: AppColors.redPrimary,
+          selectedItemColor: AppColors.colorSecondary,
           unselectedItemColor: Colors.grey,
           backgroundColor: Colors.white,
-          type: BottomNavigationBarType.fixed
-        )
+          selectedLabelStyle: AppTextStyle.smallText.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+          unselectedLabelStyle: AppTextStyle.smallText.copyWith(
+            fontWeight: FontWeight.w200,
+          ),
+          type: BottomNavigationBarType.fixed,
+        ),
       ),
       home: const AuthGate(),
     );

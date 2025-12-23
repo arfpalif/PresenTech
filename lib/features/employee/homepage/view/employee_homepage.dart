@@ -4,8 +4,11 @@ import 'package:intl/intl.dart';
 import 'package:presentech/features/employee/absence/view/absence_list.dart';
 import 'package:presentech/features/employee/homepage/controller/employee_homepage_controller.dart';
 import 'package:presentech/features/employee/homepage/controller/navigation_controller.dart';
+import 'package:presentech/features/employee/permissions/view/employee_permission.dart';
 import 'package:presentech/features/employee/tasks/controller/employee_task_controller.dart';
 import 'package:presentech/features/employee/absence/controller/presence_controller.dart';
+import 'package:presentech/features/employee/tasks/view/employee_add_task.dart';
+import 'package:presentech/features/employee/tasks/view/employee_task_detail.dart';
 import 'package:presentech/features/views/components/Gradient_btn.dart';
 import 'package:presentech/features/employee/tasks/view/employee_task.dart';
 import 'package:presentech/features/views/components/component_badgets.dart';
@@ -44,45 +47,45 @@ class _EmployeeHomepageState extends State<EmployeeHomepage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.all(30.0),
+        padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Obx(
+              Padding(
+                padding: const EdgeInsets.only(top: 35.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Obx(
                       () => Text(
                         "Hi, ${homeController.name.value}",
                         style: AppTextStyle.heading1.copyWith(fontSize: 20),
                       ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      navController.changePage(2);
-                    },
-                    child: Obx(() {
-                      final imageUrl = homeController.profilePic.value;
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: imageUrl.isEmpty
-                            ? CircleAvatar(
-                                radius: 20,
-                                child: Icon(Icons.person),
-                              )
-                            : Image.network(
-                                imageUrl,
-                                width: 48,
-                                height: 48,
-                                fit: BoxFit.cover,
-                              ),
-                      );
-                    }),
-                  ),
-                ],
+                    GestureDetector(
+                      onTap: () {
+                        navController.changePage(2);
+                      },
+                      child: Obx(() {
+                        final imageUrl = homeController.profilePic.value;
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: imageUrl.isEmpty
+                              ? CircleAvatar(
+                                  radius: 20,
+                                  child: Icon(Icons.person),
+                                )
+                              : Image.network(
+                                  imageUrl,
+                                  width: 48,
+                                  height: 48,
+                                  fit: BoxFit.cover,
+                                ),
+                        );
+                      }),
+                    ),
+                  ],
+                ),
               ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
@@ -242,14 +245,19 @@ class _EmployeeHomepageState extends State<EmployeeHomepage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: AppGradientButton(text: "Izin", onPressed: () {}),
+                    child: AppGradientButton(
+                      text: "Izin",
+                      onPressed: () {
+                        Get.to(EmployeePermission());
+                      },
+                    ),
                   ),
                   SizedBox(width: 10),
                   Expanded(
                     child: AppGradientButtonGreen(
                       text: "Tambah tugas",
                       onPressed: () {
-                        Get.to(EmployeeTask());
+                        Get.to(const EmployeeAddTask());
                       },
                     ),
                   ),
@@ -322,10 +330,15 @@ class _EmployeeHomepageState extends State<EmployeeHomepage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Tasks", style: AppTextStyle.heading1),
-                  Text(
-                    "View All",
-                    style: AppTextStyle.normal.copyWith(
-                      color: Colors.grey,
+                  GestureDetector(
+                    onTap: () {
+                      Get.to(const EmployeeTask());
+                    },
+                    child: Text(
+                      "View All",
+                      style: AppTextStyle.normal.copyWith(
+                        color: AppColors.colorPrimary,
+                      ),
                     ),
                   ),
                 ],
@@ -354,7 +367,7 @@ class _EmployeeHomepageState extends State<EmployeeHomepage> {
                         children: <Widget>[
                           ListTile(
                             onTap: () {
-                              Get.to(EmployeeTask(), arguments: t);
+                              Get.to(EmployeeTaskDetail(), arguments: t);
                             },
                             title: Text(
                               t.title,
@@ -369,31 +382,12 @@ class _EmployeeHomepageState extends State<EmployeeHomepage> {
                               ),
                             ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              AppGradientButton(
-                                text: "update",
-                                onPressed: () {
-                                  Get.to(EmployeeTask());
-                                },
-                              ),
-                              SizedBox(width: 10),
-                              AppGradientButtonGreen(
-                                text: "Delete",
-                                onPressed: () {
-                                  controller.deleteTask(t.id!);
-                                },
-                              ),
-                            ],
-                          ),
                         ],
                       ),
                     );
                   },
                 );
               }),
-              
             ],
           ),
         ),

@@ -15,7 +15,11 @@ class ComponentBadgets extends StatelessWidget {
           height: 32,
           width: 60,
           child: AppGradientButtonGreen(
-            text: "Hadir",textStyle: AppTextStyle.heading1.copyWith(fontSize: 12, color: Colors.white),
+            text: "Hadir",
+            textStyle: AppTextStyle.heading1.copyWith(
+              fontSize: 12,
+              color: Colors.white,
+            ),
             onPressed: () {},
           ),
         );
@@ -25,8 +29,12 @@ class ComponentBadgets extends StatelessWidget {
           height: 32,
           width: 60,
           child: AppGradientButtonYellow(
-            text: "Telat", textStyle: AppTextStyle.heading1.copyWith(fontSize: 12, color: Colors.white),
-            onPressed: () {}, 
+            text: "Telat",
+            textStyle: AppTextStyle.heading1.copyWith(
+              fontSize: 12,
+              color: Colors.white,
+            ),
+            onPressed: () {},
           ),
         );
 
@@ -35,8 +43,54 @@ class ComponentBadgets extends StatelessWidget {
           height: 32,
           width: 60,
           child: AppGradientButtonRed(
-            text: "Alfa", textStyle: AppTextStyle.heading1.copyWith(fontSize: 12, color: Colors.white),
+            text: "Alfa",
+            textStyle: AppTextStyle.heading1.copyWith(
+              fontSize: 12,
+              color: Colors.white,
+            ),
             onPressed: () {}, // read-only
+          ),
+        );
+
+      case 'pending':
+        return SizedBox(
+          height: 32,
+          width: 70,
+          child: AppGradientButtonYellow(
+            text: "Pending",
+            textStyle: AppTextStyle.normal.copyWith(
+              color: Colors.white,
+              fontSize: 10,
+            ),
+            onPressed: () {},
+          ),
+        );
+
+      case 'approved':
+        return SizedBox(
+          height: 32,
+          width: 60,
+          child: AppGradientButtonGreen(
+            text: "Approved",
+            textStyle: AppTextStyle.heading1.copyWith(
+              fontSize: 12,
+              color: Colors.white,
+            ),
+            onPressed: () {},
+          ),
+        );
+
+      case 'rejected':
+        return SizedBox(
+          height: 32,
+          width: 60,
+          child: AppGradientButtonRed(
+            text: "Rejected",
+            textStyle: AppTextStyle.heading1.copyWith(
+              fontSize: 12,
+              color: Colors.white,
+            ),
+            onPressed: () {},
           ),
         );
 
@@ -81,4 +135,3 @@ Color statusColor(String status) {
 String statusText(String status) {
   return status.toUpperCase();
 }
-

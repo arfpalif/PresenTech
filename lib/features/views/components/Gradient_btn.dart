@@ -21,8 +21,8 @@ class AppGradientButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = gradientColors ?? 
-      [AppColors.colorPrimary, AppColors.colorSecondary];
+    final colors =
+        gradientColors ?? [AppColors.colorPrimary, AppColors.colorSecondary];
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool bounded = constraints.hasBoundedWidth;
@@ -49,7 +49,9 @@ class AppGradientButton extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
                     text,
-                    style: textStyle ?? AppTextStyle.normal.copyWith(color: Colors.white),
+                    style:
+                        textStyle ??
+                        AppTextStyle.normal.copyWith(color: Colors.white),
                   ),
                 ),
               ),
@@ -74,15 +76,15 @@ class AppGradientButtonGreen extends StatelessWidget {
     required this.text,
     required this.onPressed,
     this.gradientColors,
-    this.borderRadius = 5,  
+    this.borderRadius = 5,
     this.height = 40,
     this.textStyle,
   });
 
   @override
   Widget build(BuildContext context) {
-    final colors = gradientColors ?? 
-      [AppColors.greenPrimary, AppColors.greenSecondary];
+    final colors =
+        gradientColors ?? [AppColors.greenPrimary, AppColors.greenSecondary];
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool bounded = constraints.hasBoundedWidth;
@@ -109,7 +111,9 @@ class AppGradientButtonGreen extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
                     text,
-                    style: textStyle ?? AppTextStyle.normal.copyWith(color: Colors.white),
+                    style:
+                        textStyle ??
+                        AppTextStyle.normal.copyWith(color: Colors.white),
                   ),
                 ),
               ),
@@ -134,15 +138,15 @@ class AppGradientButtonRed extends StatelessWidget {
     required this.text,
     required this.onPressed,
     this.gradientColors,
-    this.borderRadius = 5,  
+    this.borderRadius = 5,
     this.height = 40,
     this.textStyle,
   });
 
   @override
   Widget build(BuildContext context) {
-    final colors = gradientColors ?? 
-      [AppColors.redPrimary, AppColors.redSecondary];
+    final colors =
+        gradientColors ?? [AppColors.redPrimary, AppColors.redSecondary];
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool bounded = constraints.hasBoundedWidth;
@@ -169,7 +173,9 @@ class AppGradientButtonRed extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
                     text,
-                    style: textStyle ?? AppTextStyle.normal.copyWith(color: Colors.white),
+                    style:
+                        textStyle ??
+                        AppTextStyle.normal.copyWith(color: Colors.white),
                   ),
                 ),
               ),
@@ -194,15 +200,15 @@ class AppGradientButtonYellow extends StatelessWidget {
     required this.text,
     required this.onPressed,
     this.gradientColors,
-    this.borderRadius = 5,  
+    this.borderRadius = 5,
     this.height = 40,
     this.textStyle,
   });
 
   @override
   Widget build(BuildContext context) {
-    final colors = gradientColors ?? 
-      [AppColors.redPrimary, AppColors.redSecondary];
+    final colors =
+        gradientColors ?? [AppColors.yellowPrimary, AppColors.yellowSecondary];
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool bounded = constraints.hasBoundedWidth;
@@ -229,7 +235,9 @@ class AppGradientButtonYellow extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
                     text,
-                    style: textStyle ?? AppTextStyle.normal.copyWith(color: Colors.white),
+                    style:
+                        textStyle ??
+                        AppTextStyle.normal.copyWith(color: Colors.white),
                   ),
                 ),
               ),

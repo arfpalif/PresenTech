@@ -1,30 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:get/get.dart';
+import 'package:presentech/features/employee/homepage/controller/navigation_controller.dart';
+import 'package:presentech/features/hrd/location/controller/location_controller.dart';
 import 'package:presentech/features/views/components/Gradient_btn.dart';
 import 'package:presentech/features/views/themes/themes.dart';
 
-class HrdLocation extends StatefulWidget {
+class HrdLocation extends GetView<LocationController> {
   const HrdLocation({super.key});
-
-  @override
-  State<HrdLocation> createState() => _HrdLocationState();
-}
-
-class _HrdLocationState extends State<HrdLocation> {
-  final TextEditingController _taskTitleController = TextEditingController();
-  final TextEditingController _acceptanceController = TextEditingController();
-  String? selectedLevel;
-  String? selectedPriority;
-  MapController mapController = MapController(
-    initPosition: GeoPoint(latitude: 47.4358055, longitude: 8.4737324),
-    areaLimit: BoundingBox(
-      east: 10.4922941,
-      north: 47.8084648,
-      south: 45.817995,
-      west: 5.9559113,
-    ),
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -46,149 +29,138 @@ class _HrdLocationState extends State<HrdLocation> {
           ),
         ),
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
                 height: 300,
-                child: OSMFlutter(
-                  controller: mapController,
-                  onMapIsReady: (isReady) async {
-                    if (isReady) {
-                      await mapController.setZoom(zoomLevel: 15);
-                      await mapController.goToLocation(
-                        GeoPoint(latitude: 47.4358055, longitude: 8.4737324),
-                      );
+                child: GestureDetector(
+                  onLongPress: () async {
+                    final center = await controller.mapController.centerMap;
+                    if (center != null) {
+                      await controller.setMarker(center);
                     }
                   },
-                  osmOption: OSMOption(
-                    userTrackingOption: const UserTrackingOption(
-                      enableTracking: true,
-                      unFollowUser: false,
-                    ),
-                    zoomOption: const ZoomOption(
-                      initZoom: 8,
-                      minZoomLevel: 3,
-                      maxZoomLevel: 19,
-                    ),
-                    userLocationMarker: UserLocationMaker(
-                      personMarker: const MarkerIcon(
-                        icon: Icon(
-                          Icons.location_history_rounded,
-                          color: Colors.red,
-                          size: 48,
+                  child: OSMFlutter(
+                    controller: controller.mapController,
+                    onGeoPointClicked: (GeoPoint point) async {
+                      await controller.setMarker(point);
+                    },
+                    onMapIsReady: (isReady) async {
+                      if (isReady) {
+                        await controller.mapController.setZoom(zoomLevel: 15);
+                      }
+                    },
+                    osmOption: OSMOption(
+                      userTrackingOption: const UserTrackingOption(
+                        enableTracking: false,
+                        unFollowUser: false,
+                      ),
+                      zoomOption: const ZoomOption(
+                        initZoom: 8,
+                        minZoomLevel: 3,
+                        maxZoomLevel: 19,
+                      ),
+                      userLocationMarker: UserLocationMaker(
+                        personMarker: const MarkerIcon(
+                          icon: Icon(
+                            Icons.location_history_rounded,
+                            color: Colors.red,
+                            size: 48,
+                          ),
+                        ),
+                        directionArrowMarker: const MarkerIcon(
+                          icon: Icon(Icons.double_arrow, size: 48),
                         ),
                       ),
-                      directionArrowMarker: const MarkerIcon(
-                        icon: Icon(Icons.double_arrow, size: 48),
+                      roadConfiguration: const RoadOption(
+                        roadColor: Colors.yellowAccent,
                       ),
-                    ),
-                    roadConfiguration: const RoadOption(
-                      roadColor: Colors.yellowAccent,
+                      showZoomController: true,
                     ),
                   ),
                 ),
               ),
-              Text("Location name", style: AppTextStyle.heading1),
+              const SizedBox(height: 20),
               TextField(
-                keyboardType: TextInputType.emailAddress,
-                controller: _taskTitleController,
-                obscureText: false,
-                decoration: InputDecoration(prefixIcon: Icon(Icons.email)),
+                style: AppTextStyle.normal,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                controller: controller.latitudeController,
+                decoration: InputDecoration(
+                  labelText: "Latitude",
+                  hintStyle: AppTextStyle.normal,
+                  prefixIcon: const Icon(Icons.roundabout_right),
+                ),
               ),
-              Text("Address", style: AppTextStyle.heading1),
+              const SizedBox(height: 20),
               TextField(
-                keyboardType: TextInputType.emailAddress,
-                controller: _taskTitleController,
-                obscureText: false,
-                decoration: InputDecoration(prefixIcon: Icon(Icons.email)),
+                style: AppTextStyle.normal,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                controller: controller.longitudeController,
+                decoration: InputDecoration(
+                  labelText: "Longitude",
+                  hintStyle: AppTextStyle.normal,
+                  prefixIcon: const Icon(Icons.roundabout_left),
+                ),
               ),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text("Level", style: AppTextStyle.heading1),
-                        ),
-                        DropdownButton<String>(
-                          value: selectedLevel,
-                          hint: const Text("Level"),
-                          isExpanded: true,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedLevel = newValue;
-                            });
-                          },
-                          items: [
-                            DropdownMenuItem(
-                              value: "easy",
-                              child: Text("easy"),
-                            ),
-                            DropdownMenuItem(
-                              value: "medium",
-                              child: Text("medium"),
-                            ),
-                            DropdownMenuItem(
-                              value: "hard",
-                              child: Text("hard"),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text("Priority", style: AppTextStyle.heading1),
-                        ),
-                        DropdownButton<String>(
-                          value: selectedPriority,
-                          hint: const Text("Priority"),
-                          isExpanded: true,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedPriority = newValue;
-                            });
-                          },
-                          items: [
-                            DropdownMenuItem(
-                              value: "high",
-                              child: Text("high"),
-                            ),
-                            DropdownMenuItem(
-                              value: "medium",
-                              child: Text("medium"),
-                            ),
-                            DropdownMenuItem(value: "low", child: Text("low")),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              Text("Acceptance criteria", style: AppTextStyle.heading1),
+              const SizedBox(height: 20),
               TextField(
+                style: AppTextStyle.normal,
                 keyboardType: TextInputType.text,
-                controller: _acceptanceController,
-                obscureText: false,
-                decoration: InputDecoration(prefixIcon: Icon(Icons.email)),
+                controller: controller.addressController,
+                decoration: InputDecoration(
+                  labelText: "Address",
+                  hintStyle: AppTextStyle.normal,
+                  prefixIcon: const Icon(Icons.location_on),
+                ),
               ),
-              SizedBox(height: 10),
-              AppGradientButton(text: "Submit", onPressed: () {}),
+              const SizedBox(height: 20),
+              TextField(
+                style: AppTextStyle.normal,
+                keyboardType: TextInputType.text,
+                controller: controller.officeNameController,
+                decoration: InputDecoration(
+                  labelText: "Office name",
+                  hintStyle: AppTextStyle.normal,
+                  prefixIcon: const Icon(Icons.local_post_office),
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                style: AppTextStyle.normal,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                controller: controller.radiusController,
+                decoration: InputDecoration(
+                  labelText: "Absence radius",
+                  hintStyle: AppTextStyle.normal,
+                  prefixIcon: const Icon(Icons.rule),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Obx(() {
+                final saving = controller.isSaving.value;
+                return AppGradientButton(
+                  text: saving ? "Saving..." : "Submit",
+                  onPressed: saving
+                      ? () {}
+                      : () async {
+                          final success = await controller.submitLocation();
+                          if (success) {
+                            Get.find<NavigationController>().changePage(0);
+                          }
+                        },
+                );
+              }),
             ],
           ),
         ),

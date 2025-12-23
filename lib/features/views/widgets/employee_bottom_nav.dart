@@ -3,19 +3,26 @@ import 'package:get/get.dart';
 import 'package:presentech/features/employee/homepage/controller/navigation_controller.dart';
 import 'package:presentech/features/employee/homepage/view/employee_homepage.dart';
 import 'package:presentech/features/employee/permissions/view/employee_permission.dart';
-import 'package:presentech/features/employee/reports/view/employee_reports.dart';
+import 'package:presentech/features/employee/tasks/controller/employee_task_controller.dart';
+import 'package:presentech/features/employee/settings/controller/employee_setting_controller.dart';
 import 'package:presentech/features/employee/settings/view/employee_settings.dart';
+import 'package:presentech/features/employee/tasks/view/employee_task.dart';
+import 'package:presentech/features/views/themes/themes.dart';
 
 class EmployeeBottomNav extends StatelessWidget {
-  EmployeeBottomNav({super.key});
+  EmployeeBottomNav({super.key}) {
+    // Pastikan controller sudah tersedia saat widget pertama kali dibuat
+    Get.lazyPut(() => EmployeeSettingController(), fenix: true);
+    Get.lazyPut(() => EmployeeTaskController(), fenix: true);
+  }
 
   final NavigationController navC = Get.find<NavigationController>();
 
   final List<Widget> pages = [
-    EmployeeHomepage(),
-    const EmployeeReports(),
-    const EmployeeSettings(),
+    const EmployeeHomepage(),
     const EmployeePermission(),
+    const EmployeeTask(),
+    const EmployeeSettings(),
   ];
 
   @override
@@ -29,21 +36,18 @@ class EmployeeBottomNav extends StatelessWidget {
           currentIndex: navC.currentIndex.value,
           onTap: navC.changePage,
           backgroundColor: Colors.white,
-          selectedItemColor: Colors.blue,
+          selectedItemColor: AppColors.colorSecondary,
           unselectedItemColor: Colors.grey,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart),
-              label: 'Reports',
+              icon: Icon(Icons.date_range),
+              label: 'Permission',
             ),
+            BottomNavigationBarItem(icon: Icon(Icons.task), label: 'Tasks'),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),
               label: 'Pengaturan',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart),
-              label: 'Permission',
             ),
           ],
         ),

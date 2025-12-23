@@ -6,6 +6,7 @@ class FilterButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const FilterButton({
+    super.key,
     required this.title,
     required this.isActive,
     required this.onTap,
@@ -16,10 +17,7 @@ class FilterButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 8,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isActive ? Colors.blue : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(20),

@@ -7,7 +7,11 @@ enum AbsenceFilter { today, week, month }
 class HrdEmployeeController extends GetxController {
   final supabase = Supabase.instance.client;
   var statusAbsen = "".obs;
-  var selectedFilter = Rxn<AbsenceFilter>();
+  var profileUrl = "".obs;
+  var name = "".obs;
+
+  var filteredEmployees = <Employee>[].obs;
+  var searchQuery = ''.obs;
 
   RxList<Employee> employees = <Employee>[].obs;
   RxBool isLoading = false.obs;
@@ -16,30 +20,6 @@ class HrdEmployeeController extends GetxController {
   void onInit() {
     super.onInit();
     fetchEmployees();
-  }
-
-  Future<Map<String, dynamic>> getOffice() async {
-    final user = await supabase.from("users").select("office_id").maybeSingle();
-
-    final officeId = user?['office_id'];
-
-    if (user == null || officeId == null) {
-      Get.snackbar("Error", "User tidak termasuk dalam office apapun");
-      throw Exception("User dont have office");
-    }
-
-    final office = await supabase
-        .from("offices")
-        .select()
-        .eq("id", officeId)
-        .maybeSingle();
-    print("office row => $office");
-
-    if (office == null) {
-      Get.snackbar("Error", "Tidak ada office");
-      throw Exception("Error");
-    }
-    return office;
   }
 
   Future<void> fetchEmployees() async {
@@ -53,9 +33,28 @@ class HrdEmployeeController extends GetxController {
           .toList();
 
       print("Employees fetched: ${employees.length}");
+      filteredEmployees.assignAll(employees);
     } catch (e) {
       print("Error fetch employees: $e");
       print("Employees fetched: ${employees.length}");
     } finally {}
+  }
+
+  void searchEmployee(String query) {
+    searchQuery.value = query;
+
+    if (query.isEmpty) {
+      filteredEmployees.assignAll(employees);
+    } else {
+      filteredEmployees.assignAll(
+        employees
+            .where(
+              (e) =>
+                  e.name.toLowerCase().contains(query.toLowerCase()) ||
+                  e.role.toLowerCase().contains(query.toLowerCase()),
+            )
+            .toList(),
+      );
+    }
   }
 }

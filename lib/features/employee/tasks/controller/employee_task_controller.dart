@@ -15,6 +15,12 @@ class EmployeeTaskController extends GetxController {
   RxList<Task> tasks = <Task>[].obs;
   RxBool isLoading = false.obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    fetchTasks();
+  }
+
   void pickStartDate(BuildContext context) async {
     final picked = await showDatePicker(
       context: context,
@@ -45,26 +51,39 @@ class EmployeeTaskController extends GetxController {
 
   Future<void> fetchTasks() async {
     try {
+      isLoading.value = true;
 
       final response = await _supabase
           .from('tasks')
           .select()
           .order('id', ascending: false);
 
-      tasks.value = response
-          .map<Task>((item) => Task.fromJson(item))
-          .toList();
-      
+      tasks.value = response.map<Task>((item) => Task.fromJson(item)).toList();
     } catch (e) {
       print("Error fetchTasks: $e");
     } finally {
+      isLoading.value = false;
     }
   }
 
   Future<bool> insertTask(Task task) async {
     try {
       await _supabase.from('tasks').insert(task.toInsertJson());
-      await fetchTasks(); 
+      await fetchTasks();
+      return true;
+    } catch (e) {
+      print("Error insertTask: $e");
+      return false;
+    }
+  }
+
+  Future<bool> updateTask(Task task) async {
+    try {
+      await _supabase
+          .from('tasks')
+          .update(task.toInsertJson())
+          .eq('id', task.id!);
+      await fetchTasks();
       return true;
     } catch (e) {
       print("Error insertTask: $e");
@@ -76,6 +95,7 @@ class EmployeeTaskController extends GetxController {
     try {
       await _supabase.from('tasks').delete().eq('id', id);
       tasks.removeWhere((t) => t.id == id);
+      Get.snackbar("Success", "Task berhasil dihapus");
       return true;
     } catch (e) {
       print("Error deleteTask: $e");

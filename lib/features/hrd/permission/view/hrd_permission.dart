@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/features/employee/permissions/models/permission_filter.dart';
 import 'package:presentech/features/hrd/permission/controller/hrd_permission_controller.dart';
-import 'package:presentech/features/hrd/permission/model/permission.dart';
-import 'package:presentech/features/views/components/Gradient_btn.dart';
-import 'package:presentech/features/views/components/component_badgets.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/shared/view/components/Gradient_btn.dart';
+import 'package:presentech/shared/view/components/component_badgets.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
 class HrdPermission extends GetView<HrdPermissionController> {
   @override
@@ -120,7 +119,8 @@ class HrdPermission extends GetView<HrdPermissionController> {
                             Padding(
                               padding: const EdgeInsets.all(10),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Expanded(
                                     child: AppGradientButtonRed(

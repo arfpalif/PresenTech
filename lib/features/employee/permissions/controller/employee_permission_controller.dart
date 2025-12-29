@@ -6,9 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EmployeePermissionController extends GetxController {
   final supabase = Supabase.instance.client;
-
   var filteredEmployees;
-
   var selectedFilter = Rxn<PermissionFilter>();
 
   Object? statusAbsen;
@@ -16,6 +14,11 @@ class EmployeePermissionController extends GetxController {
   RxBool isLoading = false.obs;
 
   RxList<Permission> permissions = <Permission>[].obs;
+  @override
+  void onInit() {
+    super.onInit();
+    getPermission();
+  }
 
   Future<void> getPermission() async {
     final response = await supabase

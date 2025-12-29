@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/employee/tasks/controller/employee_task_controller.dart';
-import 'package:presentech/features/employee/tasks/view/employee_add_task.dart';
-import 'package:presentech/features/employee/tasks/view/employee_task_detail.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
 class EmployeeTask extends GetView<EmployeeTaskController> {
   const EmployeeTask({super.key});
@@ -34,7 +33,7 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
         foregroundColor: Colors.white,
         backgroundColor: AppColors.colorSecondary,
         onPressed: () {
-          Get.to(() => const EmployeeAddTask());
+          Get.toNamed(Routes.employee_task_add);
         },
         child: const Icon(Icons.add),
       ),
@@ -62,7 +61,7 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
                   margin: const EdgeInsets.only(bottom: 15),
                   child: ListTile(
                     onTap: () {
-                      Get.to(() => const EmployeeTaskDetail(), arguments: t);
+                      Get.toNamed(Routes.employee_task_detail, arguments: t);
                     },
                     contentPadding: const EdgeInsets.all(10),
                     title: Text(

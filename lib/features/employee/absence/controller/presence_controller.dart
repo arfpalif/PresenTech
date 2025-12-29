@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:geolocator/geolocator.dart';
-import 'package:presentech/features/employee/absence/model/absence.dart';
+import 'package:presentech/shared/models/absence.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +22,7 @@ class PresenceController extends GetxController {
     super.onInit();
     getTodayAbsence();
     checkTodayAbsence();
+    fetchAbsence();
   }
 
   Future<Map<String, dynamic>?> getTodayAbsence() async {
@@ -287,18 +288,23 @@ class PresenceController extends GetxController {
     }
 
     try {
+      isLoading.value = true;
       final response = await supabase
           .from('absences')
           .select()
           .eq('user_id', userId)
           .order('created_at', ascending: false);
-      print(userId);
+      print("Fetch Absence Response: $response");
       absences.value = response
           .map<Absence>((item) => Absence.fromJson(item))
           .toList();
+      print("Absences loaded: ${absences.length} items");
     } catch (e) {
       print("Error fetch Absence: $e");
-    } finally {}
+      Get.snackbar("Error", "Gagal fetch absensi: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void changeFilter(AbsenceFilter filter) {

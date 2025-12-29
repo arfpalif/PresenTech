@@ -2,20 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:presentech/features/employee/absence/controller/presence_controller.dart';
-import 'package:presentech/features/views/components/component_badgets.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/shared/view/components/component_badgets.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
-class AbsenceList extends StatefulWidget {
-  const AbsenceList({super.key});
+class AbsenceList extends GetView<PresenceController> {
+  AbsenceList({super.key});
 
-  @override
-  State<AbsenceList> createState() => _AbsenceListState();
-}
-
-class _AbsenceListState extends State<AbsenceList> {
-  final PresenceController pc = Get.put(PresenceController());
-  bool isSelectedWeek = false;
-  bool isSelectedToday = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,20 +28,23 @@ class _AbsenceListState extends State<AbsenceList> {
                   Obx(
                     () => FilterChip(
                       label: Text("Today"),
-                      selected: pc.selectedFilter.value == AbsenceFilter.today,
+                      selected:
+                          controller.selectedFilter.value ==
+                          AbsenceFilter.today,
                       onSelected: (bool value) {
-                        pc.changeFilter(AbsenceFilter.today);
+                        controller.changeFilter(AbsenceFilter.today);
                         print("Hari ini");
-                        print(pc.statusAbsen);
+                        print(controller.statusAbsen);
                       },
                     ),
                   ),
                   Obx(
                     () => FilterChip(
                       label: Text("This weeks"),
-                      selected: pc.selectedFilter.value == AbsenceFilter.week,
+                      selected:
+                          controller.selectedFilter.value == AbsenceFilter.week,
                       onSelected: (bool value) {
-                        pc.changeFilter(AbsenceFilter.week);
+                        controller.changeFilter(AbsenceFilter.week);
                         print("Seminggu");
                       },
                     ),
@@ -57,9 +52,11 @@ class _AbsenceListState extends State<AbsenceList> {
                   Obx(
                     () => FilterChip(
                       label: Text("This month"),
-                      selected: pc.selectedFilter.value == AbsenceFilter.month,
+                      selected:
+                          controller.selectedFilter.value ==
+                          AbsenceFilter.month,
                       onSelected: (bool value) {
-                        pc.changeFilter(AbsenceFilter.month);
+                        controller.changeFilter(AbsenceFilter.month);
                         print("Sebulan");
                       },
                     ),
@@ -68,20 +65,20 @@ class _AbsenceListState extends State<AbsenceList> {
               ),
               SizedBox(height: 10),
               Obx(() {
-                if (pc.isLoading.value) {
+                if (controller.isLoading.value) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                if (pc.absences.isEmpty) {
+                if (controller.absences.isEmpty) {
                   return const Text("Belum ada absensi");
                 }
 
                 return ListView.builder(
-                  itemCount: pc.absences.length,
+                  itemCount: controller.absences.length,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
-                    final t = pc.absences[index];
+                    final t = controller.absences[index];
                     return Card(
                       shadowColor: Colors.transparent,
                       color: AppColors.greyprimary,

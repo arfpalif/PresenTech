@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:presentech/features/employee/auth/controller/auth_controller.dart';
-import 'package:presentech/features/employee/auth/view/loginpage.dart';
+import 'package:presentech/features/auth/controller/auth_controller.dart';
+import 'package:presentech/features/auth/view/loginpage.dart';
 import 'package:presentech/features/employee/settings/model/user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

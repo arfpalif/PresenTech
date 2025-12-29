@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/features/hrd/permission/controller/hrd_permission_controller.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
-class EmployeePermissionDetail extends StatefulWidget {
-  const EmployeePermissionDetail({super.key});
-
-  @override
-  State<EmployeePermissionDetail> createState() =>
-      _EmployeePermissionDetailState();
-}
-
-class _EmployeePermissionDetailState extends State<EmployeePermissionDetail> {
+class EmployeePermissionDetail extends GetView<HrdPermissionController> {
   final permission = Get.arguments;
 
   @override

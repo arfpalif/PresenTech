@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/configs/binding/initial_binding.dart';
-import 'package:presentech/features/employee/auth/controller/auth_controller.dart';
-import 'package:presentech/features/employee/auth/controller/auth_gate.dart';
-import 'package:presentech/features/employee/homepage/controller/navigation_controller.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/configs/pages/app_pages.dart';
+import 'package:presentech/features/auth/controller/auth_controller.dart';
+import 'package:presentech/features/auth/controller/auth_gate.dart';
+import 'package:presentech/shared/controllers/navigation_controller.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Flutter Demo',
-      initialBinding: InitialBinding(),
+      getPages: [...AppPages.pages],
       theme: ThemeData(
         // This is the theme of your application.
         //

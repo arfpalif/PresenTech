@@ -1,31 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/features/employee/tasks/controller/date_controller.dart';
 import 'package:presentech/features/employee/tasks/controller/employee_task_controller.dart';
-import 'package:presentech/features/employee/tasks/model/tasks.dart';
-import 'package:presentech/features/views/components/Gradient_btn.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/shared/models/tasks.dart';
+import 'package:presentech/shared/view/components/Gradient_btn.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
-class EmployeeAddTask extends StatefulWidget {
-  const EmployeeAddTask({super.key});
-
-  @override
-  State<EmployeeAddTask> createState() => _EmployeeAddTaskState();
-}
-
-class _EmployeeAddTaskState extends State<EmployeeAddTask> {
+class EmployeeAddTask extends GetView<EmployeeTaskController> {
   final _taskTitleController = TextEditingController();
   final _acceptanceController = TextEditingController();
-  final _dateController = Get.put(DateController());
-  final _taskController = Get.put(EmployeeTaskController());
 
   String? selectedLevel;
   String? selectedPriority;
 
+  EmployeeAddTask({super.key});
+
   void submitForm() async {
     if (_acceptanceController.text.isEmpty ||
-        _dateController.startDateController.text.isEmpty ||
-        _dateController.endDateController.text.isEmpty ||
+        controller.startDateController.text.isEmpty ||
+        controller.endDateController.text.isEmpty ||
         selectedLevel == null ||
         selectedPriority == null) {
       Get.snackbar("Error", "Harap isi semua field");
@@ -45,15 +37,15 @@ class _EmployeeAddTaskState extends State<EmployeeAddTask> {
       }
     }
 
-    final start = parseDate(_dateController.startDateController.text);
-    final end = parseDate(_dateController.endDateController.text);
+    final start = parseDate(controller.startDateController.text);
+    final end = parseDate(controller.endDateController.text);
 
     if (start == null || end == null) {
       Get.snackbar("Error", "Format tanggal tidak valid");
       return;
     }
 
-    final newTask = Task(
+    final newTask = Tasks(
       createdAt: DateTime.now().toIso8601String(),
       acceptanceCriteria: _acceptanceController.text,
       startDate: start,
@@ -61,9 +53,10 @@ class _EmployeeAddTaskState extends State<EmployeeAddTask> {
       priority: selectedPriority!,
       level: selectedLevel!,
       title: _taskTitleController.text,
+      userId: controller.userId!,
     );
 
-    final success = await _taskController.insertTask(newTask);
+    final success = await controller.insertTask(newTask);
 
     if (success) {
       Get.back();
@@ -103,25 +96,25 @@ class _EmployeeAddTaskState extends State<EmployeeAddTask> {
               TextField(
                 style: AppTextStyle.normal,
                 readOnly: true,
-                controller: _dateController.startDateController,
+                controller: controller.startDateController,
                 obscureText: false,
                 decoration: InputDecoration(
                   labelText: "Start Date",
                   prefixIcon: Icon(Icons.calendar_month),
                 ),
-                onTap: () => _dateController.pickStartDate(context),
+                onTap: () => controller.pickStartDate(context),
               ),
               SizedBox(height: 10),
               TextField(
                 style: AppTextStyle.normal,
                 readOnly: true,
-                controller: _dateController.endDateController,
+                controller: controller.endDateController,
                 obscureText: false,
                 decoration: InputDecoration(
                   labelText: "End Date",
                   prefixIcon: Icon(Icons.calendar_month),
                 ),
-                onTap: () => _dateController.pickEndDate(context),
+                onTap: () => controller.pickEndDate(context),
               ),
               SizedBox(height: 10),
               Row(
@@ -139,9 +132,7 @@ class _EmployeeAddTaskState extends State<EmployeeAddTask> {
                           hint: const Text("Level"),
                           isExpanded: true,
                           onChanged: (String? newValue) {
-                            setState(() {
-                              selectedLevel = newValue;
-                            });
+                            selectedLevel = selectedLevel;
                           },
                           items: [
                             DropdownMenuItem(
@@ -174,9 +165,7 @@ class _EmployeeAddTaskState extends State<EmployeeAddTask> {
                           hint: const Text("Priority"),
                           isExpanded: true,
                           onChanged: (String? newValue) {
-                            setState(() {
-                              selectedPriority = newValue;
-                            });
+                            selectedPriority = selectedPriority;
                           },
                           items: [
                             DropdownMenuItem(

@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/features/employee/tasks/model/tasks.dart';
+import 'package:presentech/shared/models/tasks.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EmployeeTaskController extends GetxController {
   final _supabase = Supabase.instance.client;
   final titleController = TextEditingController();
   final acceptanceController = TextEditingController();
+  final userId = Supabase.instance.client.auth.currentUser?.id;
 
   final startDateController = TextEditingController();
   final endDateController = TextEditingController();
   final selectedDate = Rx<DateTime?>(null);
 
-  RxList<Task> tasks = <Task>[].obs;
+  RxList<Tasks> tasks = <Tasks>[].obs;
   RxBool isLoading = false.obs;
 
   @override
@@ -58,7 +59,7 @@ class EmployeeTaskController extends GetxController {
           .select()
           .order('id', ascending: false);
 
-      tasks.value = response.map<Task>((item) => Task.fromJson(item)).toList();
+      tasks.value = response.map<Tasks>((item) => Tasks.fromMap(item)).toList();
     } catch (e) {
       print("Error fetchTasks: $e");
     } finally {
@@ -66,9 +67,9 @@ class EmployeeTaskController extends GetxController {
     }
   }
 
-  Future<bool> insertTask(Task task) async {
+  Future<bool> insertTask(Tasks task) async {
     try {
-      await _supabase.from('tasks').insert(task.toInsertJson());
+      await _supabase.from('tasks').insert(task.toMap());
       await fetchTasks();
       return true;
     } catch (e) {
@@ -77,12 +78,9 @@ class EmployeeTaskController extends GetxController {
     }
   }
 
-  Future<bool> updateTask(Task task) async {
+  Future<bool> updateTask(Tasks task) async {
     try {
-      await _supabase
-          .from('tasks')
-          .update(task.toInsertJson())
-          .eq('id', task.id!);
+      await _supabase.from('tasks').update(task.toMap()).eq('id', task.id!);
       await fetchTasks();
       return true;
     } catch (e) {

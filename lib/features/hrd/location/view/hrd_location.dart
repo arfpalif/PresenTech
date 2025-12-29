@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:get/get.dart';
-import 'package:presentech/features/employee/homepage/controller/navigation_controller.dart';
 import 'package:presentech/features/hrd/location/controller/location_controller.dart';
-import 'package:presentech/features/views/components/Gradient_btn.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/configs/routes/app_routes.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
 class HrdLocation extends GetView<LocationController> {
   const HrdLocation({super.key});
@@ -29,136 +27,110 @@ class HrdLocation extends GetView<LocationController> {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        foregroundColor: Colors.white,
+        backgroundColor: AppColors.colorSecondary,
+        onPressed: () {
+          Get.toNamed(Routes.hrd_add_location);
+        },
+        child: const Icon(Icons.add),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 300,
-                child: GestureDetector(
-                  onLongPress: () async {
-                    final center = await controller.mapController.centerMap;
-                    if (center != null) {
-                      await controller.setMarker(center);
-                    }
-                  },
-                  child: OSMFlutter(
-                    controller: controller.mapController,
-                    onGeoPointClicked: (GeoPoint point) async {
-                      await controller.setMarker(point);
-                    },
-                    onMapIsReady: (isReady) async {
-                      if (isReady) {
-                        await controller.mapController.setZoom(zoomLevel: 15);
-                      }
-                    },
-                    osmOption: OSMOption(
-                      userTrackingOption: const UserTrackingOption(
-                        enableTracking: false,
-                        unFollowUser: false,
-                      ),
-                      zoomOption: const ZoomOption(
-                        initZoom: 8,
-                        minZoomLevel: 3,
-                        maxZoomLevel: 19,
-                      ),
-                      userLocationMarker: UserLocationMaker(
-                        personMarker: const MarkerIcon(
-                          icon: Icon(
-                            Icons.location_history_rounded,
-                            color: Colors.red,
-                            size: 48,
+              Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (controller.offices.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 40),
+                        Icon(
+                          Icons.location_off,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "Belum ada lokasi",
+                          style: AppTextStyle.heading2.copyWith(
+                            color: Colors.grey[600],
                           ),
                         ),
-                        directionArrowMarker: const MarkerIcon(
-                          icon: Icon(Icons.double_arrow, size: 48),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Tekan tombol refresh untuk memuat data",
+                          style: AppTextStyle.normal.copyWith(
+                            color: Colors.grey[500],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            controller.fetchOffices();
+                          },
+                          icon: const Icon(Icons.refresh),
+                          label: const Text("Refresh"),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  itemCount: controller.offices.length,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    final office = controller.offices[index];
+                    return Card(
+                      shadowColor: Colors.transparent,
+                      color: AppColors.greyprimary,
+                      margin: const EdgeInsets.only(bottom: 15),
+                      child: ListTile(
+                        onTap: () {
+                          Get.toNamed(
+                            Routes.hrd_location_detail,
+                            arguments: office,
+                          );
+                        },
+                        contentPadding: const EdgeInsets.all(10),
+                        title: Text(
+                          office.name,
+                          style: AppTextStyle.heading2.copyWith(
+                            color: Colors.black,
+                          ),
+                        ),
+                        subtitle: Text(
+                          "${office.address}\nRadius: ${office.radius} meter",
+                          style: AppTextStyle.normal.copyWith(
+                            color: Colors.grey,
+                          ),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              "Lat: ${office.latitude.toStringAsFixed(4)}",
+                              style: AppTextStyle.normal,
+                            ),
+                            Text(
+                              "Lng: ${office.longitude.toStringAsFixed(4)}",
+                              style: AppTextStyle.normal,
+                            ),
+                          ],
                         ),
                       ),
-                      roadConfiguration: const RoadOption(
-                        roadColor: Colors.yellowAccent,
-                      ),
-                      showZoomController: true,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                style: AppTextStyle.normal,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                controller: controller.latitudeController,
-                decoration: InputDecoration(
-                  labelText: "Latitude",
-                  hintStyle: AppTextStyle.normal,
-                  prefixIcon: const Icon(Icons.roundabout_right),
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                style: AppTextStyle.normal,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                controller: controller.longitudeController,
-                decoration: InputDecoration(
-                  labelText: "Longitude",
-                  hintStyle: AppTextStyle.normal,
-                  prefixIcon: const Icon(Icons.roundabout_left),
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                style: AppTextStyle.normal,
-                keyboardType: TextInputType.text,
-                controller: controller.addressController,
-                decoration: InputDecoration(
-                  labelText: "Address",
-                  hintStyle: AppTextStyle.normal,
-                  prefixIcon: const Icon(Icons.location_on),
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                style: AppTextStyle.normal,
-                keyboardType: TextInputType.text,
-                controller: controller.officeNameController,
-                decoration: InputDecoration(
-                  labelText: "Office name",
-                  hintStyle: AppTextStyle.normal,
-                  prefixIcon: const Icon(Icons.local_post_office),
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                style: AppTextStyle.normal,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                controller: controller.radiusController,
-                decoration: InputDecoration(
-                  labelText: "Absence radius",
-                  hintStyle: AppTextStyle.normal,
-                  prefixIcon: const Icon(Icons.rule),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Obx(() {
-                final saving = controller.isSaving.value;
-                return AppGradientButton(
-                  text: saving ? "Saving..." : "Submit",
-                  onPressed: saving
-                      ? () {}
-                      : () async {
-                          final success = await controller.submitLocation();
-                          if (success) {
-                            Get.find<NavigationController>().changePage(0);
-                          }
-                        },
+                    );
+                  },
                 );
               }),
             ],

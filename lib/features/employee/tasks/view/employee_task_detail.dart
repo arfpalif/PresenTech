@@ -1,33 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/features/employee/tasks/controller/date_controller.dart';
 import 'package:presentech/features/employee/tasks/controller/employee_task_controller.dart';
-import 'package:presentech/features/employee/tasks/model/tasks.dart';
-import 'package:presentech/features/views/components/Gradient_btn.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/shared/controllers/date_controller.dart';
+import 'package:presentech/shared/models/tasks.dart';
+import 'package:presentech/shared/view/components/Gradient_btn.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
-class EmployeeTaskDetail extends StatefulWidget {
-  const EmployeeTaskDetail({super.key});
-
-  @override
-  State<EmployeeTaskDetail> createState() => _EmployeeTaskDetailState();
-}
-
-class _EmployeeTaskDetailState extends State<EmployeeTaskDetail> {
+class EmployeeTaskDetail extends GetView<EmployeeTaskController> {
   final _taskTitleController = TextEditingController();
   final _acceptanceController = TextEditingController();
-  final _dateController = Get.put(DateController());
-  final _taskController = Get.put(EmployeeTaskController());
+  final _dateController = Get.find<DateController>();
+  final _taskController = Get.find<EmployeeTaskController>();
 
   String? selectedLevel;
   String? selectedPriority;
 
-  late final Task task;
-
-  @override
-  void initState() {
-    super.initState();
-    task = Get.arguments as Task;
+  late final Tasks task;
+  EmployeeTaskDetail({super.key}) {
+    task = Get.arguments as Tasks;
     _taskTitleController.text = task.title;
     _acceptanceController.text = task.acceptanceCriteria;
     _dateController.startDateController.text =
@@ -69,7 +59,7 @@ class _EmployeeTaskDetailState extends State<EmployeeTaskDetail> {
       return;
     }
 
-    final newTask = Task(
+    final newTask = Tasks(
       createdAt: task.createdAt,
       acceptanceCriteria: _acceptanceController.text,
       startDate: start,
@@ -78,6 +68,7 @@ class _EmployeeTaskDetailState extends State<EmployeeTaskDetail> {
       level: selectedLevel!,
       title: _taskTitleController.text,
       id: task.id,
+      userId: task.userId,
     );
 
     final success = await _taskController.updateTask(newTask);
@@ -156,9 +147,7 @@ class _EmployeeTaskDetailState extends State<EmployeeTaskDetail> {
                           hint: const Text("Level"),
                           isExpanded: true,
                           onChanged: (String? newValue) {
-                            setState(() {
-                              selectedLevel = newValue;
-                            });
+                            selectedLevel = newValue;
                           },
                           items: [
                             DropdownMenuItem(
@@ -191,9 +180,7 @@ class _EmployeeTaskDetailState extends State<EmployeeTaskDetail> {
                           hint: const Text("Priority"),
                           isExpanded: true,
                           onChanged: (String? newValue) {
-                            setState(() {
-                              selectedPriority = newValue;
-                            });
+                            selectedPriority = newValue;
                           },
                           items: [
                             DropdownMenuItem(

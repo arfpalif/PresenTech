@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:presentech/features/employee/absence/model/absence.dart';
+import 'package:presentech/shared/models/absence.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 enum AbsenceFilter { today, week, month }
@@ -12,13 +12,14 @@ class HrdAttendanceController extends GetxController {
   RxInt hadir = 0.obs;
   RxInt alfa = 0.obs;
 
+  var filteredEmployees;
+
   RxList<Absence> absences = <Absence>[].obs;
   RxBool isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    getTodayAbsence();
     fetchAbsence();
   }
 
@@ -38,7 +39,9 @@ class HrdAttendanceController extends GetxController {
     try {
       final response = await supabase
           .from('absences')
-          .select('id, created_at, date, clock_in, clock_out, status, user_id, users(name)')
+          .select(
+            'id, created_at, date, clock_in, clock_out, status, user_id, users(name)',
+          )
           .order('created_at', ascending: false);
       absences.value = response
           .map<Absence>((item) => Absence.fromJson(item))
@@ -52,7 +55,9 @@ class HrdAttendanceController extends GetxController {
     try {
       final response = await supabase
           .from('absences')
-          .select('id, created_at, date, clock_in, clock_out, status, user_id, users(name)')
+          .select(
+            'id, created_at, date, clock_in, clock_out, status, user_id, users(name)',
+          )
           .order('created_at', ascending: false);
       absences.value = response
           .map<Absence>((item) => Absence.fromJson(item))
@@ -61,15 +66,12 @@ class HrdAttendanceController extends GetxController {
       telat.value = absences
           .where((absence) => absence.status == 'telat')
           .length;
-          
+
       hadir.value = absences
           .where((absence) => absence.status == 'hadir')
           .length;
 
-      alfa.value = absences
-          .where((absence) => absence.status == 'alfa')
-          .length;
-      
+      alfa.value = absences.where((absence) => absence.status == 'alfa').length;
     } catch (e) {
       print("Error fetch Absence: $e");
     } finally {}
@@ -88,14 +90,14 @@ class HrdAttendanceController extends GetxController {
     try {
       isLoading.value = true;
 
-      final userId = supabase.auth.currentUser!.id;
       final now = DateTime.now();
 
       if (selectedFilter.value == null) {
         final response = await supabase
             .from('absences')
-            .select('id, created_at, date, clock_in, clock_out, status, user_id, users(name)')
-            .eq('user_id', userId)
+            .select(
+              'id, created_at, date, clock_in, clock_out, status, user_id, users(name)',
+            )
             .order('created_at', ascending: false);
 
         final data = (response as List)
@@ -107,25 +109,38 @@ class HrdAttendanceController extends GetxController {
       }
 
       late DateTime startDate;
+      late DateTime endDate;
 
       switch (selectedFilter.value!) {
         case AbsenceFilter.today:
           startDate = DateTime(now.year, now.month, now.day);
+          endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
           break;
         case AbsenceFilter.week:
-          startDate = now.subtract(const Duration(days: 7));
+          // Mulai dari Senin minggu ini
+          final weekday = now.weekday; // 1 = Monday, 7 = Sunday
+          startDate = DateTime(
+            now.year,
+            now.month,
+            now.day,
+          ).subtract(Duration(days: weekday - 1));
+          endDate = startDate.add(
+            Duration(days: 6, hours: 23, minutes: 59, seconds: 59),
+          );
           break;
         case AbsenceFilter.month:
           startDate = DateTime(now.year, now.month, 1);
+          endDate = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
           break;
       }
 
       final response = await supabase
           .from('absences')
-          .select('id, created_at, date, clock_in, clock_out, status, user_id, users(name)')
-          .eq('user_id', userId)
-          .gte('created_at', startDate.toIso8601String())
-          .lte('created_at', now.toIso8601String())
+          .select(
+            'id, created_at, date, clock_in, clock_out, status, user_id, users(name)',
+          )
+          .gte('date', startDate.toIso8601String().split('T')[0])
+          .lte('date', endDate.toIso8601String().split('T')[0])
           .order('created_at', ascending: false);
 
       final data = (response as List).map((e) => Absence.fromJson(e)).toList();

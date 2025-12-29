@@ -1,31 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/employee/permissions/controller/employee_permission_controller.dart';
-import 'package:presentech/features/employee/permissions/view/employee_add_permission.dart';
 import 'package:presentech/features/employee/permissions/models/permission_filter.dart';
 import 'package:presentech/features/employee/permissions/models/permission_model.dart';
-import 'package:presentech/features/employee/permissions/view/employee_permission_detail.dart';
-import 'package:presentech/features/views/components/component_badgets.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/shared/view/components/component_badgets.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
-class EmployeePermission extends StatefulWidget {
-  const EmployeePermission({super.key});
-
-  @override
-  State<EmployeePermission> createState() => _EmployeePermissionState();
-}
-
-class _EmployeePermissionState extends State<EmployeePermission> {
-  final EmployeePermissionController controller = Get.put(
-    EmployeePermissionController(),
-  );
+class EmployeePermission extends GetView<EmployeePermissionController> {
   bool isSelectedWeek = false;
   bool isSelectedToday = false;
-  @override
-  void initState() {
-    super.initState();
-    controller.getPermission();
-  }
+
+  EmployeePermission({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +37,7 @@ class _EmployeePermissionState extends State<EmployeePermission> {
         foregroundColor: Colors.white,
         backgroundColor: AppColors.colorSecondary,
         onPressed: () {
-          Get.to(() => const EmployeeAddPermission());
+          Get.toNamed(Routes.employee_permission_add);
         },
         child: const Icon(Icons.add),
       ),
@@ -124,8 +110,8 @@ class _EmployeePermissionState extends State<EmployeePermission> {
                       margin: const EdgeInsets.only(bottom: 15),
                       child: ListTile(
                         onTap: () {
-                          Get.to(
-                            () => const EmployeePermissionDetail(),
+                          Get.toNamed(
+                            Routes.employee_permission_detail,
                             arguments: t,
                           );
                         },

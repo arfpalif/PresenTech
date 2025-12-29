@@ -5,7 +5,6 @@ import 'package:presentech/features/hrd/permission/model/permission.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HrdPermissionController extends GetxController {
-  // Tambahkan variabel dan metode yang diperlukan untuk mengelola izin di sini
   var isLoading = false.obs;
   var name = ''.obs;
   var reason = ''.obs;

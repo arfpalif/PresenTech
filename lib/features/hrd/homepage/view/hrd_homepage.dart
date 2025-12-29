@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:presentech/features/employee/auth/controller/auth_controller.dart';
-import 'package:presentech/features/employee/homepage/controller/navigation_controller.dart';
+import 'package:presentech/configs/routes/app_routes.dart';
+import 'package:presentech/features/auth/controller/auth_controller.dart';
 import 'package:presentech/features/hrd/attendance/controller/hrd_attendance_controller.dart';
 import 'package:presentech/features/hrd/homepage/controller/hrd_homepage_controller.dart';
-import 'package:presentech/features/hrd/tasks/views/hrd_task.dart';
-import 'package:presentech/features/views/components/Gradient_btn.dart';
-import 'package:presentech/features/employee/auth/view/loginpage.dart';
-import 'package:presentech/features/views/components/component_badgets.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/shared/controllers/navigation_controller.dart';
+import 'package:presentech/shared/view/components/Gradient_btn.dart';
+import 'package:presentech/features/auth/view/loginpage.dart';
+import 'package:presentech/shared/view/components/component_badgets.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
 class HrdHomepage extends StatefulWidget {
   const HrdHomepage({super.key});
@@ -20,20 +20,24 @@ class HrdHomepage extends StatefulWidget {
 }
 
 class _HrdHomepageState extends State<HrdHomepage> {
-  final authC = Get.find<AuthController>();
-  final attendaceC = Get.put(HrdAttendanceController());
-  final controller = Get.put(HrdHomepageController());
-  final navController = Get.put(NavigationController());
-
-  void signOut() async {
-    await authC.signOut();
-    Get.offAll(const Loginpage());
-  }
+  late final AuthController authC;
+  late final HrdAttendanceController attendaceC;
+  late final HrdHomepageController controller;
+  late final NavigationController navController;
 
   @override
   void initState() {
     super.initState();
+    authC = Get.find<AuthController>();
+    attendaceC = Get.put(HrdAttendanceController());
+    controller = Get.put(HrdHomepageController());
+    navController = Get.find<NavigationController>();
     controller.getUser();
+  }
+
+  void signOut() async {
+    await authC.signOut();
+    Get.offAll(const Loginpage());
   }
 
   @override
@@ -168,7 +172,7 @@ class _HrdHomepageState extends State<HrdHomepage> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Get.to(HrdTask());
+                              Get.toNamed(Routes.hrd_tasks);
                             },
                             child: Column(
                               children: [
@@ -201,9 +205,25 @@ class _HrdHomepageState extends State<HrdHomepage> {
                         ],
                       ),
                       SizedBox(height: 30),
-                      Text(
-                        "Rekap Absensi Karyawan",
-                        style: AppTextStyle.heading1,
+                      Row(
+                        children: [
+                          Text(
+                            "Rekap Absensi Karyawan",
+                            style: AppTextStyle.heading1,
+                          ),
+                          Spacer(),
+                          GestureDetector(
+                            onTap: () {
+                              Get.toNamed(Routes.HRD_ABSEN);
+                            },
+                            child: Text(
+                              "View All",
+                              style: AppTextStyle.normal.copyWith(
+                                color: AppColors.colorPrimary,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       Obx(() {
                         if (attendaceC.isLoading.value) {
@@ -236,7 +256,7 @@ class _HrdHomepageState extends State<HrdHomepage> {
                                       ),
                                     ),
                                     subtitle: Text(
-                                      "${DateFormat('dd-MM-yyyy').format(t.date)} | Masuk : ${t.clockIn.toString()} keluar : ${t.clockOut.toString()}",
+                                      "${DateFormat('dd-MM-yyyy').format(t.date)} | Masuk : ${t.clockIn != null && t.clockIn.isNotEmpty ? t.clockIn.substring(0, 5) : '-'} | Keluar : ${t.clockOut != null && t.clockOut.isNotEmpty ? t.clockOut.substring(0, 5) : '-'}",
                                       style: AppTextStyle.normal.copyWith(
                                         color: Colors.grey,
                                       ),
@@ -266,8 +286,8 @@ class _HrdHomepageState extends State<HrdHomepage> {
 }
 
 Widget headerSection() {
-  final controller = Get.put(HrdHomepageController());
-  final navController = Get.put(NavigationController());
+  final controller = Get.find<HrdHomepageController>();
+  final navController = Get.find<NavigationController>();
   return Container(
     decoration: const BoxDecoration(
       gradient: LinearGradient(
@@ -295,14 +315,14 @@ Widget headerSection() {
                   Spacer(),
                   GestureDetector(
                     onTap: () {
-                      Get.to(HrdTask());
+                        Get.toNamed(Routes.hrd_tasks);
                     },
                     child: Icon(Icons.help, color: Colors.white),
                   ),
                   SizedBox(width: 10),
                   GestureDetector(
                     onTap: () {
-                      Get.to(HrdTask());
+                        Get.toNamed(Routes.hrd_tasks);
                     },
                     child: Icon(Icons.notifications, color: Colors.white),
                   ),
@@ -348,7 +368,7 @@ Widget headerSection() {
 }
 
 Widget attendanceSummaryCard() {
-  final attendaceC = Get.put(HrdAttendanceController());
+  final attendaceC = Get.find<HrdAttendanceController>();
   return Transform.translate(
     offset: const Offset(0, -50),
     child: Padding(

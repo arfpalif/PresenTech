@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:presentech/features/hrd/profile/controllers/hrd_profile_controller.dart';
-import 'package:presentech/features/views/components/Gradient_btn.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/shared/view/components/Gradient_btn.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
 class HrdProfilePage extends GetView<HrdProfileController> {
   const HrdProfilePage({super.key});

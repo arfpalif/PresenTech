@@ -57,7 +57,6 @@ class Permission {
       return DateTime.now();
     }
 
-    // Normalize to date-only (strip time) for start/end if needed
     DateTime toYmd(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
 
     final created = parseDate(json["created_at"]);
@@ -80,13 +79,11 @@ class Permission {
     "created_at": createdAt.toIso8601String(),
     "type": type.value,
     "reason": reason,
-    // Send as date-only strings (yyyy-MM-dd)
     "start_date": DateFormat('yyyy-MM-dd').format(startDate),
     "end_date": DateFormat('yyyy-MM-dd').format(endDate),
     "user_id": userId,
   };
 
-  // Convenience getters for UI (date-only strings)
   String get createdAtYmd => DateFormat('yyyy-MM-dd').format(createdAt);
   String get startDateYmd => DateFormat('yyyy-MM-dd').format(startDate);
   String get endDateYmd => DateFormat('yyyy-MM-dd').format(endDate);

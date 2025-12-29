@@ -1,21 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:presentech/features/employee/profile/controller/profile_controller.dart';
 import 'package:presentech/features/employee/settings/model/user.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends GetView<ProfileController> {
   const ProfilePage({super.key});
-
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(100),
                               child: Image.network(
-                                user.profilePicture?.isNotEmpty == true
+                                user.profilePicture.isNotEmpty
                                     ? user.profilePicture
                                     : 'https://www.gravatar.com/avatar/?d=mp',
                                 width: 100,
@@ -65,7 +56,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             SizedBox(height: 20),
                             Text(
-                              user.name ?? 'Pengguna',
+                              user.name ?? '-',
                               style: AppTextStyle.heading1,
                             ),
                             SizedBox(height: 10),

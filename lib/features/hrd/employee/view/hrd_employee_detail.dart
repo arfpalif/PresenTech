@@ -3,19 +3,12 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:presentech/features/hrd/employee/controller/hrd_employee_controller.dart';
 import 'package:presentech/features/hrd/employee/controller/hrd_employee_detail_controller.dart';
-import 'package:presentech/features/views/components/Gradient_btn.dart';
-import 'package:presentech/features/views/components/component_badgets.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/features/hrd/location/model/office.dart';
+import 'package:presentech/shared/view/components/Gradient_btn.dart';
+import 'package:presentech/shared/view/components/component_badgets.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
-class HrdEmployeeDetail extends StatefulWidget {
-  const HrdEmployeeDetail({super.key});
-
-  @override
-  State<HrdEmployeeDetail> createState() => _HrdEmployeeDetailState();
-}
-
-class _HrdEmployeeDetailState extends State<HrdEmployeeDetail> {
-  final employeeC = Get.put(HrdEmployeeDetailController());
+class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
   final t = Get.arguments;
   bool isEdit = false;
   final TextEditingController nameController = TextEditingController();
@@ -23,20 +16,6 @@ class _HrdEmployeeDetailState extends State<HrdEmployeeDetail> {
   final TextEditingController roleController = TextEditingController();
   final TextEditingController joinDateController = TextEditingController();
   int? userId;
-
-  @override
-  void initState() {
-    super.initState();
-    if (t != null) {
-      isEdit = true;
-    }
-    if (isEdit) {
-      nameController.text = t.name;
-      emailController.text = t.email;
-      roleController.text = t.role;
-      joinDateController.text = t.createdAt;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +91,85 @@ class _HrdEmployeeDetailState extends State<HrdEmployeeDetail> {
                 ),
               ),
               SizedBox(height: 20),
+              Text("Lokasi Kantor", style: AppTextStyle.heading2),
+              SizedBox(height: 10),
+              Obx(() {
+                if (controller.isLoadingOffices.value) {
+                  return Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
+                if (controller.offices.isEmpty) {
+                  return Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      "Belum ada lokasi kantor tersedia",
+                      style: AppTextStyle.normal.copyWith(color: Colors.grey),
+                    ),
+                  );
+                }
+
+                return Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<Office>(
+                      isExpanded: true,
+                      value: controller.selectedOffice.value,
+                      hint: Text(
+                        "Pilih Lokasi Kantor",
+                        style: AppTextStyle.normal,
+                      ),
+                      items: controller.offices.map((Office office) {
+                        return DropdownMenuItem<Office>(
+                          value: office,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                office.name,
+                                style: AppTextStyle.normal.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                office.address,
+                                style: AppTextStyle.normal.copyWith(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (Office? newValue) {
+                        if (newValue != null) {
+                          controller.selectedOffice.value = newValue;
+                        }
+                      },
+                    ),
+                  ),
+                );
+              }),
+              SizedBox(height: 20),
               TextField(
                 style: AppTextStyle.normal,
                 keyboardType: TextInputType.text,
@@ -126,9 +184,20 @@ class _HrdEmployeeDetailState extends State<HrdEmployeeDetail> {
               AppGradientButton(
                 text: "Submit",
                 onPressed: () async {
-                  final success = await employeeC.updateEmployee(
+                  // Validasi office dipilih
+                  if (controller.selectedOffice.value == null) {
+                    Get.snackbar(
+                      "Error",
+                      "Silakan pilih lokasi kantor",
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                    return;
+                  }
+
+                  final success = await controller.updateEmployee(
                     nameController.text,
                     emailController.text,
+                    controller.selectedOffice.value!.id,
                   );
                   if (success) {
                     final mainController = Get.find<HrdEmployeeController>();
@@ -148,18 +217,18 @@ class _HrdEmployeeDetailState extends State<HrdEmployeeDetail> {
               Text("Riwayat absensi", style: AppTextStyle.heading1),
               SizedBox(height: 10),
               Obx(() {
-                if (employeeC.absences.isEmpty) {
+                if (controller.absences.isEmpty) {
                   return Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text("Tidak ada riwayat absensi"),
                   );
                 }
                 return ListView.builder(
-                  itemCount: employeeC.absences.length,
+                  itemCount: controller.absences.length,
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
                   itemBuilder: (_, index) {
-                    final t = employeeC.absences[index];
+                    final t = controller.absences[index];
                     return Card(
                       shadowColor: Colors.transparent,
                       color: AppColors.greyprimary,
@@ -177,7 +246,7 @@ class _HrdEmployeeDetailState extends State<HrdEmployeeDetail> {
                               ),
                             ),
                             subtitle: Text(
-                              "Masuk : ${t.clockIn.toString()} keluar : ${t.clockOut.toString()}",
+                              "Masuk : ${t.clockIn != null && t.clockIn.isNotEmpty ? t.clockIn.substring(0, 5) : '-'} | Keluar : ${t.clockOut != null && t.clockOut.isNotEmpty ? t.clockOut.substring(0, 5) : '-'}",
                               style: AppTextStyle.normal.copyWith(
                                 color: Colors.grey,
                               ),

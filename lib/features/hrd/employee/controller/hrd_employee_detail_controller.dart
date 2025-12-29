@@ -1,13 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:presentech/features/employee/absence/model/absence.dart';
 import 'package:presentech/features/hrd/employee/models/employee.dart';
+import 'package:presentech/features/hrd/location/model/office.dart';
+import 'package:presentech/shared/models/absence.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HrdEmployeeDetailController extends GetxController {
   final supabase = Supabase.instance.client;
   RxList<Employee> employees = <Employee>[].obs;
   late Employee employee;
+  final RxBool isLoadingOffices = false.obs;
+  final RxList<Office> offices = <Office>[].obs;
+  final Rxn<Office> selectedOffice = Rxn<Office>();
 
   @override
   void onInit() {
@@ -18,8 +22,9 @@ class HrdEmployeeDetailController extends GetxController {
       Get.back();
       return;
     }
-    
+
     employee = args as Employee;
+    fetchOffices();
     fetchAbsences();
   }
 
@@ -56,19 +61,46 @@ class HrdEmployeeDetailController extends GetxController {
     } finally {}
   }
 
-  Future<bool> updateEmployee(String name, String email) async {
+  Future<bool> updateEmployee(String name, String email, int officeId) async {
     try {
       final supabase = Supabase.instance.client;
       await supabase
           .from('users')
-          .update({'name': name, 'email': email})
+          .update({'name': name, 'email': email, 'office_id': officeId})
           .eq('id', employee.id);
-          fetchEmployees();
+      fetchEmployees();
       return true;
-      
     } catch (e) {
       debugPrint('Error updating employee: $e');
       return false;
+    }
+  }
+
+  Future<void> fetchOffices() async {
+    try {
+      isLoadingOffices.value = true;
+      final response = await supabase
+          .from('offices')
+          .select('*')
+          .order('id', ascending: true);
+
+      final data = (response as List)
+          .map<Office>((item) => Office.fromJson(item))
+          .toList();
+      offices.assignAll(data);
+
+      Office? found;
+      for (final offices in offices) {
+        if (offices.id == employee.officeId) {
+          found = offices;
+          break;
+        }
+      }
+      selectedOffice.value = found;
+    } catch (e) {
+      debugPrint('Error fetching offices: $e');
+    } finally {
+      isLoadingOffices.value = false;
     }
   }
 }

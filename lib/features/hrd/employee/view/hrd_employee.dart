@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/hrd/employee/controller/hrd_employee_controller.dart';
-import 'package:presentech/features/hrd/employee/view/hrd_employee_detail.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
 class HrdEmployee extends StatefulWidget {
   const HrdEmployee({super.key});
@@ -12,7 +12,14 @@ class HrdEmployee extends StatefulWidget {
 }
 
 class _HrdEmployeeState extends State<HrdEmployee> {
-  final employeeC = Get.put(HrdEmployeeController());
+  late final HrdEmployeeController employeeC;
+
+  @override
+  void initState() {
+    super.initState();
+    employeeC = Get.find<HrdEmployeeController>();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +95,10 @@ class _HrdEmployeeState extends State<HrdEmployee> {
                           ),
                           trailing: Icon(Icons.arrow_right),
                           onTap: () {
-                            Get.to(HrdEmployeeDetail(), arguments: t);
+                            Get.toNamed(
+                              Routes.hrd_employee_detail,
+                              arguments: t,
+                            );
                           },
                         ),
                       );

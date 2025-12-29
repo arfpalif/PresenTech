@@ -2,41 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/features/employee/permissions/controller/employee_permission_controller.dart';
 import 'package:presentech/features/employee/permissions/models/permission_model.dart';
-import 'package:presentech/features/employee/tasks/controller/date_controller.dart';
-import 'package:presentech/features/views/components/Gradient_btn.dart';
-import 'package:presentech/features/views/themes/themes.dart';
+import 'package:presentech/shared/controllers/date_controller.dart';
+import 'package:presentech/shared/view/components/Gradient_btn.dart';
+import 'package:presentech/shared/view/themes/themes.dart';
 
-class EmployeeAddPermission extends StatefulWidget {
-  const EmployeeAddPermission({super.key});
-
-  @override
-  State<EmployeeAddPermission> createState() => _EmployeeAddPermissionState();
-}
-
-class _EmployeeAddPermissionState extends State<EmployeeAddPermission> {
+class EmployeeAddPermission extends GetView<EmployeePermissionController> {
   final _PermissionTitleController = TextEditingController();
-  final _dateController = Get.put(DateController());
-  final _PermissionController = Get.put(EmployeePermissionController());
+  final _dateController = Get.find<DateController>();
+  final _PermissionController = Get.find<EmployeePermissionController>();
 
-  PermissionType? selectedType;
+  final Rx<PermissionType?> selectedType = Rx<PermissionType?>(null);
 
-  bool isEdit = false;
-  final user = Get.arguments;
+  final bool isEdit;
 
-  @override
-  void initState() {
-    super.initState();
-    isEdit = user != null;
-    if (isEdit) {
-      _PermissionTitleController.text = user.title;
-    }
-  }
+  EmployeeAddPermission({super.key, this.isEdit = false});
 
   void submitForm() async {
     if (_PermissionTitleController.text.isEmpty ||
         _dateController.startDateController.text.isEmpty ||
         _dateController.endDateController.text.isEmpty ||
-        selectedType == null) {
+        selectedType.value == null) {
       Get.snackbar("Error", "Harap isi semua field");
       return;
     }
@@ -66,7 +51,7 @@ class _EmployeeAddPermissionState extends State<EmployeeAddPermission> {
       createdAt: DateTime.now(),
       startDate: start,
       endDate: end,
-      type: selectedType!,
+      type: selectedType.value!,
       reason: _PermissionTitleController.text,
     );
 
@@ -156,13 +141,11 @@ class _EmployeeAddPermissionState extends State<EmployeeAddPermission> {
                     child: Text("Type", style: AppTextStyle.heading1),
                   ),
                   DropdownButton<PermissionType>(
-                    value: selectedType,
+                    value: selectedType.value,
                     hint: const Text("Type"),
                     isExpanded: true,
                     onChanged: (PermissionType? newValue) {
-                      setState(() {
-                        selectedType = newValue;
-                      });
+                      selectedType.value = newValue;
                     },
                     items: [
                       const DropdownMenuItem(

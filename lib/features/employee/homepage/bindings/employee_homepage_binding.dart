@@ -6,8 +6,8 @@ import 'package:presentech/features/employee/tasks/controller/employee_task_cont
 class EmployeeHomepageBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => EmployeeHomepageController());
-    Get.lazyPut(() => PresenceController());
-    Get.lazyPut(() => EmployeeTaskController());
+    Get.put(EmployeeHomepageController());
+    Get.put(PresenceController());
+    Get.put(EmployeeTaskController());
   }
 }

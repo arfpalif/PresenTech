@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/features/employee/permissions/models/permission_filter.dart';
 import 'package:presentech/features/hrd/permission/model/permission.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:presentech/features/hrd/permission/repositories/hrd_permission_repository.dart';
 
 class HrdPermissionController extends GetxController {
+  //repository
+  final permissionRepo = HrdPermissionRepository();
+
+  //variables
   var isLoading = false.obs;
   var name = ''.obs;
   var reason = ''.obs;
@@ -14,7 +18,6 @@ class HrdPermissionController extends GetxController {
 
   var selectedFilter = Rxn<PermissionFilter>();
   final RxList<Permission> permissions = <Permission>[].obs;
-  final supabase = Supabase.instance.client;
 
   @override
   void onInit() {
@@ -24,10 +27,7 @@ class HrdPermissionController extends GetxController {
 
   Future<void> fetchPermissions() async {
     try {
-      final response = await supabase
-          .from('permissions')
-          .select()
-          .order('created_at', ascending: false);
+      final response = await permissionRepo.fetchPermissions();
 
       permissions.assignAll(
         response.map((e) => Permission.fromJson(e)).toList(),
@@ -54,10 +54,7 @@ class HrdPermissionController extends GetxController {
       final now = DateTime.now();
 
       if (selectedFilter.value == null) {
-        final response = await supabase
-            .from('permissions')
-            .select()
-            .order('created_at', ascending: false);
+        final response = await permissionRepo.fetchPermissions();
 
         final data = (response as List)
             .map((e) => Permission.fromJson(e))
@@ -81,12 +78,10 @@ class HrdPermissionController extends GetxController {
           break;
       }
 
-      final response = await supabase
-          .from('permissions')
-          .select()
-          .gte('created_at', startDate.toIso8601String())
-          .lte('created_at', now.toIso8601String())
-          .order('created_at', ascending: false);
+      final response = await permissionRepo.fetchPermissionsByDateRange(
+        startDate,
+        now,
+      );
 
       final data = (response as List)
           .map((e) => Permission.fromJson(e))
@@ -100,29 +95,21 @@ class HrdPermissionController extends GetxController {
 
   Future<void> approvePermission(int permissionId) async {
     try {
-      await supabase
-          .from('permissions')
-          .update({'status': 'approved'})
-          .eq('id', permissionId);
+      await permissionRepo.approvePermission(permissionId);
 
       fetchPermissionsByDay();
     } catch (e) {
-      debugPrint('Error approving permission: $e');
       Get.snackbar('Error', 'Failed to approve permission');
     }
   }
 
   Future<void> rejectPermission(int permissionId) async {
     try {
-      await supabase
-          .from('permissions')
-          .update({'status': 'rejected'})
-          .eq('id', permissionId);
+      await permissionRepo.rejectPermission(permissionId);
 
       fetchPermissionsByDay();
       permissions.remove((p) => p.id == permissionId);
     } catch (e) {
-      debugPrint('Error rejecting permission: $e');
       Get.snackbar('Error', 'Failed to reject permission');
     }
   }

@@ -1,164 +1,192 @@
 import 'package:get/get.dart';
-import 'package:presentech/features/auth/view/loginpage.dart';
-import 'package:presentech/features/auth/view/register_pages.dart';
+import 'package:presentech/features/auth/login/bindings/login_binding.dart';
+import 'package:presentech/features/auth/login/view/ui/login_page.dart';
+import 'package:presentech/features/auth/register/bindings/register_binding.dart';
+import 'package:presentech/features/auth/register/view/ui/register_page.dart';
+import 'package:presentech/features/auth/splash/bindings/splash_binding.dart';
+import 'package:presentech/features/auth/splash/view/splash_screen.dart';
 import 'package:presentech/features/employee/absence/binding/presence_binding.dart';
-import 'package:presentech/features/employee/absence/view/absence_list.dart';
+import 'package:presentech/features/employee/absence/view/ui/absence_list.dart';
 import 'package:presentech/features/employee/homepage/bindings/employee_homepage_binding.dart';
 import 'package:presentech/features/employee/homepage/view/ui/employee_homepage.dart';
 import 'package:presentech/features/employee/permissions/bindings/employee_permissions_binding.dart';
-import 'package:presentech/features/employee/permissions/view/employee_add_permission.dart';
-import 'package:presentech/features/employee/permissions/view/employee_permission.dart';
-import 'package:presentech/features/employee/permissions/view/employee_permission_detail.dart';
+import 'package:presentech/features/employee/permissions/view/ui/employee_add_permission.dart';
+import 'package:presentech/features/employee/permissions/view/ui/employee_permission.dart';
+import 'package:presentech/features/employee/permissions/view/ui/employee_permission_detail.dart';
 import 'package:presentech/features/employee/profile/binding/profile_binding.dart';
-import 'package:presentech/features/employee/profile/view/profile_page.dart';
+import 'package:presentech/features/employee/profile/view/ui/profile_page.dart';
 import 'package:presentech/features/employee/settings/binding/employee_setting_binding.dart';
 import 'package:presentech/features/employee/settings/view/ui/employee_settings.dart';
 import 'package:presentech/features/employee/tasks/binding/employee_task_binding.dart';
-import 'package:presentech/features/employee/tasks/view/employee_add_task.dart';
-import 'package:presentech/features/employee/tasks/view/employee_task.dart';
-import 'package:presentech/features/employee/tasks/view/employee_task_detail.dart';
+import 'package:presentech/features/employee/tasks/view/ui/employee_add_task.dart';
+import 'package:presentech/features/employee/tasks/view/ui/employee_task.dart';
+import 'package:presentech/features/employee/tasks/view/ui/employee_task_detail.dart';
 import 'package:presentech/features/hrd/attendance/binding/hrd_attendance_binding.dart';
-import 'package:presentech/features/hrd/attendance/view/hrd_attedance.dart';
+import 'package:presentech/features/hrd/attendance/view/ui/hrd_attedance.dart';
 import 'package:presentech/features/hrd/employee/binding/hrd_employee_binding.dart';
 import 'package:presentech/features/hrd/employee/binding/hrd_employee_detail_binding.dart';
-import 'package:presentech/features/hrd/employee/view/hrd_employee.dart';
-import 'package:presentech/features/hrd/employee/view/hrd_employee_detail.dart';
-import 'package:presentech/features/hrd/homepage/view/hrd_homepage.dart';
+import 'package:presentech/features/hrd/employee/view/ui/hrd_employee.dart';
+import 'package:presentech/features/hrd/employee/view/ui/hrd_employee_detail.dart';
+import 'package:presentech/features/hrd/homepage/bindings/hrd_homepage_binding.dart';
+import 'package:presentech/features/hrd/homepage/view/ui/hrd_homepage.dart';
 import 'package:presentech/features/hrd/location/binding/hrd_add_location_binding.dart';
 import 'package:presentech/features/hrd/location/binding/hrd_location_binding.dart';
 import 'package:presentech/features/hrd/location/binding/hrd_location_detail_binding.dart';
-import 'package:presentech/features/hrd/location/view/hrd_add_location.dart';
-import 'package:presentech/features/hrd/location/view/hrd_location.dart';
-import 'package:presentech/features/hrd/location/view/hrd_location_detail.dart';
+import 'package:presentech/features/hrd/location/view/ui/hrd_add_location.dart';
+import 'package:presentech/features/hrd/location/view/ui/hrd_location.dart';
+import 'package:presentech/features/hrd/location/view/ui/hrd_location_detail.dart';
 import 'package:presentech/features/hrd/permission/binding/hrd_permission_binding.dart';
-import 'package:presentech/features/hrd/permission/view/hrd_permission.dart';
+import 'package:presentech/features/hrd/permission/view/ui/hrd_permission.dart';
 import 'package:presentech/features/hrd/profile/bindings/hrd_profile_binding.dart';
-import 'package:presentech/features/hrd/profile/view/hrd_profile_page.dart';
+import 'package:presentech/features/hrd/profile/view/ui/hrd_profile_page.dart';
 import 'package:presentech/features/hrd/tasks/binding/hrd_task_binding.dart';
-import 'package:presentech/features/hrd/tasks/views/hrd_task_detail.dart';
-import 'package:presentech/features/hrd/tasks/views/hrd_task_list.dart';
+import 'package:presentech/features/hrd/tasks/views/ui/hrd_task_detail.dart';
+import 'package:presentech/features/hrd/tasks/views/ui/hrd_task_list.dart';
+import 'package:presentech/shared/bindings/employee_nav_binding.dart';
+import 'package:presentech/shared/bindings/hrd_nav_binding.dart';
+import 'package:presentech/shared/view/widgets/employee_bottom_nav.dart';
+import 'package:presentech/shared/view/widgets/hrd_bottom_nav.dart';
 import '../routes/app_routes.dart';
 
 class AppPages {
   static final pages = [
     // <!-- Auth Pages -->
     GetPage(
-      name: Routes.LOGIN,
-      page: () => Loginpage(),
-      binding: BindingsBuilder(() {}),
+      name: Routes.login,
+      page: () => LoginPage(),
+      binding: LoginBinding(),
     ),
     GetPage(
-      name: Routes.REGISTER,
-      page: () => RegisterPages(),
-      binding: BindingsBuilder(() {}),
+      name: Routes.register,
+      page: () => RegisterPage(),
+      binding: RegisterBinding(),
+    ),
+    GetPage(
+      name: Routes.splash,
+      page: () => SplashScreen(),
+      binding: SplashBinding(),
+    ),
+
+    //Navbar
+    GetPage(
+      name: Routes.employeeNavbar,
+      page: () => EmployeeBottomNav(),
+      binding: EmployeeNavBinding(),
+    ),
+    GetPage(
+      name: Routes.hrdNavbar,
+      page: () => HrdBottomNav(),
+      binding: HrdNavBinding(),
     ),
 
     // <!-- Employee Pages -->
     GetPage(
-      name: Routes.employee_home,
+      name: Routes.employeeHome,
       page: () => EmployeeHomepage(),
       binding: EmployeeHomepageBinding(),
     ),
     GetPage(
-      name: Routes.employee_absence_history,
+      name: Routes.employeeAbsenceHistory,
       page: () => AbsenceList(),
       binding: PresenceBinding(),
     ),
     GetPage(
-      name: Routes.employee_izin,
+      name: Routes.employeeIzin,
       page: () => EmployeePermission(),
       binding: EmployeePermissionsBinding(),
     ),
     GetPage(
-      name: Routes.employee_permission_add,
+      name: Routes.employeePermissionAdd,
       page: () => EmployeeAddPermission(),
       binding: EmployeePermissionsBinding(),
+      transition: Transition.cupertino,
+      transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
-      name: Routes.employee_permission_detail,
+      name: Routes.employeePermissionDetail,
       page: () => EmployeePermissionDetail(),
       binding: EmployeePermissionsBinding(),
     ),
     GetPage(
-      name: Routes.employee_tugas,
+      name: Routes.employeeTugas,
       page: () => EmployeeTask(),
       binding: EmployeeTaskBinding(),
     ),
     GetPage(
-      name: Routes.employee_task_add,
+      name: Routes.employeeTaskAdd,
       page: () => EmployeeAddTask(),
       binding: EmployeeTaskBinding(),
     ),
     GetPage(
-      name: Routes.employee_task_detail,
+      name: Routes.employeeTaskDetail,
       page: () => EmployeeTaskDetail(),
       binding: EmployeeTaskBinding(),
     ),
     GetPage(
-      name: Routes.employee_profile,
+      name: Routes.employeeProfile,
       page: () => const ProfilePage(),
       binding: ProfileBinding(),
     ),
 
     GetPage(
-      name: Routes.employee_settings,
-      page: () => const EmployeeSettings(),
+      name: Routes.employeeSettings,
+      page: () => EmployeeSettings(),
       binding: EmployeeSettingBinding(),
     ),
 
     //<!-- HRD Pages -->
     GetPage(
-      name: Routes.HRD_HOME,
+      name: Routes.hrdHome,
       page: () => HrdHomepage(),
-      binding: BindingsBuilder(() {}),
+      binding: HrdHomepageBinding(),
     ),
     GetPage(
-      name: Routes.HRD_ABSEN,
+      name: Routes.hrdAbsen,
       page: () => HrdAttedance(),
       binding: HrdAttendanceBinding(),
     ),
     GetPage(
-      name: Routes.HRD_APPROVAL,
+      name: Routes.hrdApproval,
       page: () => HrdPermission(),
       binding: HrdPermissionBinding(),
     ),
     GetPage(
-      name: Routes.hrd_location,
+      name: Routes.hrdLocation,
       page: () => const HrdLocation(),
       binding: HrdLocationBinding(),
     ),
     GetPage(
-      name: Routes.hrd_profile,
+      name: Routes.hrdProfile,
       page: () => HrdProfilePage(),
       binding: HrdProfileBinding(),
     ),
     GetPage(
-      name: Routes.hrd_location_detail,
+      name: Routes.hrdLocationDetail,
       page: () => HrdLocationDetail(),
       binding: HrdLocationDetailBinding(),
     ),
     GetPage(
-      name: Routes.hrd_tasks,
+      name: Routes.hrdTask,
       page: () => HrdTaskList(),
       binding: HrdTaskBinding(),
     ),
     GetPage(
-      name: Routes.hrd_task_detail,
+      name: Routes.hrdTaskDetail,
       page: () => HrdTaskDetail(),
       binding: HrdTaskBinding(),
     ),
     GetPage(
-      name: Routes.hrd_employee,
-      page: () => const HrdEmployee(),
+      name: Routes.hrdEmployee,
+      page: () => HrdEmployee(),
       binding: HrdEmployeeBinding(),
     ),
     GetPage(
-      name: Routes.hrd_employee_detail,
+      name: Routes.hrdEmployeeDetail,
       page: () => HrdEmployeeDetail(),
       binding: HrdEmployeeDetailBinding(),
     ),
     GetPage(
-      name: Routes.hrd_add_location,
+      name: Routes.hrdAddLocation,
       page: () => HrdAddLocation(),
       binding: HrdAddLocationBinding(),
     ),

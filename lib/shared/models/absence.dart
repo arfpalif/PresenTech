@@ -2,8 +2,8 @@ class Absence {
   int id;
   String createdAt;
   DateTime date;
-  String clockIn;
-  String clockOut;
+  String? clockIn;
+  String? clockOut;
   dynamic status;
   String userId;
   String? userName;
@@ -12,8 +12,8 @@ class Absence {
     required this.id,
     required this.createdAt,
     required this.date,
-    required this.clockIn,
-    required this.clockOut,
+    this.clockIn,
+    this.clockOut,
     required this.status,
     required this.userId,
     this.userName,

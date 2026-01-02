@@ -146,7 +146,8 @@ class AppGradientButtonRed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors =
-        gradientColors ?? [AppColors.redPrimary, AppColors.redSecondary];
+        gradientColors ??
+        [AppColors.redPrimary, AppColors.redSecondary.withOpacity(0.8)];
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool bounded = constraints.hasBoundedWidth;

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:presentech/features/employee/permissions/models/permission_model.dart';
+import 'package:presentech/shared/models/permission.dart';
 import 'package:presentech/features/employee/permissions/models/permission_filter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

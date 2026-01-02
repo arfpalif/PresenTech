@@ -4,8 +4,6 @@ import 'package:presentech/features/employee/profile/controller/profile_controll
 class ProfileBinding extends Bindings {
   @override
   void dependencies() {
-    if (!Get.isRegistered<ProfileController>()) {
-      Get.lazyPut(() => ProfileController());
-    }
+    Get.lazyPut(() => ProfileController());
   }
 }

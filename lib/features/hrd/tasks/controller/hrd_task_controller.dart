@@ -1,9 +1,10 @@
 import 'package:get/get.dart';
+import 'package:presentech/features/hrd/tasks/repositories/hrd_task_repository.dart';
 import 'package:presentech/shared/models/tasks.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HrdTaskController extends GetxController {
-  final _supabase = Supabase.instance.client;
+  //repository
+  final taskRepo = HrdTaskRepository();
 
   RxList<Tasks> tasks = <Tasks>[].obs;
   RxBool isLoading = false.obs;
@@ -17,12 +18,7 @@ class HrdTaskController extends GetxController {
   Future<void> fetchTasks() async {
     try {
       isLoading.value = true;
-
-      final response = await _supabase
-          .from('tasks')
-          .select('*, users!tasks_user_id_fkey(name)')
-          .order('id', ascending: false);
-
+      final response = await taskRepo.fetchTasks();
       tasks.value = response.map<Tasks>((item) => Tasks.fromMap(item)).toList();
     } catch (e) {
       print("Error fetchTasks: $e");
@@ -34,7 +30,7 @@ class HrdTaskController extends GetxController {
 
   Future<bool> insertTask(Tasks task) async {
     try {
-      await _supabase.from('tasks').insert(task.toMap());
+      await taskRepo.insertTask(task);
       await fetchTasks();
       return true;
     } catch (e) {
@@ -46,7 +42,7 @@ class HrdTaskController extends GetxController {
 
   Future<bool> updateTask(Tasks task) async {
     try {
-      await _supabase.from('tasks').update(task.toMap()).eq('id', task.id!);
+      await taskRepo.updateTask(task);
       await fetchTasks();
       return true;
     } catch (e) {
@@ -58,7 +54,7 @@ class HrdTaskController extends GetxController {
 
   Future<bool> deleteTask(int id) async {
     try {
-      await _supabase.from('tasks').delete().eq('id', id);
+      await taskRepo.deleteTask(id);
       tasks.removeWhere((t) => t.id == id);
       Get.snackbar("Berhasil", "Tugas berhasil dihapus");
       return true;
@@ -71,7 +67,7 @@ class HrdTaskController extends GetxController {
 
   Future<bool> updateTaskStatus(int id, String status) async {
     try {
-      await _supabase.from('tasks').update({'status': status}).eq('id', id);
+      await taskRepo.updateTaskStatus(id, status);
       await fetchTasks();
       return true;
     } catch (e) {

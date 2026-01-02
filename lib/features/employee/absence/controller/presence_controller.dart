@@ -271,7 +271,6 @@ class PresenceController extends GetxController {
     if (todayAbsence == null) {
       await clockInAbsence();
       Get.snackbar("Sukses", "Berhasil clock in");
-      await fetchAbsence();
       checkTodayAbsence();
     } else {
       await clockOutAbsence();

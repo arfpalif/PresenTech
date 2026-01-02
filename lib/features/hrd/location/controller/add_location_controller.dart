@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:get/get.dart';
 import 'package:presentech/features/hrd/location/model/office.dart';
+import 'package:presentech/features/hrd/location/repositories/hrd_location_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AddLocationController extends GetxController {
+  //repository
+  final hrdLocationRepo = HrdLocationRepository();
+
+  //variables
   final TextEditingController officeNameController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController latitudeController = TextEditingController();
@@ -13,6 +18,7 @@ class AddLocationController extends GetxController {
     text: '50',
   );
 
+  //map controller
   late final MapController mapController;
 
   final Rxn<GeoPoint> currentMarkerPoint = Rxn<GeoPoint>();
@@ -26,23 +32,34 @@ class AddLocationController extends GetxController {
   void onInit() {
     super.onInit();
     mapController = MapController(
-      initPosition: GeoPoint(
-        latitude: -7.554417790224685,
-        longitude: 112.23951655089304,
-      ),
+      initPosition: GeoPoint(latitude: 0, longitude: 0),
     );
+
+    // Fallback listener: sometimes the widget callback does not fire, so listen directly
+    // to the controller's long-tap notifier to ensure we always handle long presses.
+    mapController.listenerMapLongTapping.addListener(() {
+      final point = mapController.listenerMapLongTapping.value;
+      if (point != null) {
+        onLongPressed(point);
+      }
+    });
   }
 
   Future<void> onMapReady() async {
+    debugPrint('OSM map is ready');
     await mapController.setZoom(zoomLevel: 15);
     isMapReady.value = true;
   }
 
-  Future<void> onMapTapped(GeoPoint point) async {
+  Future<void> onLongPressed(GeoPoint point) async {
+    if (!isMapReady.value) return;
+
+    debugPrint('Long pressed at: $point');
+
+    // Remove previous marker if one already exists to avoid null errors
     if (currentMarkerPoint.value != null) {
       await mapController.removeMarker(currentMarkerPoint.value!);
     }
-
     await mapController.addMarker(
       point,
       markerIcon: const MarkerIcon(
@@ -58,11 +75,7 @@ class AddLocationController extends GetxController {
   Future<void> fetchOffices() async {
     try {
       isLoading.value = true;
-
-      final response = await supabase
-          .from('offices')
-          .select('*')
-          .order('id', ascending: true);
+      final response = await hrdLocationRepo.fetchOffices();
 
       final data = (response as List).map((e) {
         debugPrint("PARSING OFFICE: $e");

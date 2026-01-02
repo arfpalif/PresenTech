@@ -4,8 +4,6 @@ import 'package:presentech/features/employee/absence/controller/presence_control
 class PresenceBinding extends Bindings {
   @override
   void dependencies() {
-    if (!Get.isRegistered<PresenceController>()) {
-      Get.lazyPut(() => PresenceController());
-    }
+    Get.lazyPut(() => PresenceController());
   }
 }

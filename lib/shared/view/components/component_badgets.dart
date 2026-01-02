@@ -94,7 +94,11 @@ class ComponentBadgets extends StatelessWidget {
         );
 
       default:
-        return AppGradientButton(text: "-", onPressed: () {});
+        return SizedBox(
+          height: 32,
+          width: 60,
+          child: AppGradientButton(text: "-", onPressed: () {}),
+        );
     }
   }
 }

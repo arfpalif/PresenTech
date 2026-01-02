@@ -1,36 +1,39 @@
 import 'package:get/get.dart';
+import 'package:presentech/features/hrd/homepage/repositories/hrd_homepage_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HrdHomepageController extends GetxController {
   final supabase = Supabase.instance.client;
+  //repository
+  final homeRepo = HrdHomepageRepository();
+
+  @override
+  void onInit() {
+    // TODO: implement onInit
+    super.onInit();
+    getUser();
+  }
 
   var name = "".obs;
   var profilePic = "".obs;
   var role = "".obs;
 
   Future<void> getUser() async {
-    final session = supabase.auth.currentUser;
-    final userId = session?.id;
+    try {
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) {
+        return;
+      }
 
-    if (userId == null) {
-      Get.snackbar("Error", "User not login");
-      throw Exception("Error");
+      final response = await homeRepo.getUser(userId);
+
+      if (response != null) {
+        profilePic.value = response['profile_picture'] ?? '';
+        name.value = response['name'] ?? '';
+        role.value = response['role'] ?? '';
+      }
+    } catch (e) {
+      throw ('Error fetching HRD homepage data: $e');
     }
-
-    final response = await supabase
-        .from("users")
-        .select('name, profile_picture, role')
-        .eq("id", userId)
-        .maybeSingle();
-
-    if (response == null) {
-      throw Exception("Error");
-    }
-
-    print("user row => ${response['name']}");
-
-    name.value = response['name'];
-    profilePic.value = response['profile_picture'];
-    role.value = response['role'];
   }
 }

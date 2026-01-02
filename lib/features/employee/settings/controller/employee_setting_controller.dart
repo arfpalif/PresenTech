@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:presentech/features/auth/controller/auth_controller.dart';
-import 'package:presentech/features/auth/view/loginpage.dart';
+import 'package:presentech/configs/routes/app_routes.dart';
+import 'package:presentech/shared/controllers/auth_controller.dart';
 import 'package:presentech/features/employee/settings/model/user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -36,6 +36,6 @@ class EmployeeSettingController extends GetxController {
   Future<void> signOut() async {
     final authController = AuthController();
     await authController.signOut();
-    Get.offAll(const Loginpage());
+    Get.offAllNamed(Routes.login);
   }
 }

@@ -1,31 +1,34 @@
 abstract class Routes {
-  static const LOGIN = '/login';
-  static const REGISTER = '/register';
+  static const login = '/login';
+  static const register = '/register';
+  static const splash = '/splash';
 
-  static const employee_home = '/employee/home';
-  static const employee_izin = '/employee/employee_permission';
-  static const employee_tugas = '/employee/employee_task';
-  static const employee_report = '/employee/employee_reports';
-  static const employee_profile = '/employee/employee_profile';
-  static const employee_settings = '/employee/employee_settings';
-  static const employee_absence_history = '/employee/absence_history';
-  static const employee_task_add = '/employee/employee_task/add';
-  static const employee_task_detail = '/employee/employee_task/detail';
-  static const employee_permission_add = '/employee/employee_permission/add';
-  static const employee_permission_detail =
+  static const employeeHome = '/employee/home';
+  static const employeeIzin = '/employee/employee_permission';
+  static const employeeTugas = '/employee/employee_task';
+  static const employeeProfile = '/employee/employee_profile';
+  static const employeeSettings = '/employee/employee_settings';
+  static const employeeAbsenceHistory = '/employee/absence_history';
+  static const employeeTaskAdd = '/employee/employee_task/add';
+  static const employeeTaskDetail = '/employee/employee_task/detail';
+  static const employeePermissionAdd = '/employee/employee_permission/add';
+  static const employeePermissionDetail =
       '/employee/employee_permission/detail';
 
-  static const HRD_HOME = '/hrd/hrd_homepage';
-  static const HRD_APPROVAL = '/hrd/hrd_permissions';
-  static const HRD_ABSEN = '/hrd/hrd_attendance';
-  static const hrd_location = '/hrd/hrd_location';
-  static const hrd_reports = '/hrd/hrd_reports';
-  static const hrd_employee = '/hrd/hrd_employee';
-  static const hrd_profile = '/hrd/hrd_profile';
-  static const hrd_tasks = '/hrd/hrd_tasks';
-  static const hrd_task_detail = '/hrd/hrd_tasks/detail';
-  static const hrd_location_detail =
+  static const hrdHome = '/hrd/hrd_homepage';
+  static const hrdApproval = '/hrd/hrd_permissions';
+  static const hrdAbsen = '/hrd/hrd_attendance';
+  static const hrdLocation = '/hrd/hrd_location';
+  static const hrdReports = '/hrd/hrd_reports';
+  static const hrdEmployee = '/hrd/hrd_employee';
+  static const hrdProfile = '/hrd/hrd_profile';
+  static const hrdTask = '/hrd/hrd_tasks';
+  static const hrdTaskDetail = '/hrd/hrd_tasks/detail';
+  static const hrdLocationDetail =
       '/features/hrd/location/view/hrd_location_detail';
-  static const hrd_add_location = '/hrd/hrd_add_location';
-  static const hrd_employee_detail = '/hrd/hrd_employee/detail';
+  static const hrdAddLocation = '/hrd/hrd_add_location';
+  static const hrdEmployeeDetail = '/hrd/hrd_employee/detail';
+
+  static const employeeNavbar = '/employee/employee_navbar';
+  static const hrdNavbar = '/hrd/hrd_navbar';
 }

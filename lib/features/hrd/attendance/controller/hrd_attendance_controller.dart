@@ -1,11 +1,14 @@
 import 'package:get/get.dart';
+import 'package:presentech/features/hrd/attendance/repositories/hrd_attendance_repository.dart';
 import 'package:presentech/shared/models/absence.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 enum AbsenceFilter { today, week, month }
 
 class HrdAttendanceController extends GetxController {
-  final supabase = Supabase.instance.client;
+  //repository
+  final attendanceRepo = HrdAttendanceRepository();
+
+  //variables
   var statusAbsen = "".obs;
   var selectedFilter = Rxn<AbsenceFilter>();
   RxInt telat = 0.obs;
@@ -26,26 +29,14 @@ class HrdAttendanceController extends GetxController {
   Future<Map<String, dynamic>?> getTodayAbsence() async {
     final today = DateTime.now().toIso8601String().split("T")[0];
 
-    final absence = await supabase
-        .from('absences')
-        .select()
-        .eq("date", today)
-        .maybeSingle();
+    final absence = await attendanceRepo.getTodayAbsence();
 
     return absence;
   }
 
   Future<void> fetchAbsence() async {
     try {
-      final response = await supabase
-          .from('absences')
-          .select(
-            'id, created_at, date, clock_in, clock_out, status, user_id, users(name)',
-          )
-          .order('created_at', ascending: false);
-      absences.value = response
-          .map<Absence>((item) => Absence.fromJson(item))
-          .toList();
+      final response = await attendanceRepo.fetchAbsence();
     } catch (e) {
       print("Error fetch Absence: $e");
     } finally {}
@@ -53,15 +44,7 @@ class HrdAttendanceController extends GetxController {
 
   Future<void> fetchAbsenceToday() async {
     try {
-      final response = await supabase
-          .from('absences')
-          .select(
-            'id, created_at, date, clock_in, clock_out, status, user_id, users(name)',
-          )
-          .order('created_at', ascending: false);
-      absences.value = response
-          .map<Absence>((item) => Absence.fromJson(item))
-          .toList();
+      final response = await attendanceRepo.getTodayAbsence();
 
       telat.value = absences
           .where((absence) => absence.status == 'telat')
@@ -93,12 +76,7 @@ class HrdAttendanceController extends GetxController {
       final now = DateTime.now();
 
       if (selectedFilter.value == null) {
-        final response = await supabase
-            .from('absences')
-            .select(
-              'id, created_at, date, clock_in, clock_out, status, user_id, users(name)',
-            )
-            .order('created_at', ascending: false);
+        final response = await attendanceRepo.fetchAbsence();
 
         final data = (response as List)
             .map((e) => Absence.fromJson(e))
@@ -134,14 +112,7 @@ class HrdAttendanceController extends GetxController {
           break;
       }
 
-      final response = await supabase
-          .from('absences')
-          .select(
-            'id, created_at, date, clock_in, clock_out, status, user_id, users(name)',
-          )
-          .gte('date', startDate.toIso8601String().split('T')[0])
-          .lte('date', endDate.toIso8601String().split('T')[0])
-          .order('created_at', ascending: false);
+      final response = await attendanceRepo.fetchAbsence();
 
       final data = (response as List).map((e) => Absence.fromJson(e)).toList();
 

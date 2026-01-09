@@ -1,8 +1,7 @@
 import 'package:get/get.dart';
 import 'package:presentech/features/hrd/attendance/repositories/hrd_attendance_repository.dart';
 import 'package:presentech/shared/models/absence.dart';
-
-enum AbsenceFilter { today, week, month }
+import 'package:presentech/utils/enum/filter.dart';
 
 class HrdAttendanceController extends GetxController {
   //repository
@@ -15,7 +14,7 @@ class HrdAttendanceController extends GetxController {
   RxInt hadir = 0.obs;
   RxInt alfa = 0.obs;
 
-  var filteredEmployees;
+  late var filteredEmployees = ''.obs;
 
   RxList<Absence> absences = <Absence>[].obs;
   RxBool isLoading = false.obs;
@@ -24,11 +23,10 @@ class HrdAttendanceController extends GetxController {
   void onInit() {
     super.onInit();
     fetchAbsence();
+    fetchAbsenceToday();
   }
 
   Future<Map<String, dynamic>?> getTodayAbsence() async {
-    final today = DateTime.now().toIso8601String().split("T")[0];
-
     final absence = await attendanceRepo.getTodayAbsence();
 
     return absence;
@@ -37,82 +35,69 @@ class HrdAttendanceController extends GetxController {
   Future<void> fetchAbsence() async {
     try {
       final response = await attendanceRepo.fetchAbsence();
+      absences.assignAll(response?['data'] ?? []);
     } catch (e) {
       print("Error fetch Absence: $e");
-    } finally {}
+      throw Exception("Failed to fetch absences");
+    }
   }
 
   Future<void> fetchAbsenceToday() async {
     try {
-      final response = await attendanceRepo.getTodayAbsence();
+      await attendanceRepo.getTodayAbsence();
 
       telat.value = absences
           .where((absence) => absence.status == 'telat')
           .length;
+      print(telat.value);
 
       hadir.value = absences
           .where((absence) => absence.status == 'hadir')
           .length;
+      print(hadir.value);
 
       alfa.value = absences.where((absence) => absence.status == 'alfa').length;
     } catch (e) {
-      print("Error fetch Absence: $e");
-    } finally {}
-  }
-
-  void changeFilter(AbsenceFilter filter) {
-    if (selectedFilter.value == filter) {
-      selectedFilter.value = null;
-    } else {
-      selectedFilter.value = filter;
+      throw Exception("Failed to fetch absences");
     }
-    fetchAbsenceByDay();
   }
 
-  Future<void> fetchAbsenceByDay() async {
+  void changeFilter(AbsenceFilter? filter) {
+    selectedFilter.value = selectedFilter.value == filter ? null : filter;
+
+    fetchAbsenceByDay(selectedFilter.value);
+  }
+
+  Future<void> fetchAbsenceByDay(AbsenceFilter? selectedFilter) async {
     try {
       isLoading.value = true;
 
       final now = DateTime.now();
 
-      if (selectedFilter.value == null) {
+      if (selectedFilter == null) {
         final response = await attendanceRepo.fetchAbsence();
-
-        final data = (response as List)
-            .map((e) => Absence.fromJson(e))
-            .toList();
-
-        absences.assignAll(data);
+        absences.assignAll(response?['data'] ?? []);
         return;
       }
 
       late DateTime startDate;
-      late DateTime endDate;
 
-      switch (selectedFilter.value!) {
+      switch (selectedFilter) {
         case AbsenceFilter.today:
           startDate = DateTime(now.year, now.month, now.day);
-          endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
           break;
         case AbsenceFilter.week:
-          // Mulai dari Senin minggu ini
-          final weekday = now.weekday; // 1 = Monday, 7 = Sunday
-          startDate = DateTime(
-            now.year,
-            now.month,
-            now.day,
-          ).subtract(Duration(days: weekday - 1));
-          endDate = startDate.add(
-            Duration(days: 6, hours: 23, minutes: 59, seconds: 59),
-          );
+          startDate = now.subtract(const Duration(days: 7));
           break;
         case AbsenceFilter.month:
           startDate = DateTime(now.year, now.month, 1);
-          endDate = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
           break;
       }
 
-      final response = await attendanceRepo.fetchAbsence();
+      final response = await attendanceRepo.fetchAbsenceByDateRange(
+        startDate,
+        now,
+      );
 
       final data = (response as List).map((e) => Absence.fromJson(e)).toList();
 

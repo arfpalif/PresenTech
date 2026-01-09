@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/configs/themes/themes.dart';
 
 class CardHeader extends StatelessWidget {
   final String imageUrl;

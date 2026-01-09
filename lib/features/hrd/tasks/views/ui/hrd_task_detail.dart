@@ -3,8 +3,9 @@ import 'package:get/get.dart';
 import 'package:presentech/features/hrd/tasks/controller/hrd_task_controller.dart';
 import 'package:presentech/shared/models/tasks.dart';
 import 'package:presentech/shared/controllers/date_controller.dart';
-import 'package:presentech/shared/view/components/Gradient_btn.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/shared/styles/color_style.dart';
+import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
+import 'package:presentech/configs/themes/themes.dart';
 
 // ignore: must_be_immutable
 class HrdTaskDetail extends GetView<HrdTaskController> {
@@ -107,7 +108,10 @@ class HrdTaskDetail extends GetView<HrdTaskController> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: <Color>[AppColors.colorPrimary, AppColors.colorSecondary],
+              colors: <Color>[
+                ColorStyle.colorPrimary,
+                ColorStyle.colorSecondary,
+              ],
             ),
           ),
         ),

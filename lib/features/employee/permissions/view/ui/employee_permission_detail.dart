@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/shared/models/permission.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 
 class EmployeePermissionDetail extends StatelessWidget {
   final Permission permission = Get.arguments as Permission;
@@ -23,7 +24,7 @@ class EmployeePermissionDetail extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: <Color>[AppColors.colorPrimary, AppColors.greenPrimary],
+              colors: <Color>[ColorStyle.colorPrimary, ColorStyle.greenPrimary],
             ),
           ),
         ),
@@ -40,9 +41,9 @@ class EmployeePermissionDetail extends StatelessWidget {
             child: ListTile(
               contentPadding: const EdgeInsets.all(16),
               title: Text(
-                "${permission.reason}",
+                permission.reason,
                 style: AppTextStyle.heading1.copyWith(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                 ),
               ),
               subtitle: Text(
@@ -50,7 +51,7 @@ class EmployeePermissionDetail extends StatelessWidget {
                 "End Date: ${permission.endDate}\n"
                 "Status: ${permission.status}",
                 style: AppTextStyle.normal.copyWith(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                 ),
               ),
             ),

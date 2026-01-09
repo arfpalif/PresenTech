@@ -1,7 +1,11 @@
 import 'package:get/get.dart';
+import 'package:presentech/features/employee/homepage/repositories/homepage_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EmployeeHomepageController extends GetxController {
+  // Repository
+  final homePageRepo = HomepageRepository();
+
   final supabase = Supabase.instance.client;
   var name = "".obs;
   var profilePic = "".obs;
@@ -22,12 +26,7 @@ class EmployeeHomepageController extends GetxController {
       throw Exception("Error");
     }
 
-    final user = await supabase
-        .from("users")
-        .select("office_id")
-        .eq("id", userId)
-        .maybeSingle();
-
+    final user = await homePageRepo.getUserOffice(session, userId);
     print("user row => $user");
     print("office id => ${user?['office_id']}");
 
@@ -38,11 +37,7 @@ class EmployeeHomepageController extends GetxController {
       throw Exception("User dont have office");
     }
 
-    final office = await supabase
-        .from("offices")
-        .select()
-        .eq("id", officeId)
-        .maybeSingle();
+    final office = await homePageRepo.getOfficeDetails(officeId);
     print("office row => $office");
 
     if (office == null) {
@@ -62,23 +57,17 @@ class EmployeeHomepageController extends GetxController {
         throw Exception("Error");
       }
 
-      final response = await supabase
-          .from("users")
-          .select('name, profile_picture, role')
-          .eq("id", userId)
-          .maybeSingle();
+      final response = await homePageRepo.getUser(session, userId);
 
       if (response == null) {
         throw Exception("Error");
       }
 
-      print("user row => ${response['name']}");
-
       name.value = response['name'];
       profilePic.value = response['profile_picture'];
       role.value = response['role'];
     } catch (e) {
-      throw Exception();
+      throw Exception(e);
     }
   }
 }

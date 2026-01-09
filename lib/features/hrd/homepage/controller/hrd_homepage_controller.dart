@@ -9,7 +9,6 @@ class HrdHomepageController extends GetxController {
 
   @override
   void onInit() {
-    // TODO: implement onInit
     super.onInit();
     getUser();
   }
@@ -27,11 +26,9 @@ class HrdHomepageController extends GetxController {
 
       final response = await homeRepo.getUser(userId);
 
-      if (response != null) {
-        profilePic.value = response['profile_picture'] ?? '';
-        name.value = response['name'] ?? '';
-        role.value = response['role'] ?? '';
-      }
+      profilePic.value = response['profile_picture'] ?? '';
+      name.value = response['name'] ?? '';
+      role.value = response['role'] ?? '';
     } catch (e) {
       throw ('Error fetching HRD homepage data: $e');
     }

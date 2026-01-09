@@ -1,17 +1,21 @@
 import 'dart:math';
 import 'package:geolocator/geolocator.dart';
+import 'package:presentech/features/employee/absence/repositories/absence_repository.dart';
 import 'package:presentech/shared/models/absence.dart';
+import 'package:presentech/utils/enum/absence_status.dart';
+import 'package:presentech/utils/enum/filter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-enum AbsenceFilter { today, week, month }
-
 class PresenceController extends GetxController {
+  //repository
+  final absenceRepo = AbsenceRepository();
+
   final supabase = Supabase.instance.client;
   var clockIn = false.obs;
-  var Clock_Out = false.obs;
-  var statusAbsen = "".obs;
+  var clockOut = false.obs;
+  RxString statusAbsen = "".obs;
   var selectedFilter = Rxn<AbsenceFilter>();
 
   RxList<Absence> absences = <Absence>[].obs;
@@ -26,19 +30,16 @@ class PresenceController extends GetxController {
   }
 
   Future<Map<String, dynamic>?> getTodayAbsence() async {
-    final session = supabase.auth.currentSession;
-    final userId = session?.user.id;
-    final today = DateTime.now().toIso8601String().split("T")[0];
-    if (userId == null) {
+    final Session? session = supabase.auth.currentSession;
+    if (session == null) {
       return null;
     }
-    final absence = await supabase
-        .from('absences')
-        .select()
-        .eq('user_id', userId)
-        .eq("date", today)
-        .maybeSingle();
-
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final userId = session.user.id;
+    final absence = await absenceRepo.getTodayAbsence(
+      userId: userId,
+      today: today,
+    );
     return absence;
   }
 
@@ -47,49 +48,42 @@ class PresenceController extends GetxController {
 
     if (absence == null) {
       clockIn.value = false;
-      Clock_Out.value = false;
+      clockOut.value = false;
       statusAbsen.value = "Belum absen";
-      print("Masuk kondisi 1");
+
       return;
     } else if (absence['clock_in'] != null && absence['clock_out'] == null) {
       statusAbsen.value = "Sudah clockIn, belum clock out";
       clockIn.value = true;
-      print("Masuk kondisi 2");
-    } else {
+    } else if (absence['clock_in'] != null && absence['clock_out'] != null) {
       clockIn.value = true;
-      Clock_Out.value = true;
+      clockOut.value = true;
       statusAbsen.value = "Sudah absen dan clock out";
-      print("Masuk kondisi 3");
     }
   }
 
-  Future<String> checkTime() async {
-    final userId = supabase.auth.currentSession?.user.id;
+  Future<String?> checkTime() async {
+    final Session? session = supabase.auth.currentSession;
+    if (session == null) {
+      return null;
+    }
+    final userId = session.user.id;
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('HH:mm:ss').format(now);
 
-    if (userId == null) throw Exception("User tidak login");
+    final userOffice = await absenceRepo.getUserOffice(userId: userId);
 
-    final user = await supabase
-        .from('users')
-        .select('office_id')
-        .eq('id', userId)
-        .maybeSingle();
-
-    final officeId = user?['office_id'];
-    print(officeId);
+    print(userOffice);
 
     print(formattedDate);
 
-    final supabaseJam = await supabase
-        .from('work_schedules')
-        .select('start_time')
-        .eq('office_id', officeId)
-        .maybeSingle();
-    print("ini jam : $supabaseJam");
-    if (supabaseJam == null) throw Exception("Jam kerja tidak ada");
+    final workTime = await absenceRepo.getOfficeHours(
+      officeId: userOffice?['office_id'],
+    );
+    print("ini jam : $workTime");
+    if (workTime == null) throw Exception("Jam kerja tidak ada");
 
-    final startTime = supabaseJam['start_time'];
+    final startTime = workTime['start_time'];
 
     return compareTime(startTime);
   }
@@ -118,9 +112,9 @@ class PresenceController extends GetxController {
     final late = workStart.add(Duration(hours: 1));
 
     if (now.isAfter(workStart) && now.isBefore(late)) {
-      return "telat";
+      return AbsenceStatus.terlambat.name;
     }
-    return "alfa";
+    return AbsenceStatus.alfa.name;
   }
 
   Future<void> clockInAbsence() async {
@@ -133,18 +127,19 @@ class PresenceController extends GetxController {
       if (absence != null) {
         Get.snackbar("Error", "Anda sudah absen hari ini");
       } else {
-        final response = await supabase.from('absences').insert({
-          'user_id': userId,
-          'date': today,
-          'status': status,
-          'clock_in': DateTime.now().toIso8601String().split("T")[1],
-        });
+        final response = await absenceRepo.clockIn(
+          userId: userId,
+          date: today,
+          status: status ?? "unknown",
+          clockIn: DateTime.now().toIso8601String().split("T")[1],
+          time: DateTime.now().toIso8601String().split("T")[1],
+        );
 
-        print(response);
         clockIn.value = true;
+        return response;
       }
     } catch (e) {
-      print("ERROR CLOCK IN: $e");
+      print("Error clock in: $e");
       Get.snackbar("Error", e.toString());
     }
   }
@@ -154,15 +149,14 @@ class PresenceController extends GetxController {
       final user = supabase.auth.currentUser!.id;
       final today = DateTime.now().toIso8601String().split("T")[0];
 
-      final response = await supabase
-          .from('absences')
-          .update({'clock_out': DateTime.now().toIso8601String().split("T")[1]})
-          .eq('user_id', user)
-          .eq('date', today);
-      print(response);
-      if (response != null) {
-        Clock_Out.value = true;
-      }
+      final response = await absenceRepo.clockOut(
+        userId: user,
+        date: today,
+        time: DateTime.now().toIso8601String().split("T")[1],
+      );
+
+      clockOut.value = true;
+      return response;
     } catch (e) {
       Get.snackbar("Error", "Anda sudah absen hari ini");
     } finally {}
@@ -173,15 +167,10 @@ class PresenceController extends GetxController {
     final userId = session?.user.id;
 
     if (userId == null) {
-      Get.snackbar("Error", "User not login");
-      throw Exception("Error");
+      throw Exception("Error, User not login");
     }
 
-    final user = await supabase
-        .from("users")
-        .select("office_id")
-        .eq("id", userId)
-        .maybeSingle();
+    final user = await absenceRepo.getUserOffice(userId: userId);
 
     print("user row => $user");
     print("office id => ${user?['office_id']}");
@@ -193,11 +182,7 @@ class PresenceController extends GetxController {
       throw Exception("User dont have office");
     }
 
-    final office = await supabase
-        .from("offices")
-        .select()
-        .eq("id", officeId)
-        .maybeSingle();
+    final office = await absenceRepo.getOffice(officeId: officeId);
     print("office row => $office");
 
     if (office == null) {
@@ -207,9 +192,10 @@ class PresenceController extends GetxController {
     return office;
   }
 
-  Future<Position> getCurrentLocation() async {
+  Future<Position?> getCurrentLocation() async {
     bool service = await Geolocator.isLocationServiceEnabled();
     if (!service) {
+      await Geolocator.openLocationSettings();
       return Future.error("Location should be enabled");
     }
 
@@ -247,20 +233,24 @@ class PresenceController extends GetxController {
     final todayAbsence = await getTodayAbsence();
 
     if (todayAbsence != null &&
-        todayAbsence['clockn'] != null &&
+        todayAbsence['clock_in'] != null &&
         todayAbsence['clock_out'] != null) {
       Get.snackbar("Error", "Hari ini sudah absen");
       return;
     }
 
     final position = await getCurrentLocation();
+    if (position == null) {
+      Get.snackbar("Error", "Gagal mendapatkan lokasi");
+      return;
+    }
     final office = await getOffice();
-
+    print(" office data: $office ");
     final distance = calculateDistance(
       position.latitude,
       position.longitude,
-      office['latitude'],
-      office['longitude'],
+      office['latitude'] ?? 0.0,
+      office['longitude'] ?? 0.0,
     );
 
     if (distance > office['radius']) {
@@ -288,11 +278,7 @@ class PresenceController extends GetxController {
 
     try {
       isLoading.value = true;
-      final response = await supabase
-          .from('absences')
-          .select()
-          .eq('user_id', userId)
-          .order('created_at', ascending: false);
+      final response = await absenceRepo.getAllAbsences(userId: userId);
       print("Fetch Absence Response: $response");
       absences.value = response
           .map<Absence>((item) => Absence.fromJson(item))

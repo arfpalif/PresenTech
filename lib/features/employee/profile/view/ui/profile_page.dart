@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:presentech/features/employee/profile/controller/profile_controller.dart';
 import 'package:presentech/features/employee/profile/view/components/card_header.dart';
 import 'package:presentech/features/employee/settings/model/user.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/controllers/profile_controller.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 
 class ProfilePage extends GetView<ProfileController> {
   const ProfilePage({super.key});
@@ -26,7 +27,7 @@ class ProfilePage extends GetView<ProfileController> {
                 Padding(
                   padding: const EdgeInsets.only(top: 30.0),
                   child: CardHeader(
-                    imageUrl: user.profilePicture,
+                    imageUrl: user.profilePicture ?? '',
                     name: user.name,
                     role: user.role,
                   ),
@@ -39,10 +40,10 @@ class ProfilePage extends GetView<ProfileController> {
                   leading: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.colorPrimary.withOpacity(0.2),
+                      color: ColorStyle.colorPrimary.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.person, color: AppColors.colorPrimary),
+                    child: Icon(Icons.person, color: ColorStyle.colorPrimary),
                   ),
                   title: Text(
                     "Email",
@@ -59,10 +60,10 @@ class ProfilePage extends GetView<ProfileController> {
                   leading: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.colorPrimary.withOpacity(0.2),
+                      color: ColorStyle.colorPrimary.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.business, color: AppColors.colorPrimary),
+                    child: Icon(Icons.business, color: ColorStyle.colorPrimary),
                   ),
                   title: Text(
                     "Lokasi Kantor",
@@ -81,12 +82,12 @@ class ProfilePage extends GetView<ProfileController> {
                   leading: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.colorPrimary.withOpacity(0.2),
+                      color: ColorStyle.colorPrimary.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.date_range,
-                      color: AppColors.colorPrimary,
+                      color: ColorStyle.colorPrimary,
                     ),
                   ),
                   title: Text(
@@ -96,10 +97,7 @@ class ProfilePage extends GetView<ProfileController> {
                       fontSize: 10,
                     ),
                   ),
-                  subtitle: Text(
-                    "${user.createdAt}",
-                    style: AppTextStyle.heading1,
-                  ),
+                  subtitle: Text(user.createdAt, style: AppTextStyle.heading1),
                 ),
                 Divider(color: Colors.grey.shade300, thickness: 1, height: 24),
                 Text("Jadwal kerja", style: AppTextStyle.heading1),
@@ -109,10 +107,10 @@ class ProfilePage extends GetView<ProfileController> {
                   leading: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.colorPrimary.withOpacity(0.2),
+                      color: ColorStyle.colorPrimary.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.schedule, color: AppColors.colorPrimary),
+                    child: Icon(Icons.schedule, color: ColorStyle.colorPrimary),
                   ),
                   title: Text("Senin - Jumat", style: AppTextStyle.heading1),
                   subtitle: Text(

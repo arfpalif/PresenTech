@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/hrd/location/controller/location_controller.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 
 class HrdLocationList extends GetView<LocationController> {
   const HrdLocationList({super.key});
@@ -21,15 +21,15 @@ class HrdLocationList extends GetView<LocationController> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 40),
-              Icon(Icons.location_off, size: 64, color: Colors.grey[400]),
+              Icon(Icons.location_off, size: 60, color: Colors.grey[300]),
               const SizedBox(height: 16),
               Text(
-                "Belum ada lokasi",
+                "No location found",
                 style: AppTextStyle.heading2.copyWith(color: Colors.grey[600]),
               ),
               const SizedBox(height: 8),
               Text(
-                "Tekan tombol refresh untuk memuat data",
+                "Tap refresh to load data",
                 style: AppTextStyle.normal.copyWith(color: Colors.grey[500]),
                 textAlign: TextAlign.center,
               ),
@@ -38,6 +38,11 @@ class HrdLocationList extends GetView<LocationController> {
                 onPressed: () {
                   controller.fetchOffices();
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorStyle.colorPrimary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                ),
                 icon: const Icon(Icons.refresh),
                 label: const Text("Refresh"),
               ),
@@ -52,37 +57,56 @@ class HrdLocationList extends GetView<LocationController> {
         physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           final office = controller.offices[index];
-          return Card(
-            shadowColor: Colors.transparent,
-            color: AppColors.greyprimary,
-            margin: const EdgeInsets.only(bottom: 15),
+          return Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withValues(alpha: 0.1),
+                  blurRadius: 15,
+                  offset: Offset(0, 5),
+                ),
+              ],
+            ),
             child: ListTile(
               onTap: () {
                 Get.toNamed(Routes.hrdLocationDetail, arguments: office);
               },
-              contentPadding: const EdgeInsets.all(10),
+              contentPadding: const EdgeInsets.all(16),
+              leading: Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: ColorStyle.colorPrimary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.location_on, color: ColorStyle.colorPrimary),
+              ),
               title: Text(
                 office.name,
-                style: AppTextStyle.heading2.copyWith(color: Colors.black),
+                style: AppTextStyle.heading2.copyWith(color: Colors.black, fontWeight: FontWeight.bold),
               ),
-              subtitle: Text(
-                "${office.address}\nRadius: ${office.radius} meter",
-                style: AppTextStyle.normal.copyWith(color: Colors.grey),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 6.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      office.address,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyle.normal.copyWith(color: Colors.grey[600]),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      "Radius: ${office.radius} m",
+                      style: AppTextStyle.smallText.copyWith(color: ColorStyle.greenPrimary, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
               ),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "Lat: ${office.latitude.toStringAsFixed(4)}",
-                    style: AppTextStyle.normal,
-                  ),
-                  Text(
-                    "Lng: ${office.longitude.toStringAsFixed(4)}",
-                    style: AppTextStyle.normal,
-                  ),
-                ],
-              ),
+              trailing: Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
             ),
           );
         },

@@ -1,14 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:presentech/features/hrd/employee/models/employee.dart';
+import 'package:presentech/features/hrd/employee/repositories/hrd_employee_repository.dart';
 import 'package:presentech/features/hrd/location/model/office.dart';
 import 'package:presentech/shared/models/absence.dart';
+import 'package:presentech/shared/models/users.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HrdEmployeeDetailController extends GetxController {
+  //repository
+  final employeeRepo = HrdEmployeeRepository();
   final supabase = Supabase.instance.client;
-  RxList<Employee> employees = <Employee>[].obs;
-  late Employee employee;
+  RxList<Users> employees = <Users>[].obs;
+  late Users employee;
   final RxBool isLoadingOffices = false.obs;
   final RxList<Office> offices = <Office>[].obs;
   final Rxn<Office> selectedOffice = Rxn<Office>();
@@ -23,7 +26,7 @@ class HrdEmployeeDetailController extends GetxController {
       return;
     }
 
-    employee = args as Employee;
+    employee = args as Users;
     fetchOffices();
     fetchAbsences();
   }
@@ -36,7 +39,8 @@ class HrdEmployeeDetailController extends GetxController {
       final res = await supabase
           .from('absences')
           .select()
-          .eq('user_id', employee.id);
+          .eq('user_id', employee.id)
+          .order('created_at', ascending: false);
 
       absences.value = (res as List).map((e) => Absence.fromJson(e)).toList();
     } catch (e) {
@@ -51,7 +55,7 @@ class HrdEmployeeDetailController extends GetxController {
           .select()
           .order('id', ascending: true);
       employees.value = response
-          .map<Employee>((item) => Employee.fromJson(item))
+          .map<Users>((item) => Users.fromJson(item))
           .toList();
 
       print("Employees fetched: ${employees.length}");

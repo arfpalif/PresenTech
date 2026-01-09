@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:presentech/shared/view/components/Gradient_btn.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/shared/styles/color_style.dart';
+import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
+import 'package:presentech/configs/themes/themes.dart';
 
 class ComponentBadgets extends StatelessWidget {
   final String status;
@@ -125,11 +126,11 @@ class StatusBadge extends StatelessWidget {
 Color statusColor(String status) {
   switch (status) {
     case 'hadir':
-      return AppColors.greenPrimary;
+      return ColorStyle.greenPrimary;
     case 'telat':
-      return AppColors.yellowPrimary;
+      return ColorStyle.yellowPrimary;
     case 'alfa':
-      return AppColors.redPrimary;
+      return ColorStyle.redPrimary;
     default:
       return Colors.grey;
   }

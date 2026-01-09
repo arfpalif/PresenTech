@@ -3,12 +3,13 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/employee/absence/controller/presence_controller.dart';
-import 'package:presentech/shared/view/components/btn_right.dart';
+import 'package:presentech/shared/styles/color_style.dart';
+import 'package:presentech/shared/view/components/buttons/btn_right.dart';
 import 'package:presentech/shared/view/components/component_badgets.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/configs/themes/themes.dart';
 
 class AbsenceListHomepage extends GetView<PresenceController> {
-  AbsenceListHomepage({super.key});
+  const AbsenceListHomepage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +54,7 @@ class AbsenceListHomepage extends GetView<PresenceController> {
                     final t = controller.absences[index];
                     return Card(
                       shadowColor: Colors.transparent,
-                      color: AppColors.greyprimary,
+                      color: ColorStyle.greyprimary,
                       margin: EdgeInsets.only(bottom: 15),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -62,7 +63,7 @@ class AbsenceListHomepage extends GetView<PresenceController> {
                             contentPadding: EdgeInsets.all(10),
                             leading: StatusBadge(status: t.status),
                             title: Text(
-                              DateFormat('dd-MM-yyyy').format(t.date),
+                              DateFormat('dd-MMM-yyyy').format(t.date),
                               style: AppTextStyle.heading2.copyWith(
                                 color: Colors.black,
                               ),

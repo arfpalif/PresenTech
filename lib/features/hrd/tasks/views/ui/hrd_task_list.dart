@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/hrd/tasks/controller/hrd_task_controller.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 
 class HrdTaskList extends GetView<HrdTaskController> {
   const HrdTaskList({super.key});
@@ -24,7 +25,10 @@ class HrdTaskList extends GetView<HrdTaskController> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: <Color>[AppColors.colorPrimary, AppColors.colorSecondary],
+              colors: <Color>[
+                ColorStyle.colorPrimary,
+                ColorStyle.colorSecondary,
+              ],
             ),
           ),
         ),
@@ -49,7 +53,7 @@ class HrdTaskList extends GetView<HrdTaskController> {
                 final t = controller.tasks[index];
                 return Card(
                   shadowColor: Colors.transparent,
-                  color: AppColors.greyprimary,
+                  color: ColorStyle.greyprimary,
                   margin: const EdgeInsets.only(bottom: 15),
                   child: ListTile(
                     onTap: () {
@@ -69,7 +73,7 @@ class HrdTaskList extends GetView<HrdTaskController> {
                           Text(
                             'Pembuat: ${t.userName}',
                             style: AppTextStyle.normal.copyWith(
-                              color: AppColors.colorPrimary,
+                              color: ColorStyle.colorPrimary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),

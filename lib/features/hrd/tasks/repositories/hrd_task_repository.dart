@@ -58,8 +58,7 @@ class HrdTaskRepository {
       await fetchTasks();
       return true;
     } catch (e) {
-      print("Error updateTaskStatus: $e");
-      return false;
+      throw ("Error updateTaskStatus: $e");
     }
   }
 }

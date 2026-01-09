@@ -13,19 +13,26 @@ class EmployeeSettings extends GetView<EmployeeSettingController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF5F7FA),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Header(
-              onComingSoonTap: () => Get.to(ComingSoon()),
-              imageUrl: controller.profilePictureUrl.value,
-              name: controller.name.value,
-              role: controller.role.value,
+            Obx(
+              () => Header(
+                height: 180,
+                onComingSoonTap: () => Get.to(ComingSoon()),
+                imageUrl: controller.profilePictureUrl.value,
+                name: controller.name.value,
+                role: controller.role.value,
+              ),
             ),
             SizedBox(height: 20),
-            Padding(padding: const EdgeInsets.all(16.0), child: SettingMenu()),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: SettingMenu(),
+            ),
           ],
         ),
       ),

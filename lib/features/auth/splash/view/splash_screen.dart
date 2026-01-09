@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/constants/assets_constans.dart';
+import 'package:presentech/constants/assets_constant.dart';
 import 'package:presentech/features/auth/splash/controller/splash_controller.dart';
 
 class SplashScreen extends GetView<SplashController> {

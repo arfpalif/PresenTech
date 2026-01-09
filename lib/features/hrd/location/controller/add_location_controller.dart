@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:get/get.dart';
+import 'package:presentech/features/hrd/location/controller/location_controller.dart';
 import 'package:presentech/features/hrd/location/model/office.dart';
 import 'package:presentech/features/hrd/location/repositories/hrd_location_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -8,6 +9,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class AddLocationController extends GetxController {
   //repository
   final hrdLocationRepo = HrdLocationRepository();
+
+  //others controllers
+  final LocationController locationC = Get.find<LocationController>();
 
   //variables
   final TextEditingController officeNameController = TextEditingController();
@@ -56,7 +60,6 @@ class AddLocationController extends GetxController {
 
     debugPrint('Long pressed at: $point');
 
-    // Remove previous marker if one already exists to avoid null errors
     if (currentMarkerPoint.value != null) {
       await mapController.removeMarker(currentMarkerPoint.value!);
     }
@@ -77,13 +80,11 @@ class AddLocationController extends GetxController {
       isLoading.value = true;
       final response = await hrdLocationRepo.fetchOffices();
 
-      final data = (response as List).map((e) {
-        debugPrint("PARSING OFFICE: $e");
-        return Office.fromJson(e);
-      }).toList();
+      final data = response.map((e) => Office.fromJson(e)).toList();
 
       offices.assignAll(data);
     } catch (e) {
+      print("Error mengambil lokasi: $e");
       Get.snackbar(
         "Error Mengambil Lokasi",
         "Tidak dapat memuat data lokasi: ${e.toString()}",
@@ -95,7 +96,7 @@ class AddLocationController extends GetxController {
 
   Future<bool> submitLocation() async {
     final name = officeNameController.text.trim();
-    final address = this.addressController.text.trim();
+    final address = addressController.text.trim();
     final lat = double.tryParse(latitudeController.text.trim());
     final lng = double.tryParse(longitudeController.text.trim());
     final radius = double.tryParse(radiusController.text.trim());
@@ -111,14 +112,14 @@ class AddLocationController extends GetxController {
 
     isSaving.value = true;
     try {
-      await supabase.from('offices').insert({
-        'name': name,
-        'address': address,
-        'latitude': lat,
-        'longitude': lng,
-        'radius': radius,
-      });
-      await fetchOffices();
+      await hrdLocationRepo.addOfficeLocation(
+        name: name,
+        address: address,
+        latitude: lat,
+        longitude: lng,
+        radius: radius,
+      );
+      await locationC.fetchOffices();
 
       Get.back();
       Get.snackbar('Berhasil', 'Lokasi kantor berhasil ditambahkan');

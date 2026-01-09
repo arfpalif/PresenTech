@@ -5,11 +5,7 @@ import 'package:presentech/shared/controllers/date_controller.dart';
 class HrdTaskBinding extends Bindings {
   @override
   void dependencies() {
-    if (!Get.isRegistered<HrdTaskController>()) {
-      Get.lazyPut(() => HrdTaskController());
-    }
-    if (!Get.isRegistered<DateController>()) {
-      Get.lazyPut(() => DateController());
-    }
+    Get.lazyPut(() => HrdTaskController());
+    Get.lazyPut(() => DateController());
   }
 }

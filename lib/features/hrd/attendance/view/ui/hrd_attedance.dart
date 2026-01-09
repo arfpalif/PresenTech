@@ -2,58 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:presentech/features/hrd/attendance/controller/hrd_attendance_controller.dart';
+import 'package:presentech/features/hrd/attendance/view/components/filter_change.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/components/component_badgets.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/view/widgets/app_header.dart';
 
 class HrdAttedance extends GetView<HrdAttendanceController> {
-  HrdAttedance({super.key});
+  const HrdAttedance({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("HRD Attendance")),
+      appBar: AppBar(
+        title: Text(
+          'Employee attendance',
+          style: AppTextStyle.heading1.copyWith(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        flexibleSpace: const AppHeader(),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Row(
-              spacing: 10,
-              children: [
-                Obx(
-                  () => FilterChip(
-                    label: Text("Today"),
-                    selected:
-                        controller.selectedFilter.value == AbsenceFilter.today,
-                    onSelected: (bool value) {
-                      controller.changeFilter(AbsenceFilter.today);
-                      print("Hari ini");
-                    },
-                  ),
-                ),
-                Obx(
-                  () => FilterChip(
-                    label: Text("This weeks"),
-                    selected:
-                        controller.selectedFilter.value == AbsenceFilter.week,
-                    onSelected: (bool value) {
-                      controller.changeFilter(AbsenceFilter.week);
-                      print("Seminggu");
-                    },
-                  ),
-                ),
-                Obx(
-                  () => FilterChip(
-                    label: Text("This month"),
-                    selected:
-                        controller.selectedFilter.value == AbsenceFilter.month,
-                    onSelected: (bool value) {
-                      controller.changeFilter(AbsenceFilter.month);
-                      print("Sebulan");
-                    },
-                  ),
-                ),
-              ],
-            ),
+            FilterChangeAttendance(),
             SizedBox(height: 16),
             Expanded(
               child: Obx(() {
@@ -70,7 +50,7 @@ class HrdAttedance extends GetView<HrdAttendanceController> {
                     final t = controller.absences[index];
                     return Card(
                       shadowColor: Colors.transparent,
-                      color: AppColors.greyprimary,
+                      color: ColorStyle.greyprimary,
                       margin: EdgeInsets.only(bottom: 15),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,

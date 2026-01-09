@@ -4,20 +4,24 @@ import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/auth/register/repositories/register_repository.dart';
 
 class RegisterController extends GetxController {
-  final registerRepo = Get.find<RegisterRepository>();
+  final registerRepo = RegisterRepository();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final nameController = TextEditingController();
   String? role;
 
+  RxBool isFormValid = false.obs;
+
   Future<void> handleRegister() async {
     // Implement registration logic here
     try {
-      final response = await registerRepo.signUp(
+      final response = await registerRepo.signUpWithRole(
         emailController.text,
         passwordController.text,
+        role,
+        nameController.text,
       );
-      final user = response.user;
+      final user = response?.user;
       if (user == null) {
         throw Exception("Registration failed, please try again");
       }
@@ -45,6 +49,17 @@ class RegisterController extends GetxController {
         "Unexpected error: $e",
         snackPosition: SnackPosition.BOTTOM,
       );
+    }
+  }
+
+  void validateForm() {
+    if (nameController.text.isNotEmpty &&
+        emailController.text.isNotEmpty &&
+        passwordController.text.isNotEmpty &&
+        role != null) {
+      isFormValid.value = true;
+    } else {
+      isFormValid.value = false;
     }
   }
 }

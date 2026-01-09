@@ -5,7 +5,7 @@ import 'package:presentech/features/hrd/profile/controllers/hrd_profile_controll
 class HrdProfileBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put(AuthController());
+    Get.lazyPut(() => AuthController());
     Get.lazyPut(() => HrdProfileController());
   }
 }

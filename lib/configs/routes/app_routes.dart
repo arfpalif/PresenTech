@@ -2,6 +2,7 @@ abstract class Routes {
   static const login = '/login';
   static const register = '/register';
   static const splash = '/splash';
+  static const onBoarding = '/on_boarding';
 
   static const employeeHome = '/employee/home';
   static const employeeIzin = '/employee/employee_permission';
@@ -31,4 +32,6 @@ abstract class Routes {
 
   static const employeeNavbar = '/employee/employee_navbar';
   static const hrdNavbar = '/hrd/hrd_navbar';
+
+  static const comingSoon = '/coming_soon';
 }

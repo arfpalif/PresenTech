@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/shared/controllers/navigation_controller.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/ui/coming_soon.dart';
 
 class Menu extends StatelessWidget {
@@ -12,162 +13,86 @@ class Menu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 25),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: Text("Quick Actions", style: AppTextStyle.heading1),
+        ),
+        SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildMenuItem(
+              icon: Icons.person_rounded,
+              label: "Absensi",
+              colors: [ColorStyle.greenPrimary, ColorStyle.greenSecondary],
+              onTap: () => Get.toNamed(Routes.employeeAbsenceHistory),
+            ),
+            _buildMenuItem(
+              icon: Icons.assignment_rounded,
+              label: "Permission",
+              colors: [
+                ColorStyle.colorPrimary,
+                ColorStyle.colorSecondary,
+              ],
+              onTap: () => navController.changePage(1),
+            ),
+            _buildMenuItem(
+              icon: Icons.location_on_rounded,
+              label: "Location",
+              colors: [ColorStyle.yellowPrimary, ColorStyle.yellowSecondary],
+              onTap: () => Get.to(ComingSoon()),
+            ),
+            _buildMenuItem(
+              icon: Icons.task_rounded,
+              label: "Tasks",
+              colors: [ColorStyle.redPrimary, ColorStyle.redSecondary],
+              onTap: () => navController.changePage(2),
+            ),
           ],
         ),
+      ],
+    );
+  }
 
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text("Menu", style: AppTextStyle.heading1),
+  Widget _buildMenuItem({
+    required IconData icon,
+    required String label,
+    required List<Color> colors,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            height: 60,
+            width: 60,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: colors,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Get.toNamed(Routes.employeeAbsenceHistory);
-                    },
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColors.greenPrimary,
-                                AppColors.greenSecondary,
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              Icons.person,
-                              size: 35,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        Text("Absensi", style: AppTextStyle.smallText),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      navController.changePage(1);
-                    },
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColors.colorPrimary.withOpacity(0.8),
-                                AppColors.colorSecondary.withOpacity(0.5),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              Icons.email,
-                              size: 35,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        Text("Permission", style: AppTextStyle.smallText),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Get.to(ComingSoon());
-                    },
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColors.yellowPrimary,
-                                AppColors.yellowSecondary,
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              Icons.location_on,
-                              size: 35,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        Text("Location", style: AppTextStyle.smallText),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      navController.changePage(2);
-                    },
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColors.redPrimary.withOpacity(0.8),
-                                AppColors.redSecondary.withOpacity(0.7),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              Icons.book,
-                              size: 35,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        Text("Tasks", style: AppTextStyle.smallText),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: colors.first.withValues(alpha: 0.3),
+                  blurRadius: 12,
+                  offset: Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Icon(icon, color: Colors.white, size: 28),
           ),
-        ),
+          SizedBox(height: 8),
+          Text(
+            label,
+            style: AppTextStyle.smallText.copyWith(fontWeight: FontWeight.w600),
+          ),
+        ],
       ),
     );
   }

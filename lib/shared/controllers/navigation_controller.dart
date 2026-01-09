@@ -9,7 +9,7 @@ class NavigationController extends GetxController {
 
     if (index == 3) {
       if (Get.isRegistered<EmployeeSettingController>()) {
-        Get.find<EmployeeSettingController>().getUserProfile();
+        Get.find<EmployeeSettingController>().getUser();
       }
     }
   }

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/employee/settings/controller/employee_setting_controller.dart';
-import 'package:presentech/shared/view/components/Gradient_btn.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
-import 'package:presentech/shared/view/ui/coming_soon.dart';
+import 'package:presentech/shared/styles/color_style.dart';
+import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
+import 'package:presentech/configs/themes/themes.dart';
 
 class SettingMenu extends GetView<EmployeeSettingController> {
   const SettingMenu({super.key});
@@ -19,19 +19,16 @@ class SettingMenu extends GetView<EmployeeSettingController> {
         SizedBox(height: 20),
         ListTile(
           onTap: () {
-            Get.toNamed(
-              Routes.employeeProfile,
-              arguments: controller.user.value,
-            );
+            Get.toNamed(Routes.employeeProfile);
           },
           contentPadding: EdgeInsets.all(0),
           leading: Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.colorPrimary.withOpacity(0.2),
+              color: ColorStyle.colorPrimary.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.person, color: AppColors.colorPrimary),
+            child: Icon(Icons.person, color: ColorStyle.colorPrimary),
           ),
           title: Text("Profil Saya", style: AppTextStyle.normal),
           trailing: Icon(Icons.arrow_right),
@@ -39,16 +36,16 @@ class SettingMenu extends GetView<EmployeeSettingController> {
         SizedBox(height: 20),
         ListTile(
           onTap: () {
-            Get.to(ComingSoon());
+            Get.toNamed(Routes.comingSoon);
           },
           contentPadding: EdgeInsets.all(0),
           leading: Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.redPrimary.withOpacity(0.2),
+              color: ColorStyle.redPrimary.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.location_pin, color: AppColors.redPrimary),
+            child: Icon(Icons.location_pin, color: ColorStyle.redPrimary),
           ),
           title: Text("Lokasi kantor", style: AppTextStyle.normal),
           trailing: Icon(Icons.arrow_right),
@@ -58,13 +55,13 @@ class SettingMenu extends GetView<EmployeeSettingController> {
         SizedBox(height: 20),
         ListTile(
           onTap: () {
-            Get.to(ComingSoon());
+            Get.toNamed(Routes.comingSoon);
           },
           contentPadding: EdgeInsets.all(0),
           leading: Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.palette, color: Colors.grey),
@@ -75,16 +72,16 @@ class SettingMenu extends GetView<EmployeeSettingController> {
         SizedBox(height: 20),
         ListTile(
           onTap: () {
-            Get.to(ComingSoon());
+            Get.toNamed(Routes.comingSoon);
           },
           contentPadding: EdgeInsets.all(0),
           leading: Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.yellowPrimary.withOpacity(0.2),
+              color: ColorStyle.yellowPrimary.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.location_pin, color: AppColors.yellowPrimary),
+            child: Icon(Icons.location_pin, color: ColorStyle.yellowPrimary),
           ),
           title: Text("Bantuan", style: AppTextStyle.normal),
           trailing: Icon(Icons.arrow_right),

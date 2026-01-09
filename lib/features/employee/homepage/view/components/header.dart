@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/features/employee/homepage/controllers/employee_homepage_controller.dart';
 import 'package:presentech/shared/controllers/navigation_controller.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/configs/themes/themes.dart';
 
 class Header extends GetView<EmployeeHomepageController> {
-  Header({super.key});
+  const Header({super.key});
 
   NavigationController get navController => Get.find<NavigationController>();
 

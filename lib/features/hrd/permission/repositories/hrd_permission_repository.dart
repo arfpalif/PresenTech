@@ -1,3 +1,4 @@
+import 'package:presentech/constants/api_constant.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HrdPermissionRepository {
@@ -17,7 +18,7 @@ class HrdPermissionRepository {
     DateTime endDate,
   ) async {
     final response = await supabase
-        .from('permissions')
+        .from(ApiConstant.tablePermissions)
         .select()
         .gte('created_at', startDate.toIso8601String())
         .lte('created_at', endDate.toIso8601String())

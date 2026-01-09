@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/features/employee/permissions/models/permission_filter.dart';
-import 'package:presentech/features/hrd/permission/model/permission.dart';
 import 'package:presentech/features/hrd/permission/repositories/hrd_permission_repository.dart';
+import 'package:presentech/shared/models/permission.dart';
 
 class HrdPermissionController extends GetxController {
   //repository
@@ -14,7 +14,7 @@ class HrdPermissionController extends GetxController {
   var reason = ''.obs;
   var date = ''.obs;
   var status = ''.obs;
-  var filteredEmployees;
+  var filteredEmployees = ''.obs;
 
   var selectedFilter = Rxn<PermissionFilter>();
   final RxList<Permission> permissions = <Permission>[].obs;

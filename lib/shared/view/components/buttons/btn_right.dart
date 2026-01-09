@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 
 class BtnRight extends StatelessWidget {
   final String text;
@@ -28,8 +29,8 @@ class BtnRight extends StatelessWidget {
     final colors =
         gradientColors ??
         [
-          AppColors.greenPrimary.withOpacity(0.1),
-          AppColors.greenSecondary.withOpacity(0.3),
+          ColorStyle.greenPrimary.withValues(alpha: 0.1),
+          ColorStyle.greenSecondary.withValues(alpha: 0.3),
         ];
     return Card(
       child: Container(
@@ -41,7 +42,7 @@ class BtnRight extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
-          border: Border.all(color: AppColors.greenPrimary),
+          border: Border.all(color: ColorStyle.greenPrimary),
           borderRadius: BorderRadius.circular(100),
         ),
         child: Row(

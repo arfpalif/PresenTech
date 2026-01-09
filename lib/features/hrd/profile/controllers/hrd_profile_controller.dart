@@ -6,13 +6,16 @@ import 'package:presentech/shared/controllers/auth_controller.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HrdProfileController extends GetxController {
+  //repository
+  final profileRepo = HrdProfileRepository();
+
+  //variables
   final AuthController authC = Get.find<AuthController>();
   final supabase = Supabase.instance.client;
   var profilePic = "".obs;
   var name = "".obs;
   var role = "".obs;
   var isLoading = false.obs;
-  final profileRepo = HrdProfileRepository();
 
   @override
   void onInit() {
@@ -30,11 +33,9 @@ class HrdProfileController extends GetxController {
 
       final response = await profileRepo.getUser(userId);
 
-      if (response != null) {
-        profilePic.value = response['profile_picture'] ?? '';
-        name.value = response['name'] ?? '';
-        role.value = response['role'] ?? '';
-      }
+      profilePic.value = response['profile_picture'] ?? '';
+      name.value = response['name'] ?? '';
+      role.value = response['role'] ?? '';
     } catch (e) {
       debugPrint('Error fetching HRD profile: $e');
     } finally {

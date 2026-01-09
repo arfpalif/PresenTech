@@ -5,7 +5,7 @@ import 'package:presentech/shared/controllers/navigation_controller.dart';
 import 'package:presentech/features/employee/homepage/view/ui/employee_homepage.dart';
 import 'package:presentech/features/employee/settings/view/ui/employee_settings.dart';
 import 'package:presentech/features/employee/tasks/view/ui/employee_task.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 
 class EmployeeBottomNav extends GetView<NavigationController> {
   EmployeeBottomNav({super.key});
@@ -36,7 +36,7 @@ class EmployeeBottomNav extends GetView<NavigationController> {
             currentIndex: controller.currentIndex.value,
             onTap: controller.changePage,
             backgroundColor: Colors.white,
-            selectedItemColor: AppColors.colorSecondary.withOpacity(0.9),
+            selectedItemColor: ColorStyle.colorSecondary.withOpacity(0.9),
             unselectedItemColor: Colors.grey,
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),

@@ -1,6 +1,6 @@
 class Absence {
   int id;
-  String createdAt;
+  String? createdAt;
   DateTime date;
   String? clockIn;
   String? clockOut;

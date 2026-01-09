@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/auth/splash/repositories/splash_repository.dart';
@@ -14,20 +15,23 @@ class SplashController extends GetxController {
 
   Future<void> handleAuth() async {
     try {
-      final session = await splashRepo.getSession();
-      if (session == null) {
-        Get.offAllNamed(Routes.login);
-        return;
-      }
+      final session = splashRepo.getSession();
 
-      final role = await splashRepo.getRole(session.user.id);
-      if (role == 'hrd') {
-        Get.offAllNamed(Routes.hrdNavbar);
+      if (session == null) {
+        Get.offAllNamed(Routes.onBoarding);
       } else {
-        Get.offAllNamed(Routes.employeeNavbar);
+        final role = await splashRepo.getRole(session.user.id);
+        if (role == null) {
+          Get.offAllNamed(Routes.onBoarding);
+        } else {
+          role == 'employee'
+              ? Get.offAllNamed(Routes.employeeNavbar)
+              : Get.offAllNamed(Routes.hrdNavbar);
+        }
       }
     } catch (e) {
-      Get.offAllNamed(Routes.login);
+      debugPrint("SplashController handleAuth error: $e");
+      Get.offAllNamed(Routes.onBoarding);
     }
   }
 }

@@ -1,21 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:get/get.dart';
+import 'package:presentech/features/hrd/location/controller/location_controller.dart';
 import 'package:presentech/features/hrd/location/model/office.dart';
+import 'package:presentech/features/hrd/location/repositories/hrd_location_repository.dart';
 
 class DetailLocationController extends GetxController {
+  //repository
+  final hrdLocationRepo = HrdLocationRepository();
   late final Rx<Office?> office = Rx<Office?>(null);
-
+  RxList<Office> offices = <Office>[].obs;
+  final locationC = Get.find<LocationController>();
+  //controllers
   final TextEditingController latitudeController = TextEditingController();
   final TextEditingController longitudeController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController officeNameController = TextEditingController();
   final TextEditingController radiusController = TextEditingController();
 
+  //variables
+  final isLoading = false.obs;
+  final isMapReady = false.obs;
+
+  //map controller
   late final MapController mapController;
 
+  //model
   final Rxn<GeoPoint> currentMarkerPoint = Rxn<GeoPoint>();
-  final isMapReady = false.obs;
 
   @override
   void onInit() {
@@ -84,5 +95,74 @@ class DetailLocationController extends GetxController {
     currentMarkerPoint.value = point;
     latitudeController.text = point.latitude.toString();
     longitudeController.text = point.longitude.toString();
+  }
+
+  Future<void> fetchOffices() async {
+    try {
+      isLoading.value = true;
+
+      final response = await hrdLocationRepo.fetchOffices();
+
+      final data = (response as List).map((e) {
+        return Office.fromJson(e);
+      }).toList();
+
+      offices.assignAll(data);
+    } catch (e) {
+      print("Error: $e");
+      Get.snackbar(
+        "Error Mengambil Lokasi",
+        "Tidak dapat memuat data lokasi: ${e.toString()}",
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> updateOfficeLocation({
+    required int officeId,
+    required double latitude,
+    required double longitude,
+    required String name,
+    required String address,
+    required double radius,
+  }) async {
+    try {
+      isLoading.value = true;
+
+      await hrdLocationRepo.updateOfficeLocation(
+        office.value!,
+        officeId: officeId.toString(),
+        latitude: latitude,
+        longitude: longitude,
+        name: name,
+        address: address,
+        radius: radius,
+      );
+      Get.back();
+      await locationC.fetchOffices();
+
+      Get.snackbar('Berhasil', 'Lokasi kantor berhasil diperbarui');
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal memperbarui lokasi: ${e.toString()}');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> deleteOfficeLocation(String officeId) async {
+    try {
+      isLoading.value = true;
+
+      await hrdLocationRepo.deleteOfficeLocation(officeId);
+      await fetchOffices();
+
+      Get.back();
+      Get.snackbar('Berhasil', 'Lokasi kantor berhasil dihapus');
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal menghapus lokasi: ${e.toString()}');
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

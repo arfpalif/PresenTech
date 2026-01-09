@@ -6,7 +6,7 @@ import 'package:presentech/features/hrd/homepage/view/ui/hrd_homepage.dart';
 import 'package:presentech/features/hrd/permission/view/ui/hrd_permission.dart';
 import 'package:presentech/features/hrd/location/view/ui/hrd_location.dart';
 import 'package:presentech/features/hrd/profile/view/ui/hrd_profile_page.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 
 class HrdBottomNav extends GetView<NavigationController> {
   HrdBottomNav({super.key});
@@ -28,7 +28,7 @@ class HrdBottomNav extends GetView<NavigationController> {
       ),
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(
-          selectedItemColor: AppColors.colorSecondary,
+          selectedItemColor: ColorStyle.colorSecondary,
           currentIndex: controller.currentIndex.value,
           onTap: controller.changePage,
           items: const [

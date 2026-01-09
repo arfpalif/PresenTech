@@ -5,7 +5,7 @@ import 'package:presentech/shared/controllers/date_controller.dart';
 class EmployeePermissionsBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => EmployeePermissionController());
     Get.lazyPut(() => DateController());
+    Get.lazyPut(() => EmployeePermissionController());
   }
 }

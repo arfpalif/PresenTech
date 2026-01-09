@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get/route_manager.dart';
 import 'package:presentech/features/employee/homepage/controllers/employee_homepage_controller.dart';
 import 'package:presentech/features/employee/homepage/view/components/absence_list_homepage.dart';
 import 'package:presentech/features/employee/homepage/view/components/card_absence.dart';
 import 'package:presentech/features/employee/homepage/view/components/menu.dart';
 import 'package:presentech/features/employee/homepage/view/components/task_list_homepage.dart';
 import 'package:presentech/shared/controllers/navigation_controller.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/ui/coming_soon.dart';
 import 'package:presentech/shared/view/widgets/header.dart';
 
@@ -21,11 +20,11 @@ class EmployeeHomepage extends GetView<EmployeeHomepageController> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.light, // Changed to light for dark header
+        statusBarBrightness: Brightness.dark,
       ),
       child: Scaffold(
-        backgroundColor: AppColors.greyprimary,
+        backgroundColor: Color(0xFFF5F7FA), // Slightly lighter grey for cleaner look
         body: Column(
           children: [
             Obx(() {
@@ -44,28 +43,21 @@ class EmployeeHomepage extends GetView<EmployeeHomepageController> {
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    Transform.translate(
-                      offset: Offset(0, -30),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            SizedBox(height: 20),
-                            CardAbsence(),
-                            SizedBox(height: 20),
-                            Menu(),
-                            SizedBox(height: 20),
-                            AbsenceListHomepage(),
-                            SizedBox(height: 20),
-                            TaskListHomepage(),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 24),
+                      CardAbsence(),
+                      SizedBox(height: 32),
+                      Menu(),
+                      SizedBox(height: 32),
+                      AbsenceListHomepage(),
+                      SizedBox(height: 32),
+                      TaskListHomepage(),
+                      SizedBox(height: 100), // Bottom padding
+                    ],
+                  ),
                 ),
               ),
             ),

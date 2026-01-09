@@ -8,11 +8,6 @@ class AuthController extends GetxController {
   var isLoading = true.obs;
   var role = ''.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
-
   Future<void> signOut() async {
     await authRepo.signOut();
     Get.offAllNamed(Routes.login);

@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:presentech/shared/controllers/auth_controller.dart';
 import 'package:presentech/myApp.dart';
+import 'package:presentech/shared/controllers/date_controller.dart';
 import 'package:presentech/shared/controllers/navigation_controller.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await dotenv.load(fileName: ".env");
   await Supabase.initialize(
-    url: 'https://jpksiqtapxasaqutkrhh.supabase.co',
-    anonKey: 'sb_publishable_wqoOP-oikiB31asXOuWkng_r9Mb_p59',
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
   Get.lazyPut(() => NavigationController());
   Get.lazyPut(() => AuthController());
+  Get.lazyPut(() => DateController());
   runApp(MyApp());
 }
 

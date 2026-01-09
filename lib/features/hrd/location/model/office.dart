@@ -27,9 +27,9 @@ class Office {
     id: json["id"],
     address: json["address"],
     name: json["name"],
-    longitude: json["longitude"]?.toDouble(),
-    latitude: json["latitude"]?.toDouble(),
-    radius: json["radius"],
+    longitude: json["longitude"]?.toDouble() ?? 0.0,
+    latitude: json["latitude"]?.toDouble() ?? 0.0,
+    radius: json["radius"] ?? 0,
   );
 
   Map<String, dynamic> toJson() => {

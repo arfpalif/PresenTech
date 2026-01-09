@@ -4,6 +4,10 @@ class AuthRepository {
   final supabase = Supabase.instance.client;
 
   Future<void> signOut() async {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      throw Exception('Error signing out: $e');
+    }
   }
 }

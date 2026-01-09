@@ -1,13 +1,13 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/employee/permissions/controller/employee_permission_controller.dart';
 import 'package:presentech/features/employee/permissions/models/permission_filter.dart';
 import 'package:presentech/features/employee/permissions/view/components/permission_list.dart';
 import 'package:presentech/features/employee/permissions/view/ui/employee_add_permission.dart';
 import 'package:presentech/shared/controllers/date_controller.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 
 // ignore: must_be_immutable
 class EmployeePermission extends GetView<EmployeePermissionController> {
@@ -19,29 +19,37 @@ class EmployeePermission extends GetView<EmployeePermissionController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF5F7FA),
       appBar: AppBar(
         title: Text(
           'Permissions',
-          style: AppTextStyle.title.copyWith(color: Colors.white),
+          style: AppTextStyle.title.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: <Color>[AppColors.colorPrimary, AppColors.greenPrimary],
+              colors: <Color>[ColorStyle.colorPrimary, ColorStyle.greenPrimary],
             ),
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
           ),
         ),
       ),
       floatingActionButton: OpenContainer(
-        closedBuilder: (context, openContainer) => FloatingActionButton(
-          onPressed: openContainer,
-          backgroundColor: AppColors.colorSecondary,
-          foregroundColor: Colors.white,
-          child: const Icon(Icons.add),
+        closedElevation: 6,
+        closedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        closedColor: ColorStyle.greenPrimary,
+        closedBuilder: (context, openContainer) => SizedBox(
+          height: 56,
+          width: 56,
+          child: Center(
+            child: Icon(Icons.add_rounded, color: Colors.white, size: 28),
+          ),
         ),
         openBuilder: (context, closeContainer) {
           Get.lazyPut(() => EmployeePermissionController());
@@ -52,52 +60,46 @@ class EmployeePermission extends GetView<EmployeePermissionController> {
         transitionDuration: const Duration(milliseconds: 500),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                spacing: 10,
-                children: [
-                  Obx(
-                    () => FilterChip(
-                      label: Text("Today"),
-                      selected:
-                          controller.selectedFilter.value ==
-                          PermissionFilter.today,
-                      onSelected: (bool value) {
-                        controller.changeFilter(PermissionFilter.today);
-                      },
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: BouncingScrollPhysics(),
+                child: Row(
+                  spacing: 12,
+                  children: [
+                    _buildFilterChip(
+                      label: "Today",
+                      filter: PermissionFilter.today,
                     ),
-                  ),
-                  Obx(
-                    () => FilterChip(
-                      label: Text("This weeks"),
-                      selected:
-                          controller.selectedFilter.value ==
-                          PermissionFilter.week,
-                      onSelected: (bool value) {
-                        controller.changeFilter(PermissionFilter.week);
-                      },
+                    _buildFilterChip(
+                      label: "This Week",
+                      filter: PermissionFilter.week,
                     ),
-                  ),
-                  Obx(
-                    () => FilterChip(
-                      label: Text("This month"),
-                      selected:
-                          controller.selectedFilter.value ==
-                          PermissionFilter.month,
-                      onSelected: (bool value) {
-                        controller.changeFilter(PermissionFilter.month);
-                      },
+                    _buildFilterChip(
+                      label: "This Month",
+                      filter: PermissionFilter.month,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 20),
               Obx(() {
                 if (controller.permissions.isEmpty) {
-                  return const Center(child: Text("No data"));
+                  return Center(
+                    child: Column(
+                      children: [
+                        SizedBox(height: 50),
+                        Icon(Icons.assignment_outlined, size: 60, color: Colors.grey[300]),
+                        SizedBox(height: 16),
+                        const Text("No permissions found"),
+                      ],
+                    ),
+                  );
                 }
 
                 return PermissionList();
@@ -107,5 +109,34 @@ class EmployeePermission extends GetView<EmployeePermissionController> {
         ),
       ),
     );
+  }
+
+  Widget _buildFilterChip({required String label, required PermissionFilter filter}) {
+    return Obx(() {
+      final isSelected = controller.selectedFilter.value == filter;
+      return FilterChip(
+        label: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.grey[700],
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+        selected: isSelected,
+        onSelected: (bool value) {
+          controller.changeFilter(filter);
+        },
+        backgroundColor: Colors.white,
+        selectedColor: ColorStyle.colorPrimary,
+        checkmarkColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(
+            color: isSelected ? Colors.transparent : Colors.grey[300]!,
+          ),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      );
+    });
   }
 }

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/configs/pages/app_pages.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
         canvasColor: Colors.white,
         dialogTheme: DialogThemeData(backgroundColor: Colors.white),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          selectedItemColor: AppColors.colorSecondary.withOpacity(0.7),
+          selectedItemColor: ColorStyle.colorSecondary.withValues(alpha: 0.7),
           unselectedItemColor: Colors.grey,
           backgroundColor: Colors.white,
           selectedLabelStyle: AppTextStyle.smallText.copyWith(

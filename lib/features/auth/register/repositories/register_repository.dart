@@ -10,6 +10,31 @@ class RegisterRepository {
     return response;
   }
 
+  Future<AuthResponse?> signUpWithRole(
+    String email,
+    String password,
+    String? role,
+    String? name,
+  ) async {
+    try {
+      final response = await signUp(email, password);
+      final user = response.user;
+
+      if (user != null && role != null && role.isNotEmpty) {
+        await _supabase.from('users').upsert({
+          'id': user.id,
+          'email': email,
+          'role': role,
+          'name': name,
+          'created_at': DateTime.now().toIso8601String(),
+        });
+      }
+      return response;
+    } catch (e) {
+      throw ('Error in signUpWithRole: $e');
+    }
+  }
+
   Future<String?> getRole(String userId) async {
     final response = await _supabase
         .from('users')

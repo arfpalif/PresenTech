@@ -3,11 +3,15 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:presentech/features/hrd/employee/controller/hrd_employee_controller.dart';
 import 'package:presentech/features/hrd/employee/controller/hrd_employee_detail_controller.dart';
-import 'package:presentech/features/hrd/employee/models/employee.dart';
 import 'package:presentech/features/hrd/location/model/office.dart';
-import 'package:presentech/shared/view/components/Gradient_btn.dart';
+import 'package:presentech/shared/models/users.dart';
+import 'package:presentech/shared/styles/color_style.dart';
+import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
 import 'package:presentech/shared/view/components/component_badgets.dart';
-import 'package:presentech/shared/view/themes/themes.dart';
+import 'package:presentech/shared/view/components/textFields/text_field_normal.dart';
+import 'package:presentech/shared/view/widgets/app_card.dart';
+import 'package:presentech/shared/view/widgets/app_header.dart';
+import 'package:presentech/configs/themes/themes.dart';
 
 // ignore: must_be_immutable
 class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
@@ -18,262 +22,346 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
   final TextEditingController joinDateController = TextEditingController();
   int? userId;
 
-  late final Employee employee;
+  late final Users employee;
   HrdEmployeeDetail({super.key}) {
-    employee = Get.arguments as Employee;
+    employee = Get.arguments as Users;
     nameController.text = employee.name;
     emailController.text = employee.email;
     roleController.text = employee.role;
-    joinDateController.text = employee.role;
+    joinDateController.text = employee.createdAt != null
+        ? DateFormat('dd-MMM-yyyy').format(DateTime.parse(employee.createdAt!))
+        : '';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF5F7FA),
       appBar: AppBar(
         title: Text(
-          'HRD Employee Detail Page',
-          style: AppTextStyle.title.copyWith(color: Colors.white),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: <Color>[AppColors.colorPrimary, AppColors.colorSecondary],
-            ),
+          'Detail Karyawan',
+          style: AppTextStyle.heading1.copyWith(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
         ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        flexibleSpace: const AppHeader(),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(100),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            // Profile Image
+            Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 15,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+                  border: Border.all(color: Colors.white, width: 4),
+                ),
+                child: ClipOval(
                   child: Image.network(
-                    employee.profilePicture,
-                    height: 150,
-                    width: 150,
+                    employee.profilePicture ??
+                        'https://www.pngall.com/wp-content/uploads/5/Profile-PNG-File.png',
+                    height: 120,
+                    width: 120,
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              Text("Informasi kontak", style: AppTextStyle.heading1),
-              TextField(
-                style: AppTextStyle.normal,
-                keyboardType: TextInputType.text,
-                controller: nameController,
-                obscureText: false,
-                decoration: InputDecoration(
-                  labelText: "Name",
-                  prefixIcon: Icon(Icons.person),
-                ),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                style: AppTextStyle.normal,
-                keyboardType: TextInputType.text,
-                controller: emailController,
-                obscureText: false,
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  hintStyle: AppTextStyle.normal,
-                  prefixIcon: Icon(Icons.email),
-                ),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                style: AppTextStyle.normal,
-                keyboardType: TextInputType.text,
-                controller: roleController,
-                obscureText: false,
-                decoration: InputDecoration(
-                  labelText: "Role",
-                  prefixIcon: Icon(Icons.grid_view),
-                ),
-              ),
-              SizedBox(height: 20),
-              Text("Lokasi Kantor", style: AppTextStyle.heading2),
-              SizedBox(height: 10),
-              Obx(() {
-                if (controller.isLoadingOffices.value) {
-                  return Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
+            ),
+            const SizedBox(height: 24),
 
-                if (controller.offices.isEmpty) {
-                  return Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(4),
+            // Form Card
+            AppCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Informasi Kontak",
+                    style: AppTextStyle.heading2.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
-                    child: Text(
-                      "Belum ada lokasi kantor tersedia",
-                      style: AppTextStyle.normal.copyWith(color: Colors.grey),
-                    ),
-                  );
-                }
-
-                return Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(4),
                   ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<Office>(
-                      isExpanded: true,
-                      value: controller.selectedOffice.value,
-                      hint: Text(
-                        "Pilih Lokasi Kantor",
-                        style: AppTextStyle.normal,
+                  const SizedBox(height: 20),
+
+                  TextFieldNormal(
+                    controller: nameController,
+                    decoration: _inputDecoration(
+                      label: "Nama",
+                      icon: Icons.person,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  TextFieldNormal(
+                    controller: emailController,
+                    decoration: _inputDecoration(
+                      label: "Email",
+                      icon: Icons.email,
+                    ),
+                    readOnly: true,
+                  ),
+                  const SizedBox(height: 16),
+
+                  TextFieldNormal(
+                    controller: roleController,
+                    decoration: _inputDecoration(
+                      label: "Role",
+                      icon: Icons.work,
+                    ),
+                    readOnly: true,
+                  ),
+                  const SizedBox(height: 24),
+
+                  Text(
+                    "Lokasi Kantor",
+                    style: AppTextStyle.heading2.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  Obx(() {
+                    if (controller.isLoadingOffices.value) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+
+                    if (controller.offices.isEmpty) {
+                      return Text(
+                        "Belum ada lokasi kantor tersedia",
+                        style: AppTextStyle.normal.copyWith(color: Colors.grey),
+                      );
+                    }
+
+                    return Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 4,
                       ),
-                      items: controller.offices.map((Office office) {
-                        return DropdownMenuItem<Office>(
-                          value: office,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<Office>(
+                          isExpanded: true,
+                          value: controller.selectedOffice.value,
+                          hint: Text(
+                            "Pilih Lokasi Kantor",
+                            style: AppTextStyle.normal,
+                          ),
+                          icon: Icon(Icons.arrow_drop_down, color: Colors.grey),
+                          items: controller.offices.map((Office office) {
+                            return DropdownMenuItem<Office>(
+                              value: office,
+                              child: Text(
                                 office.name,
                                 style: AppTextStyle.normal.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              SizedBox(height: 2),
-                              Text(
-                                office.address,
-                                style: AppTextStyle.normal.copyWith(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (Office? newValue) {
-                        if (newValue != null) {
-                          controller.selectedOffice.value = newValue;
-                        }
-                      },
-                    ),
-                  ),
-                );
-              }),
-              SizedBox(height: 20),
-              TextField(
-                style: AppTextStyle.normal,
-                keyboardType: TextInputType.text,
-                controller: joinDateController,
-                obscureText: false,
-                decoration: InputDecoration(
-                  labelText: "Tanggal bergabung",
-                  prefixIcon: Icon(Icons.person),
-                ),
-              ),
-              SizedBox(height: 20),
-              AppGradientButton(
-                text: "Submit",
-                onPressed: () async {
-                  // Validasi office dipilih
-                  if (controller.selectedOffice.value == null) {
-                    Get.snackbar(
-                      "Error",
-                      "Silakan pilih lokasi kantor",
-                      snackPosition: SnackPosition.BOTTOM,
-                    );
-                    return;
-                  }
-
-                  final success = await controller.updateEmployee(
-                    nameController.text,
-                    emailController.text,
-                    controller.selectedOffice.value!.id,
-                  );
-                  if (success) {
-                    final mainController = Get.find<HrdEmployeeController>();
-                    await mainController.fetchEmployees();
-                    Get.back();
-                    Get.snackbar("Success", "Employee updated successfully");
-                  } else {
-                    Get.snackbar(
-                      "Error",
-                      "Failed to update employee",
-                      snackPosition: SnackPosition.BOTTOM,
-                    );
-                  }
-                },
-              ),
-              SizedBox(height: 20),
-              Text("Riwayat absensi", style: AppTextStyle.heading1),
-              SizedBox(height: 10),
-              Obx(() {
-                if (controller.absences.isEmpty) {
-                  return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text("Tidak ada riwayat absensi"),
-                  );
-                }
-                return ListView.builder(
-                  itemCount: controller.absences.length,
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (_, index) {
-                    final t = controller.absences[index];
-                    return Card(
-                      shadowColor: Colors.transparent,
-                      color: AppColors.greyprimary,
-                      margin: EdgeInsets.only(bottom: 15),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          ListTile(
-                            contentPadding: EdgeInsets.all(10),
-                            leading: StatusBadge(status: t.status),
-                            title: Text(
-                              DateFormat('dd-MM-yyyy').format(t.date),
-                              style: AppTextStyle.heading2.copyWith(
-                                color: Colors.black,
-                              ),
-                            ),
-                            subtitle: Text(
-                              "Masuk : ${t.clockIn != null && t.clockIn != null ? t.clockIn?.substring(0, 5) : '-'} | Keluar : ${t.clockOut != null && t.clockOut != null ? t.clockOut?.substring(0, 5) : '-'}",
-                              style: AppTextStyle.normal.copyWith(
-                                color: Colors.grey,
-                              ),
-                            ),
-                            trailing: ComponentBadgets(status: t.status),
-                          ),
-                        ],
+                            );
+                          }).toList(),
+                          onChanged: (Office? newValue) {
+                            if (newValue != null) {
+                              controller.selectedOffice.value = newValue;
+                            }
+                          },
+                        ),
                       ),
                     );
-                  },
-                );
-              }),
-            ],
-          ),
+                  }),
+                  const SizedBox(height: 16),
+
+                  TextFieldNormal(
+                    controller: joinDateController,
+                    decoration: _inputDecoration(
+                      label: "Tanggal Bergabung",
+                      icon: Icons.calendar_today,
+                    ),
+                    readOnly: true,
+                  ),
+                  const SizedBox(height: 24),
+
+                  AppGradientButton(
+                    text: "Update Data",
+                    onPressed: () async {
+                      if (controller.selectedOffice.value == null) {
+                        Get.snackbar(
+                          "Perhatian",
+                          "Silakan pilih lokasi kantor",
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.orange,
+                          colorText: Colors.white,
+                        );
+                        return;
+                      }
+
+                      final success = await controller.updateEmployee(
+                        nameController.text,
+                        emailController.text,
+                        controller.selectedOffice.value!.id,
+                      );
+                      if (success) {
+                        final mainController =
+                            Get.find<HrdEmployeeController>();
+                        await mainController.fetchEmployees();
+                        Get.back();
+                        Get.snackbar(
+                          "Sukses",
+                          "Data karyawan berhasil diperbarui",
+                        );
+                      } else {
+                        Get.snackbar(
+                          "Gagal",
+                          "Terjadi kesalahan saat menyimpan data",
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // History Section
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 4.0),
+                  child: Text(
+                    "Riwayat Absensi",
+                    style: AppTextStyle.heading2.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Obx(() {
+                  if (controller.absences.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "Tidak ada riwayat absensi",
+                        style: AppTextStyle.normal.copyWith(color: Colors.grey),
+                      ),
+                    );
+                  }
+                  return ListView.builder(
+                    itemCount: controller.absences.length,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (_, index) {
+                      final t = controller.absences[index];
+                      return AppCard(
+                        margin: EdgeInsets.only(bottom: 12),
+                        padding: EdgeInsets.zero,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.all(16),
+                          leading: StatusBadge(status: t.status),
+                          title: Text(
+                            DateFormat('EEEE, dd MMM yyyy').format(t.date),
+                            style: AppTextStyle.heading2.copyWith(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.login,
+                                  size: 14,
+                                  color: Colors.green,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  t.clockIn?.substring(0, 5) ?? '-',
+                                  style: AppTextStyle.normal.copyWith(
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Icon(Icons.logout, size: 14, color: Colors.red),
+                                SizedBox(width: 4),
+                                Text(
+                                  t.clockOut?.substring(0, 5) ?? '-',
+                                  style: AppTextStyle.normal.copyWith(
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          trailing: ComponentBadgets(status: t.status),
+                        ),
+                      );
+                    },
+                  );
+                }),
+              ],
+            ),
+            SizedBox(height: 40),
+          ],
         ),
       ),
     );
   }
+
+  InputDecoration _inputDecoration({
+    required String label,
+    required IconData icon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon, color: Colors.grey),
+      filled: true,
+      fillColor: Colors.grey[50],
+      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: ColorStyle.colorPrimary),
+      ),
+    );
+  }
+}
+
+InputDecoration _inputDecoration({
+  required String label,
+  required IconData icon,
+}) {
+  return InputDecoration(
+    labelText: label,
+    prefixIcon: Icon(icon, color: Colors.grey),
+    filled: true,
+    fillColor: Colors.grey[50],
+    contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Colors.grey[300]!),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: ColorStyle.colorPrimary),
+    ),
+  );
 }

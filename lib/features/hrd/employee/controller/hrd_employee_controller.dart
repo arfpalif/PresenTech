@@ -1,6 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/features/hrd/employee/models/employee.dart';
 import 'package:presentech/features/hrd/employee/repositories/hrd_employee_repository.dart';
+import 'package:presentech/shared/models/users.dart';
 
 enum AbsenceFilter { today, week, month }
 
@@ -13,10 +14,17 @@ class HrdEmployeeController extends GetxController {
   var profileUrl = "".obs;
   var name = "".obs;
 
-  var filteredEmployees = <Employee>[].obs;
+  //text editing controller
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController roleController = TextEditingController();
+  final TextEditingController joinDateController = TextEditingController();
+
+  var filteredEmployees = <Users>[].obs;
   var searchQuery = ''.obs;
 
-  RxList<Employee> employees = <Employee>[].obs;
+  RxList<Users> employees = <Users>[].obs;
   RxBool isLoading = false.obs;
 
   @override
@@ -29,14 +37,12 @@ class HrdEmployeeController extends GetxController {
     try {
       final response = await employeeRepo.fetchEmployees();
       employees.value = response
-          .map<Employee>((item) => Employee.fromJson(item))
+          .map<Users>((item) => Users.fromJson(item))
           .toList();
-      print("Employees fetched: ${employees.length}");
       filteredEmployees.assignAll(employees);
     } catch (e) {
-      print("Error fetch employees: $e");
-      print("Employees fetched: ${employees.length}");
-    } finally {}
+      throw ('Failed to fetch employees: $e');
+    }
   }
 
   void searchEmployee(String query) {

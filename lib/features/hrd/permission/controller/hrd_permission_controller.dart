@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/features/employee/permissions/models/permission_filter.dart';
+import 'package:presentech/shared/view/components/dialog/success_dialog.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/features/hrd/permission/repositories/hrd_permission_repository.dart';
 import 'package:presentech/shared/models/permission.dart';
 
@@ -16,8 +18,8 @@ class HrdPermissionController extends GetxController {
   var status = ''.obs;
   var filteredEmployees = ''.obs;
 
-  var selectedFilter = Rxn<PermissionFilter>();
   final RxList<Permission> permissions = <Permission>[].obs;
+  final selectedFilter = Rxn<PermissionFilter>();
 
   @override
   void onInit() {
@@ -34,7 +36,7 @@ class HrdPermissionController extends GetxController {
       );
     } catch (e) {
       debugPrint('Error fetching permissions: $e');
-      Get.snackbar('Error', 'Failed to fetch permissions');
+      FailedSnackbar.show('Failed to fetch permissions');
     }
   }
 
@@ -96,21 +98,21 @@ class HrdPermissionController extends GetxController {
   Future<void> approvePermission(int permissionId) async {
     try {
       await permissionRepo.approvePermission(permissionId);
-
+      SuccessDialog.show("Success", "Sukses menyetujui", () {});
       fetchPermissionsByDay();
     } catch (e) {
-      Get.snackbar('Error', 'Failed to approve permission');
+      FailedSnackbar.show('Failed to approve permission');
     }
   }
 
-  Future<void> rejectPermission(int permissionId) async {
+  Future<void> rejectPermission(int permissionId, String feedback) async {
     try {
-      await permissionRepo.rejectPermission(permissionId);
+      await permissionRepo.rejectPermission(permissionId, feedback);
 
       fetchPermissionsByDay();
-      permissions.remove((p) => p.id == permissionId);
+      permissions.removeWhere((p) => p.id == permissionId);
     } catch (e) {
-      Get.snackbar('Error', 'Failed to reject permission');
+      FailedSnackbar.show('Failed to reject permission');
     }
   }
 }

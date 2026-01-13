@@ -29,6 +29,7 @@ abstract class Routes {
       '/features/hrd/location/view/hrd_location_detail';
   static const hrdAddLocation = '/hrd/hrd_add_location';
   static const hrdEmployeeDetail = '/hrd/hrd_employee/detail';
+  static const hrdPermissionDetail = '/hrd/hrd_permissions/detail';
 
   static const employeeNavbar = '/employee/employee_navbar';
   static const hrdNavbar = '/hrd/hrd_navbar';

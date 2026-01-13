@@ -5,6 +5,8 @@ import 'package:presentech/shared/models/tasks.dart';
 import 'package:presentech/shared/controllers/date_controller.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
+import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
 import 'package:presentech/configs/themes/themes.dart';
 
 // ignore: must_be_immutable
@@ -42,7 +44,7 @@ class HrdTaskDetail extends GetView<HrdTaskController> {
         selectedLevel == null ||
         selectedPriority == null ||
         selectedStatus == null) {
-      Get.snackbar("Error", "Harap isi semua field");
+      FailedSnackbar.show("Harap isi semua field");
       return;
     }
 
@@ -63,7 +65,7 @@ class HrdTaskDetail extends GetView<HrdTaskController> {
     final end = parseDate(_dateController.endDateController.text);
 
     if (start == null || end == null) {
-      Get.snackbar("Error", "Format tanggal tidak valid");
+      FailedSnackbar.show("Format tanggal tidak valid");
       return;
     }
 
@@ -84,9 +86,9 @@ class HrdTaskDetail extends GetView<HrdTaskController> {
 
     if (success) {
       Get.back();
-      Get.snackbar("Berhasil", "Tugas berhasil diperbarui");
+      SuccessSnackbar.show("Tugas berhasil diperbarui");
     } else {
-      Get.snackbar("Error", "Gagal memperbarui tugas");
+      FailedSnackbar.show("Gagal memperbarui tugas");
     }
   }
 
@@ -240,7 +242,7 @@ class HrdTaskDetail extends GetView<HrdTaskController> {
                     controller.deleteTask(task.id!);
                     Get.back();
                   } else {
-                    Get.snackbar("Error", "ID tugas tidak valid");
+                    FailedSnackbar.show("ID tugas tidak valid");
                   }
                 },
               ),

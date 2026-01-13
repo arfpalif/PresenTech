@@ -5,6 +5,7 @@ import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/employee/tasks/controller/employee_task_controller.dart';
 import 'package:presentech/configs/themes/themes.dart';
 import 'package:presentech/shared/styles/color_style.dart';
+import 'package:presentech/shared/view/components/component_badgets.dart';
 
 class EmployeeTask extends GetView<EmployeeTaskController> {
   const EmployeeTask({super.key});
@@ -17,7 +18,10 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
       appBar: AppBar(
         title: Text(
           'Tasks',
-          style: AppTextStyle.title.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+          style: AppTextStyle.title.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -59,7 +63,11 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(height: 50),
-                    Icon(Icons.assignment_outlined, size: 60, color: Colors.grey[300]),
+                    Icon(
+                      Icons.assignment_outlined,
+                      size: 60,
+                      color: Colors.grey[300],
+                    ),
                     SizedBox(height: 16),
                     Text(
                       'No tasks available',
@@ -83,7 +91,7 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withValues(alpha: 0.1),
+                        color: Colors.grey.withOpacity(0.1),
                         blurRadius: 15,
                         offset: Offset(0, 5),
                       ),
@@ -106,27 +114,29 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                           Row(
+                          Row(
                             children: [
-                              Icon(Icons.calendar_today, size: 14, color: Colors.grey),
+                              Icon(
+                                Icons.calendar_today,
+                                size: 14,
+                                color: Colors.grey,
+                              ),
                               SizedBox(width: 4),
                               Text(
                                 '${dateFormatter.format(t.startDate)} - ${dateFormatter.format(t.endDate)}',
-                                style: AppTextStyle.smallText.copyWith(color: Colors.grey[600]),
+                                style: AppTextStyle.smallText.copyWith(
+                                  color: Colors.grey[600],
+                                ),
                               ),
                             ],
-                           ),
+                          ),
                         ],
                       ),
                     ),
                     trailing: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        _buildBadge(t.priority, _getPriorityColor(t.priority)),
-                        SizedBox(height: 4),
-                        Text('Level: ${t.level}', style: AppTextStyle.smallText.copyWith(color: Colors.grey)),
-                      ],
+                      children: [ComponentBadgets(status: t.priority)],
                     ),
                   ),
                 );
@@ -134,34 +144,6 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
             );
           }),
         ),
-      ),
-    );
-  }
-
-  Color _getPriorityColor(String priority) {
-    switch (priority.toLowerCase()) {
-      case 'high':
-        return Colors.redAccent;
-      case 'medium':
-        return Colors.orangeAccent;
-      case 'low':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  Widget _buildBadge(String text, Color color) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.5)),
-      ),
-      child: Text(
-        text,
-        style: AppTextStyle.smallText.copyWith(color: color, fontWeight: FontWeight.bold),
       ),
     );
   }

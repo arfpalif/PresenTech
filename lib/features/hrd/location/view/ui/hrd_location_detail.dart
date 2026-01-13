@@ -51,7 +51,7 @@ class HrdLocationDetail extends GetView<DetailLocationController> {
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: Colors.black.withOpacity(0.1),
                     blurRadius: 15,
                     offset: Offset(0, 5),
                   ),
@@ -93,7 +93,7 @@ class HrdLocationDetail extends GetView<DetailLocationController> {
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withValues(alpha: 0.05),
+                    color: Colors.grey.withOpacity(0.05),
                     blurRadius: 10,
                     offset: Offset(0, 5),
                   ),

@@ -64,7 +64,7 @@ class HrdLocationList extends GetView<LocationController> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withValues(alpha: 0.1),
+                  color: Colors.grey.withOpacity(0.1),
                   blurRadius: 15,
                   offset: Offset(0, 5),
                 ),
@@ -78,7 +78,7 @@ class HrdLocationList extends GetView<LocationController> {
               leading: Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: ColorStyle.colorPrimary.withValues(alpha: 0.1),
+                  color: ColorStyle.colorPrimary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.location_on, color: ColorStyle.colorPrimary),

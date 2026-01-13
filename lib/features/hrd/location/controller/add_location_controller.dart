@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:get/get.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
+import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
 import 'package:presentech/features/hrd/location/controller/location_controller.dart';
 import 'package:presentech/features/hrd/location/model/office.dart';
 import 'package:presentech/features/hrd/location/repositories/hrd_location_repository.dart';
@@ -85,10 +87,7 @@ class AddLocationController extends GetxController {
       offices.assignAll(data);
     } catch (e) {
       print("Error mengambil lokasi: $e");
-      Get.snackbar(
-        "Error Mengambil Lokasi",
-        "Tidak dapat memuat data lokasi: ${e.toString()}",
-      );
+      FailedSnackbar.show("Tidak dapat memuat data lokasi: ${e.toString()}");
     } finally {
       isLoading.value = false;
     }
@@ -106,7 +105,7 @@ class AddLocationController extends GetxController {
         lat == null ||
         lng == null ||
         radius == null) {
-      Get.snackbar('Error', 'Semua field harus terisi dengan benar');
+      FailedSnackbar.show('Semua field harus terisi dengan benar');
       return false;
     }
 
@@ -122,10 +121,10 @@ class AddLocationController extends GetxController {
       await locationC.fetchOffices();
 
       Get.back();
-      Get.snackbar('Berhasil', 'Lokasi kantor berhasil ditambahkan');
+      SuccessSnackbar.show('Lokasi kantor berhasil ditambahkan');
       return true;
     } catch (e) {
-      Get.snackbar('Error', 'Gagal menyimpan lokasi: ${e.toString()}');
+      FailedSnackbar.show('Gagal menyimpan lokasi: ${e.toString()}');
       return false;
     } finally {
       isSaving.value = false;

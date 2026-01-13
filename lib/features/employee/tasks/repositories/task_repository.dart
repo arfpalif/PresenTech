@@ -1,46 +1,28 @@
 import 'package:presentech/constants/api_constant.dart';
+import 'package:presentech/shared/models/tasks.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TaskRepository {
   final SupabaseClient supabase = Supabase.instance.client;
 
-  Future<PostgrestList> fetchTasks() async {
-    try {
-      final response = await supabase
-          .from(ApiConstant.tableTasks)
-          .select()
-          .order('id', ascending: false);
-      return response;
-    } catch (e) {
-      throw Exception('Error fetching tasks: $e');
-    }
+  Future<List<Map<String, dynamic>>> fetchTasks(String userId) async {
+    final response = await supabase
+        .from(ApiConstant.tableTasks)
+        .select()
+        .eq('user_id', userId)
+        .order('id', ascending: false);
+    return List<Map<String, dynamic>>.from(response);
   }
 
-  Future<bool> insertTask(task) async {
-    try {
-      await supabase.from('tasks').insert(task.toMap());
-      return true;
-    } catch (e) {
-      return false;
-    }
+  Future<void> insertTask(Map<String, dynamic> data) async {
+    await supabase.from(ApiConstant.tableTasks).insert(data);
   }
 
-  Future<bool> updateTask(task) async {
-    try {
-      await supabase.from('tasks').update(task.toMap()).eq('id', task.id!);
-      return true;
-    } catch (e) {
-      return false;
-    }
+  Future<void> updateTask(int id, Map<String, dynamic> data) async {
+    await supabase.from(ApiConstant.tableTasks).update(data).eq('id', id);
   }
 
-  Future<bool> deleteTask(int id) async {
-    try {
-      await supabase.from('tasks').delete().eq('id', id);
-      return true;
-    } catch (e) {
-      print("Error deleteTask: $e");
-      return false;
-    }
+  Future<void> deleteTask(int id) async {
+    await supabase.from(ApiConstant.tableTasks).delete().eq('id', id);
   }
 }

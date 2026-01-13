@@ -34,9 +34,9 @@ class HrdHomepage extends GetView<HrdHomepageController> {
                 onComingSoonTap: () {
                   Get.to(ComingSoon());
                 },
-                imageUrl: '${controller.profilePic}',
-                name: '${controller.name}',
-                role: '${controller.role}',
+                imageUrl: controller.profilePic.value,
+                name: controller.name.value,
+                role: controller.role.value,
               ),
             ),
             Padding(
@@ -90,7 +90,7 @@ class HrdHomepage extends GetView<HrdHomepageController> {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withValues(alpha: 0.1),
+                                color: Colors.grey.withOpacity(0.1),
                                 blurRadius: 20,
                                 offset: Offset(0, 5),
                               ),

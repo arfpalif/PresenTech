@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/hrd/profile/controllers/hrd_profile_controller.dart';
 import 'package:presentech/features/hrd/profile/view/components/setting_menu.dart';
-import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/configs/themes/themes.dart';
 import 'package:presentech/shared/view/widgets/header.dart';
 

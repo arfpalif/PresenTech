@@ -42,7 +42,7 @@ class Header extends StatelessWidget {
               width: 150,
               height: 150,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: Colors.white.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
             ),
@@ -54,7 +54,7 @@ class Header extends StatelessWidget {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: Colors.white.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
             ),
@@ -108,7 +108,7 @@ class Header extends StatelessWidget {
                             border: Border.all(color: Colors.white, width: 2),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
+                                color: Colors.black.withOpacity(0.1),
                                 blurRadius: 10,
                                 offset: Offset(0, 4),
                               ),
@@ -118,8 +118,8 @@ class Header extends StatelessWidget {
                             child: imageUrl.isEmpty
                                 ? CircleAvatar(
                                     radius: 28,
-                                    backgroundColor: Colors.white.withValues(
-                                      alpha: 0.2,
+                                    backgroundColor: Colors.white.withOpacity(
+                                      0.2,
                                     ),
                                     child: Icon(
                                       Icons.person,
@@ -136,7 +136,7 @@ class Header extends StatelessWidget {
                                       return CircleAvatar(
                                         radius: 28,
                                         backgroundColor: Colors.white
-                                            .withValues(alpha: 0.2),
+                                            .withOpacity(0.2),
                                         child: Icon(
                                           Icons.person,
                                           color: Colors.white,
@@ -165,7 +165,7 @@ class Header extends StatelessWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
+                                color: Colors.white.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(

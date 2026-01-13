@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
-import 'package:presentech/features/hrd/tasks/views/ui/hrd_task.dart';
 import 'package:presentech/shared/controllers/navigation_controller.dart';
 import 'package:presentech/configs/themes/themes.dart';
 import 'package:presentech/shared/styles/color_style.dart';
@@ -75,7 +74,7 @@ class Menu extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: colors.first.withValues(alpha: 0.3),
+                  color: colors.first.withOpacity(0.3),
                   blurRadius: 12,
                   offset: Offset(0, 6),
                 ),

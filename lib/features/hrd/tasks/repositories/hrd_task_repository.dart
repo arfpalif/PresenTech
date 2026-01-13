@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 import 'package:presentech/shared/models/tasks.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
+import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HrdTaskRepository {
@@ -22,7 +24,7 @@ class HrdTaskRepository {
       return true;
     } catch (e) {
       print("Error insertTask: $e");
-      Get.snackbar("Error", "Gagal menambahkan tugas: ${e.toString()}");
+      FailedSnackbar.show("Gagal menambahkan tugas: ${e.toString()}");
       return false;
     }
   }
@@ -34,7 +36,7 @@ class HrdTaskRepository {
       return true;
     } catch (e) {
       print("Error updateTask: $e");
-      Get.snackbar("Error", "Gagal memperbarui tugas: ${e.toString()}");
+      FailedSnackbar.show("Gagal memperbarui tugas: ${e.toString()}");
       return false;
     }
   }
@@ -43,11 +45,11 @@ class HrdTaskRepository {
     try {
       await supabase.from('tasks').delete().eq('id', id);
       tasks.removeWhere((t) => t.id == id);
-      Get.snackbar("Berhasil", "Tugas berhasil dihapus");
+      SuccessSnackbar.show("Tugas berhasil dihapus");
       return true;
     } catch (e) {
       print("Error deleteTask: $e");
-      Get.snackbar("Error", "Gagal menghapus tugas: ${e.toString()}");
+      FailedSnackbar.show("Gagal menghapus tugas: ${e.toString()}");
       return false;
     }
   }

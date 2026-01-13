@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
-import 'package:presentech/features/employee/absence/controller/presence_controller.dart';
+import 'package:presentech/features/employee/absence/controllers/presence_controller.dart';
+import 'package:presentech/shared/controllers/split_time.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/components/buttons/btn_right.dart';
 import 'package:presentech/shared/view/components/component_badgets.dart';
@@ -69,7 +70,7 @@ class AbsenceListHomepage extends GetView<PresenceController> {
                               ),
                             ),
                             subtitle: Text(
-                              "Masuk : ${t.clockIn.toString()} keluar : ${t.clockOut.toString()}",
+                              "Absensi : ${SplitTime().formatClockInOut(t.clockIn.toString(), t.clockOut.toString())}",
                               style: AppTextStyle.normal.copyWith(
                                 color: Colors.grey,
                               ),

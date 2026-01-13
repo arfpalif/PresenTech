@@ -3,80 +3,138 @@ import 'package:get/get.dart';
 import 'package:presentech/features/employee/tasks/repositories/task_repository.dart';
 import 'package:presentech/shared/controllers/date_controller.dart';
 import 'package:presentech/shared/models/tasks.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
+import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EmployeeTaskController extends GetxController {
-  //repository
-  final taskRepo = TaskRepository();
+  // Repository
+  final _taskRepo = TaskRepository();
 
-  //controllers
+  // Supabase
+  final _supabase = Supabase.instance.client;
+  String get _userId => _supabase.auth.currentUser?.id ?? "";
+
+  // Controllers
   final titleController = TextEditingController();
   final acceptanceController = TextEditingController();
-  final startDateController = TextEditingController();
-  final endDateController = TextEditingController();
-  final RxnString selectedLevel = RxnString();
-  final RxnString selectedPriority = RxnString();
-  late final DateController dateController;
+  DateController get dateController => Get.find<DateController>();
 
-  //supabase client
-  final userId = Supabase.instance.client.auth.currentUser?.id;
-
-  final selectedDate = Rx<DateTime?>(null);
-
-  RxList<Tasks> tasks = <Tasks>[].obs;
-  RxBool isLoading = false.obs;
+  // Observables
+  final selectedLevel = RxnString();
+  final selectedPriority = RxnString();
+  final tasks = <Tasks>[].obs;
+  final isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchTasks();
-    dateController = Get.find<DateController>();
   }
 
   Future<void> fetchTasks() async {
+    if (_userId.isEmpty) return;
+
     try {
       isLoading.value = true;
-
-      final response = await taskRepo.fetchTasks();
-      tasks.value = response.map<Tasks>((item) => Tasks.fromMap(item)).toList();
+      final response = await _taskRepo.fetchTasks(_userId);
+      tasks.assignAll(response.map((item) => Tasks.fromMap(item)));
     } catch (e) {
-      print("Error fetchTasks: $e");
+      debugPrint("Error fetchTasks: $e");
+      FailedSnackbar.show("Gagal mengambil data tugas");
     } finally {
       isLoading.value = false;
     }
   }
 
-  Future<bool> insertTask(Tasks task) async {
+  Future<void> _handleTaskAction(
+    Future<void> Function() action,
+    String successMsg,
+    String errorMsg,
+  ) async {
     try {
-      await taskRepo.insertTask(task);
+      isLoading.value = true;
+      await action();
       await fetchTasks();
-      return true;
+      SuccessSnackbar.show(successMsg);
     } catch (e) {
-      print("Error insertTask: $e");
-      return false;
+      debugPrint("Task Action Error: $e");
+      FailedSnackbar.show(errorMsg);
+    } finally {
+      isLoading.value = false;
     }
   }
 
-  Future<bool> updateTask(Tasks task) async {
-    try {
-      await taskRepo.updateTask(task);
-      await fetchTasks();
-      return true;
-    } catch (e) {
-      print("Error insertTask: $e");
-      return false;
-    }
+  Future<void> insertTask(Tasks task) async {
+    await _handleTaskAction(
+      () => _taskRepo.insertTask(task.toMap()),
+      "Tugas berhasil ditambahkan",
+      "Gagal menambahkan tugas",
+    );
   }
 
-  Future<bool> deleteTask(int id) async {
-    try {
-      await taskRepo.deleteTask(id);
-      tasks.removeWhere((t) => t.id == id);
-      Get.snackbar("Success", "Task berhasil dihapus");
-      return true;
-    } catch (e) {
-      print("Error deleteTask: $e");
-      return false;
+  Future<void> updateTask(Tasks task) async {
+    if (task.id == null) return;
+    await _handleTaskAction(
+      () => _taskRepo.updateTask(task.id!, task.toMap()),
+      "Tugas berhasil diperbarui",
+      "Gagal memperbarui tugas",
+    );
+  }
+
+  Future<void> deleteTask(int id) async {
+    await _handleTaskAction(
+      () => _taskRepo.deleteTask(id),
+      "Tugas berhasil dihapus",
+      "Gagal menghapus tugas",
+    );
+  }
+
+  void submitForm() async {
+    if (titleController.text.isEmpty ||
+        acceptanceController.text.isEmpty ||
+        dateController.startDateController.text.isEmpty ||
+        dateController.endDateController.text.isEmpty ||
+        selectedLevel.value == null ||
+        selectedPriority.value == null) {
+      FailedSnackbar.show("Harap isi semua field");
+      return;
     }
+
+    DateTime? parseDate(String s) {
+      try {
+        final parts = s.split('-');
+        if (parts.length != 3) return null;
+        return DateTime(
+          int.parse(parts[2]),
+          int.parse(parts[1]),
+          int.parse(parts[0]),
+        );
+      } catch (_) {
+        return null;
+      }
+    }
+
+    final start = parseDate(dateController.startDateController.text);
+    final end = parseDate(dateController.endDateController.text);
+
+    if (start == null || end == null) {
+      FailedSnackbar.show("Format tanggal tidak valid");
+      return;
+    }
+
+    final newTask = Tasks(
+      createdAt: DateTime.now().toIso8601String(),
+      acceptanceCriteria: acceptanceController.text,
+      startDate: start,
+      endDate: end,
+      priority: selectedPriority.value!,
+      level: selectedLevel.value!,
+      title: titleController.text,
+      userId: _userId,
+    );
+
+    await insertTask(newTask);
+    Get.back();
   }
 }

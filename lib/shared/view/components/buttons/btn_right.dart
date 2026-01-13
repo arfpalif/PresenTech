@@ -29,8 +29,8 @@ class BtnRight extends StatelessWidget {
     final colors =
         gradientColors ??
         [
-          ColorStyle.greenPrimary.withValues(alpha: 0.1),
-          ColorStyle.greenSecondary.withValues(alpha: 0.3),
+          ColorStyle.greenPrimary.withOpacity(0.1),
+          ColorStyle.greenSecondary.withOpacity(0.3),
         ];
     return Card(
       child: Container(

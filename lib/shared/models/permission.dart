@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'package:intl/intl.dart';
-
-enum PermissionType { permission, leave }
-
-enum PermissionStatus { pending, approved, rejected }
+import 'package:presentech/utils/enum/permission_status.dart';
+import 'package:presentech/utils/enum/permission_type.dart';
 
 extension PermissionTypeX on PermissionType {
   String get value => switch (this) {
@@ -37,16 +35,18 @@ class Permission {
   DateTime startDate;
   DateTime endDate;
   String? userId;
+  String? feedback;
 
   Permission({
     this.id,
     required this.createdAt,
     required this.type,
     required this.reason,
-    this.status,
+    required this.status,
     required this.startDate,
     required this.endDate,
     this.userId,
+    this.feedback,
   });
 
   factory Permission.fromJson(Map<String, dynamic> json) {
@@ -68,10 +68,14 @@ class Permission {
       createdAt: created,
       type: PermissionTypeX.fromString(json["type"]),
       reason: json["reason"],
-      status: json["status"],
+      status: PermissionStatus.values.firstWhere(
+        (e) => e.toString() == 'PermissionStatus.${json["status"]}',
+        orElse: () => PermissionStatus.pending,
+      ),
       startDate: toYmd(start),
       endDate: toYmd(end),
       userId: json["user_id"],
+      feedback: json["feedback"],
     );
   }
 
@@ -82,6 +86,7 @@ class Permission {
     "start_date": DateFormat('yyyy-MM-dd').format(startDate),
     "end_date": DateFormat('yyyy-MM-dd').format(endDate),
     "user_id": userId,
+    "feedback": feedback,
   };
 
   String get createdAtYmd => DateFormat('dd-MMM-yyyy').format(createdAt);

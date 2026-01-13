@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/features/hrd/location/model/office.dart';
 import 'package:presentech/features/hrd/location/repositories/hrd_location_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -30,10 +31,7 @@ class LocationController extends GetxController {
       offices.assignAll(data);
     } catch (e) {
       print("Error: $e");
-      Get.snackbar(
-        "Error Mengambil Lokasi",
-        "Tidak dapat memuat data lokasi: ${e.toString()}",
-      );
+      FailedSnackbar.show("Tidak dapat memuat data lokasi: ${e.toString()}");
     } finally {
       isLoading.value = false;
     }

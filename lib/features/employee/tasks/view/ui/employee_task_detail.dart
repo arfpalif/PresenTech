@@ -6,6 +6,8 @@ import 'package:presentech/shared/models/tasks.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
 import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
+import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
 import 'package:presentech/shared/view/components/textFields/text_field_outlined.dart';
 
 // ignore: must_be_immutable
@@ -36,7 +38,7 @@ class EmployeeTaskDetail extends GetView<EmployeeTaskController> {
         _dateController.endDateController.text.isEmpty ||
         selectedLevel == null ||
         selectedPriority == null) {
-      Get.snackbar("Error", "Harap isi semua field");
+      FailedSnackbar.show("Harap isi semua field");
       return;
     }
 
@@ -57,7 +59,7 @@ class EmployeeTaskDetail extends GetView<EmployeeTaskController> {
     final end = parseDate(_dateController.endDateController.text);
 
     if (start == null || end == null) {
-      Get.snackbar("Error", "Format tanggal tidak valid");
+      FailedSnackbar.show("Format tanggal tidak valid");
       return;
     }
 
@@ -72,15 +74,8 @@ class EmployeeTaskDetail extends GetView<EmployeeTaskController> {
       id: task.id,
       userId: task.userId,
     );
-
-    final success = await controller.updateTask(newTask);
-
-    if (success) {
-      Get.back();
-      Get.snackbar("Success", "Task berhasil diperbarui");
-    } else {
-      Get.snackbar("Error", "Gagal menambahkan task");
-    }
+    await controller.updateTask(newTask);
+    SuccessSnackbar.show("Tugas berhasil diperbarui");
   }
 
   @override
@@ -122,7 +117,7 @@ class EmployeeTaskDetail extends GetView<EmployeeTaskController> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withValues(alpha: 0.05),
+                    color: Colors.grey.withOpacity(0.05),
                     blurRadius: 10,
                     offset: Offset(0, 5),
                   ),

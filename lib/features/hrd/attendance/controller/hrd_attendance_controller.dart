@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:presentech/features/hrd/attendance/repositories/hrd_attendance_repository.dart';
 import 'package:presentech/shared/models/absence.dart';
+import 'package:presentech/utils/enum/absence_status.dart';
 import 'package:presentech/utils/enum/filter.dart';
 
 class HrdAttendanceController extends GetxController {
@@ -23,7 +24,6 @@ class HrdAttendanceController extends GetxController {
   void onInit() {
     super.onInit();
     fetchAbsence();
-    fetchAbsenceToday();
   }
 
   Future<Map<String, dynamic>?> getTodayAbsence() async {
@@ -36,30 +36,43 @@ class HrdAttendanceController extends GetxController {
     try {
       final response = await attendanceRepo.fetchAbsence();
       absences.assignAll(response?['data'] ?? []);
+      _updateSummary();
     } catch (e) {
       print("Error fetch Absence: $e");
       throw Exception("Failed to fetch absences");
     }
   }
 
-  Future<void> fetchAbsenceToday() async {
-    try {
-      await attendanceRepo.getTodayAbsence();
+  void _updateSummary() {
+    print("Updating summary: absences count = ${absences.length}");
+    
+    final today = DateTime.now();
+    final todayStr = "${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
+    print("Filtering for today: $todayStr");
 
-      telat.value = absences
-          .where((absence) => absence.status == 'telat')
-          .length;
-      print(telat.value);
+    final todayAbsences = absences.where((a) {
+      final aDateStr = "${a.date.year}-${a.date.month.toString().padLeft(2, '0')}-${a.date.day.toString().padLeft(2, '0')}";
+      return aDateStr == todayStr;
+    }).toList();
 
-      hadir.value = absences
-          .where((absence) => absence.status == 'hadir')
-          .length;
-      print(hadir.value);
-
-      alfa.value = absences.where((absence) => absence.status == 'alfa').length;
-    } catch (e) {
-      throw Exception("Failed to fetch absences");
+    print("Today's absences found: ${todayAbsences.length}");
+    if (todayAbsences.isEmpty && absences.isNotEmpty) {
+      print("First absence date in list: ${absences.first.date}");
     }
+
+    telat.value = todayAbsences
+        .where((absence) => absence.status == AbsenceStatus.terlambat)
+        .length;
+
+    hadir.value = todayAbsences
+        .where((absence) => absence.status == AbsenceStatus.hadir)
+        .length;
+
+    alfa.value = todayAbsences
+        .where((absence) => absence.status == AbsenceStatus.alfa)
+        .length;
+    
+    print("Summary counts -> Hadir: ${hadir.value}, Telat: ${telat.value}, Alpha: ${alfa.value}");
   }
 
   void changeFilter(AbsenceFilter? filter) {

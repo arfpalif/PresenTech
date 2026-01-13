@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:presentech/features/hrd/tasks/repositories/hrd_task_repository.dart';
 import 'package:presentech/shared/models/tasks.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
+import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
 
 class HrdTaskController extends GetxController {
   //repository
@@ -22,7 +24,7 @@ class HrdTaskController extends GetxController {
       tasks.value = response.map<Tasks>((item) => Tasks.fromMap(item)).toList();
     } catch (e) {
       print("Error fetchTasks: $e");
-      Get.snackbar("Error", "Gagal mengambil data tugas: ${e.toString()}");
+      FailedSnackbar.show("Gagal mengambil data tugas: ${e.toString()}");
     } finally {
       isLoading.value = false;
     }
@@ -35,7 +37,7 @@ class HrdTaskController extends GetxController {
       return true;
     } catch (e) {
       print("Error insertTask: $e");
-      Get.snackbar("Error", "Gagal menambahkan tugas: ${e.toString()}");
+      FailedSnackbar.show("Gagal menambahkan tugas: ${e.toString()}");
       return false;
     }
   }
@@ -47,7 +49,7 @@ class HrdTaskController extends GetxController {
       return true;
     } catch (e) {
       print("Error updateTask: $e");
-      Get.snackbar("Error", "Gagal memperbarui tugas: ${e.toString()}");
+      FailedSnackbar.show("Gagal memperbarui tugas: ${e.toString()}");
       return false;
     }
   }
@@ -56,11 +58,11 @@ class HrdTaskController extends GetxController {
     try {
       await taskRepo.deleteTask(id);
       tasks.removeWhere((t) => t.id == id);
-      Get.snackbar("Berhasil", "Tugas berhasil dihapus");
+      SuccessSnackbar.show("Tugas berhasil dihapus");
       return true;
     } catch (e) {
       print("Error deleteTask: $e");
-      Get.snackbar("Error", "Gagal menghapus tugas: ${e.toString()}");
+      FailedSnackbar.show("Gagal menghapus tugas: ${e.toString()}");
       return false;
     }
   }

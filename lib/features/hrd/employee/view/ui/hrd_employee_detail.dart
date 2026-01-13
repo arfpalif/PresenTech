@@ -5,12 +5,14 @@ import 'package:presentech/features/hrd/employee/controller/hrd_employee_control
 import 'package:presentech/features/hrd/employee/controller/hrd_employee_detail_controller.dart';
 import 'package:presentech/features/hrd/location/model/office.dart';
 import 'package:presentech/shared/models/users.dart';
-import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
 import 'package:presentech/shared/view/components/component_badgets.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
+import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
 import 'package:presentech/shared/view/components/textFields/text_field_normal.dart';
 import 'package:presentech/shared/view/widgets/app_card.dart';
 import 'package:presentech/shared/view/widgets/app_header.dart';
+import 'package:presentech/shared/styles/input_style.dart';
 import 'package:presentech/configs/themes/themes.dart';
 
 // ignore: must_be_immutable
@@ -28,9 +30,9 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
     nameController.text = employee.name;
     emailController.text = employee.email;
     roleController.text = employee.role;
-    joinDateController.text = employee.createdAt != null
-        ? DateFormat('dd-MMM-yyyy').format(DateTime.parse(employee.createdAt!))
-        : '';
+    joinDateController.text = DateFormat(
+      'dd-MMM-yyyy',
+    ).format(DateTime.parse(employee.createdAt));
   }
 
   @override
@@ -64,7 +66,7 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: Colors.black.withOpacity(0.1),
                       blurRadius: 15,
                       offset: Offset(0, 5),
                     ),
@@ -99,8 +101,8 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
 
                   TextFieldNormal(
                     controller: nameController,
-                    decoration: _inputDecoration(
-                      label: "Nama",
+                    decoration: AppInputStyle.decoration(
+                      labelText: "Nama",
                       icon: Icons.person,
                     ),
                   ),
@@ -108,8 +110,8 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
 
                   TextFieldNormal(
                     controller: emailController,
-                    decoration: _inputDecoration(
-                      label: "Email",
+                    decoration: AppInputStyle.decoration(
+                      labelText: "Email",
                       icon: Icons.email,
                     ),
                     readOnly: true,
@@ -118,8 +120,8 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
 
                   TextFieldNormal(
                     controller: roleController,
-                    decoration: _inputDecoration(
-                      label: "Role",
+                    decoration: AppInputStyle.decoration(
+                      labelText: "Role",
                       icon: Icons.work,
                     ),
                     readOnly: true,
@@ -189,8 +191,8 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
 
                   TextFieldNormal(
                     controller: joinDateController,
-                    decoration: _inputDecoration(
-                      label: "Tanggal Bergabung",
+                    decoration: AppInputStyle.decoration(
+                      labelText: "Tanggal Bergabung",
                       icon: Icons.calendar_today,
                     ),
                     readOnly: true,
@@ -201,13 +203,7 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
                     text: "Update Data",
                     onPressed: () async {
                       if (controller.selectedOffice.value == null) {
-                        Get.snackbar(
-                          "Perhatian",
-                          "Silakan pilih lokasi kantor",
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: Colors.orange,
-                          colorText: Colors.white,
-                        );
+                        FailedSnackbar.show("Silakan pilih lokasi kantor");
                         return;
                       }
 
@@ -221,13 +217,11 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
                             Get.find<HrdEmployeeController>();
                         await mainController.fetchEmployees();
                         Get.back();
-                        Get.snackbar(
-                          "Sukses",
+                        SuccessSnackbar.show(
                           "Data karyawan berhasil diperbarui",
                         );
                       } else {
-                        Get.snackbar(
-                          "Gagal",
+                        FailedSnackbar.show(
                           "Terjadi kesalahan saat menyimpan data",
                         );
                       }
@@ -322,46 +316,4 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
       ),
     );
   }
-
-  InputDecoration _inputDecoration({
-    required String label,
-    required IconData icon,
-  }) {
-    return InputDecoration(
-      labelText: label,
-      prefixIcon: Icon(icon, color: Colors.grey),
-      filled: true,
-      fillColor: Colors.grey[50],
-      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: ColorStyle.colorPrimary),
-      ),
-    );
-  }
-}
-
-InputDecoration _inputDecoration({
-  required String label,
-  required IconData icon,
-}) {
-  return InputDecoration(
-    labelText: label,
-    prefixIcon: Icon(icon, color: Colors.grey),
-    filled: true,
-    fillColor: Colors.grey[50],
-    contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: Colors.grey[300]!),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: ColorStyle.colorPrimary),
-    ),
-  );
 }

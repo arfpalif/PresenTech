@@ -7,6 +7,7 @@ import 'package:presentech/features/employee/homepage/view/components/card_absen
 import 'package:presentech/features/employee/homepage/view/components/menu.dart';
 import 'package:presentech/features/employee/homepage/view/components/task_list_homepage.dart';
 import 'package:presentech/shared/controllers/navigation_controller.dart';
+import 'package:presentech/shared/controllers/profile_controller.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/ui/coming_soon.dart';
 import 'package:presentech/shared/view/widgets/header.dart';
@@ -14,17 +15,18 @@ import 'package:presentech/shared/view/widgets/header.dart';
 class EmployeeHomepage extends GetView<EmployeeHomepageController> {
   EmployeeHomepage({super.key});
   final NavigationController navController = Get.find<NavigationController>();
+  final ProfileController profileController = Get.find<ProfileController>();
 
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light, // Changed to light for dark header
+        statusBarIconBrightness: Brightness.light,
         statusBarBrightness: Brightness.dark,
       ),
       child: Scaffold(
-        backgroundColor: Color(0xFFF5F7FA), // Slightly lighter grey for cleaner look
+        backgroundColor: ColorStyle.whiteSecondary,
         body: Column(
           children: [
             Obx(() {
@@ -35,9 +37,9 @@ class EmployeeHomepage extends GetView<EmployeeHomepageController> {
                 onComingSoonTap: () {
                   Get.to(ComingSoon());
                 },
-                imageUrl: controller.profilePic.value,
-                name: controller.name.value,
-                role: controller.role.value,
+                imageUrl: profileController.profilePictureUrl.value,
+                name: profileController.name.value,
+                role: profileController.role.value,
               );
             }),
             Expanded(

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/features/employee/permissions/controller/employee_permission_controller.dart';
-import 'package:presentech/shared/models/permission.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
+import 'package:presentech/shared/view/components/dropdowns/dropdown_field_normal.dart';
+import 'package:presentech/shared/view/components/textFields/text_field_normal.dart';
+import 'package:presentech/shared/styles/input_style.dart';
 import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/utils/enum/permission_type.dart';
 
 class EmployeeAddPermission extends GetView<EmployeePermissionController> {
   const EmployeeAddPermission({super.key, this.isEdit = false});
@@ -17,7 +20,10 @@ class EmployeeAddPermission extends GetView<EmployeePermissionController> {
       appBar: AppBar(
         title: Text(
           'Add Permission',
-          style: AppTextStyle.title.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+          style: AppTextStyle.title.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -46,7 +52,7 @@ class EmployeeAddPermission extends GetView<EmployeePermissionController> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withValues(alpha: 0.05),
+                    color: Colors.grey.withOpacity(0.05),
                     blurRadius: 10,
                     offset: Offset(0, 5),
                   ),
@@ -55,23 +61,39 @@ class EmployeeAddPermission extends GetView<EmployeePermissionController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLabel('Permission Title'),
-                  _buildTextField(
+                  Text(
+                    'Permission Title',
+                    style: AppTextStyle.normal.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFieldNormal(
                     controller: controller.permissionTitleController,
-                    hint: 'Enter title',
-                    icon: Icons.title,
+                    decoration: AppInputStyle.decoration(icon: Icons.title),
                   ),
                   SizedBox(height: 16),
-                  _buildLabel('Duration'),
+                  Text(
+                    'Duration',
+                    style: AppTextStyle.normal.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
-                        child: _buildTextField(
-                          controller: controller.dateController.startDateController,
-                          hint: 'Start Date',
-                          icon: Icons.calendar_today,
+                        child: TextFieldNormal(
+                          controller:
+                              controller.dateController.startDateController,
                           readOnly: true,
-                          onTap: () => controller.dateController.pickStartDate(context),
+                          onTap: () =>
+                              controller.dateController.pickStartDate(context),
+                          decoration: AppInputStyle.decoration(
+                            icon: Icons.calendar_today,
+                          ),
                         ),
                       ),
                       Padding(
@@ -79,24 +101,44 @@ class EmployeeAddPermission extends GetView<EmployeePermissionController> {
                         child: Text("to", style: TextStyle(color: Colors.grey)),
                       ),
                       Expanded(
-                        child: _buildTextField(
-                          controller: controller.dateController.endDateController,
-                          hint: 'End Date',
-                          icon: Icons.event,
+                        child: TextFieldNormal(
+                          controller:
+                              controller.dateController.endDateController,
                           readOnly: true,
-                          onTap: () => controller.dateController.pickEndDate(context),
+                          onTap: () =>
+                              controller.dateController.pickEndDate(context),
+                          decoration: AppInputStyle.decoration(
+                            icon: Icons.event,
+                          ),
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: 16),
-                  _buildLabel('Type'),
-                  Obx(() => _buildDropdown(
-                    value: controller.selectedType.value,
-                    hint: "Select Type",
-                    items: [PermissionType.permission, PermissionType.leave],
-                    onChanged: (val) => controller.selectedType.value = val,
-                  )),
+                  Text(
+                    'Type',
+                    style: AppTextStyle.normal.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Obx(
+                    () => DropdownFieldNormal<PermissionType>(
+                      value: controller.selectedType.value,
+                      items: const [
+                        PermissionType.permission,
+                        PermissionType.leave,
+                      ],
+                      labelBuilder: (type) => type == PermissionType.permission
+                          ? "Permission"
+                          : "Leave",
+                      onChanged: (val) => controller.selectedType.value = val,
+                      decoration: AppInputStyle.decoration(
+                        icon: Icons.category,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -108,77 +150,6 @@ class EmployeeAddPermission extends GetView<EmployeePermissionController> {
               },
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLabel(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(
-        text,
-        style: AppTextStyle.normal.copyWith(fontWeight: FontWeight.bold, color: Colors.black87),
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hint,
-    required IconData icon,
-    bool readOnly = false,
-    VoidCallback? onTap,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: TextField(
-        controller: controller,
-        readOnly: readOnly,
-        onTap: onTap,
-        style: AppTextStyle.normal,
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(color: Colors.grey[400]),
-          prefixIcon: Icon(icon, color: ColorStyle.colorPrimary.withValues(alpha: 0.6), size: 20),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDropdown({
-    required PermissionType? value,
-    required String hint,
-    required List<PermissionType> items,
-    required Function(PermissionType?) onChanged,
-  }) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<PermissionType>(
-          value: value,
-          hint: Text(hint, style: TextStyle(color: Colors.grey[400], fontSize: 14)),
-          isExpanded: true,
-          icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey),
-          items: items.map((PermissionType item) {
-            String label = item == PermissionType.permission ? "Permission" : "Leave";
-            return DropdownMenuItem<PermissionType>(
-              value: item,
-              child: Text(label, style: AppTextStyle.normal),
-            );
-          }).toList(),
-          onChanged: onChanged,
         ),
       ),
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/features/employee/absence/controller/presence_controller.dart';
+import 'package:presentech/features/employee/absence/controllers/presence_controller.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
 import 'package:presentech/configs/themes/themes.dart';
@@ -21,7 +21,7 @@ class CardAbsence extends StatelessWidget {
           gradient: LinearGradient(
             colors: [
               ColorStyle.colorPrimary,
-              ColorStyle.colorSecondary.withValues(alpha: 0.8),
+              ColorStyle.colorSecondary.withOpacity(0.8),
             ],
           ),
         ),
@@ -109,7 +109,7 @@ class CardAbsence extends StatelessWidget {
                     return AppGradientButtonGreen(
                       text: "Presensi masuk",
                       onPressed: () {
-                        controller.absence();
+                        controller.submitAbsence();
                       },
                     );
                   }
@@ -117,14 +117,14 @@ class CardAbsence extends StatelessWidget {
                     return AppGradientButtonRed(
                       text: "Presensi keluar",
                       onPressed: () {
-                        controller.absence();
+                        controller.submitAbsence();
                       },
                     );
                   }
                   return AppGradientButtonGreen(
                     text: "Anda sudah absen, hari ini",
                     onPressed: () {
-                      controller.absence();
+                      controller.submitAbsence();
                     },
                   );
                 }),

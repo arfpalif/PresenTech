@@ -1,24 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/shared/models/permission.dart';
+import 'package:intl/intl.dart';
 import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/features/employee/permissions/controller/employee_permission_controller.dart';
+import 'package:presentech/shared/models/permission.dart';
 import 'package:presentech/shared/styles/color_style.dart';
+import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
+import 'package:presentech/shared/view/components/textFields/text_field_normal.dart';
+import 'package:presentech/shared/styles/input_style.dart';
+import 'package:presentech/shared/view/components/component_badgets.dart';
+import 'package:presentech/utils/enum/permission_type.dart';
 
 class EmployeePermissionDetail extends StatelessWidget {
   final Permission permission = Get.arguments as Permission;
+  final EmployeePermissionController controller =
+      Get.find<EmployeePermissionController>();
 
   EmployeePermissionDetail({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final titleController = TextEditingController(text: permission.reason);
+    final startDateController = TextEditingController(
+      text: DateFormat('dd-MMM-yyyy').format(permission.startDate),
+    );
+    final endDateController = TextEditingController(
+      text: DateFormat('dd-MMM-yyyy').format(permission.endDate),
+    );
+    final typeController = TextEditingController(
+      text: permission.type == PermissionType.permission
+          ? "Permission"
+          : "Leave",
+    );
+
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
         title: Text(
           'Permission Detail',
-          style: AppTextStyle.title.copyWith(color: Colors.white),
+          style: AppTextStyle.title.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+        centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -26,36 +54,155 @@ class EmployeePermissionDetail extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: <Color>[ColorStyle.colorPrimary, ColorStyle.greenPrimary],
             ),
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Card(
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.grey.shade100,
-            ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              title: Text(
-                permission.reason,
-                style: AppTextStyle.heading1.copyWith(
-                  color: Colors.black.withValues(alpha: 0.5),
-                ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
               ),
-              subtitle: Text(
-                "Start Date: ${permission.startDate}\n"
-                "End Date: ${permission.endDate}\n"
-                "Status: ${permission.status}",
-                style: AppTextStyle.normal.copyWith(
-                  color: Colors.black.withValues(alpha: 0.5),
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Status',
+                        style: AppTextStyle.normal.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      ComponentBadgets(status: permission.status),
+                    ],
+                  ),
+                  const Divider(height: 32),
+                  Text(
+                    'Permission Title',
+                    style: AppTextStyle.normal.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFieldNormal(
+                    controller: titleController,
+                    readOnly: true,
+                    decoration: AppInputStyle.decoration(icon: Icons.title),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Duration',
+                    style: AppTextStyle.normal.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFieldNormal(
+                          controller: startDateController,
+                          readOnly: true,
+                          decoration: AppInputStyle.decoration(
+                            icon: Icons.calendar_today,
+                          ),
+                        ),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text("to", style: TextStyle(color: Colors.grey)),
+                      ),
+                      Expanded(
+                        child: TextFieldNormal(
+                          controller: endDateController,
+                          readOnly: true,
+                          decoration: AppInputStyle.decoration(
+                            icon: Icons.event,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Type',
+                    style: AppTextStyle.normal.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFieldNormal(
+                    controller: typeController,
+                    readOnly: true,
+                    decoration: AppInputStyle.decoration(icon: Icons.category),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Submitted on',
+                    style: AppTextStyle.normal.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFieldNormal(
+                    controller: TextEditingController(
+                      text: permission.createdAtYmd,
+                    ),
+                    readOnly: true,
+                    decoration: AppInputStyle.decoration(
+                      icon: Icons.access_time_filled,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Feedback',
+                    style: AppTextStyle.normal.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFieldNormal(
+                    controller: TextEditingController(
+                      text: permission.feedback ?? '-',
+                    ),
+                    readOnly: true,
+                    decoration: AppInputStyle.decoration(icon: Icons.feedback),
+                  ),
+                  const SizedBox(height: 24),
+                  AppGradientButton(
+                    text: "Cancel request",
+                    onPressed: () {
+                      controller.cancelPermission(
+                        permission.id.toString(),
+                        permission.status,
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

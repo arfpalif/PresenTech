@@ -8,8 +8,8 @@ class SplashController extends GetxController {
   SplashController(this.splashRepo);
 
   @override
-  onInit() {
-    super.onInit();
+  void onReady() {
+    super.onReady();
     handleAuth();
   }
 

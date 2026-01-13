@@ -40,7 +40,7 @@ class ProfilePage extends GetView<ProfileController> {
                   leading: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: ColorStyle.colorPrimary.withValues(alpha: 0.2),
+                      color: ColorStyle.colorPrimary.withOpacity(0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(Icons.person, color: ColorStyle.colorPrimary),
@@ -60,7 +60,7 @@ class ProfilePage extends GetView<ProfileController> {
                   leading: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: ColorStyle.colorPrimary.withValues(alpha: 0.2),
+                      color: ColorStyle.colorPrimary.withOpacity(0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(Icons.business, color: ColorStyle.colorPrimary),
@@ -82,7 +82,7 @@ class ProfilePage extends GetView<ProfileController> {
                   leading: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: ColorStyle.colorPrimary.withValues(alpha: 0.2),
+                      color: ColorStyle.colorPrimary.withOpacity(0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -107,7 +107,7 @@ class ProfilePage extends GetView<ProfileController> {
                   leading: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: ColorStyle.colorPrimary.withValues(alpha: 0.2),
+                      color: ColorStyle.colorPrimary.withOpacity(0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(Icons.schedule, color: ColorStyle.colorPrimary),

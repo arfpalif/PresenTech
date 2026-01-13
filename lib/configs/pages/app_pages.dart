@@ -8,7 +8,7 @@ import 'package:presentech/features/auth/register/view/ui/register_page.dart';
 import 'package:presentech/features/auth/splash/bindings/splash_binding.dart';
 import 'package:presentech/features/auth/splash/view/splash_screen.dart';
 import 'package:presentech/features/employee/absence/binding/presence_binding.dart';
-import 'package:presentech/features/employee/absence/view/ui/absence_widget.dart';
+import 'package:presentech/features/employee/absence/views/ui/absence_widget.dart';
 import 'package:presentech/features/employee/homepage/bindings/employee_homepage_binding.dart';
 import 'package:presentech/features/employee/homepage/view/ui/employee_homepage.dart';
 import 'package:presentech/features/employee/permissions/bindings/employee_permissions_binding.dart';
@@ -16,7 +16,6 @@ import 'package:presentech/features/employee/permissions/view/ui/employee_add_pe
 import 'package:presentech/features/employee/permissions/view/ui/employee_permission.dart';
 import 'package:presentech/features/employee/permissions/view/ui/employee_permission_detail.dart';
 import 'package:presentech/features/employee/profile/view/ui/profile.dart';
-import 'package:presentech/features/employee/settings/binding/employee_setting_binding.dart';
 import 'package:presentech/features/employee/settings/view/ui/employee_settings.dart';
 import 'package:presentech/features/employee/tasks/binding/employee_task_binding.dart';
 import 'package:presentech/features/employee/tasks/view/ui/employee_add_task.dart';
@@ -37,7 +36,9 @@ import 'package:presentech/features/hrd/location/view/ui/hrd_add_location.dart';
 import 'package:presentech/features/hrd/location/view/ui/hrd_location.dart';
 import 'package:presentech/features/hrd/location/view/ui/hrd_location_detail.dart';
 import 'package:presentech/features/hrd/permission/binding/hrd_permission_binding.dart';
+import 'package:presentech/features/hrd/permission/binding/hrd_permission_detail_binding.dart';
 import 'package:presentech/features/hrd/permission/view/ui/hrd_permission.dart';
+import 'package:presentech/features/hrd/permission/view/ui/hrd_permission_detail.dart';
 import 'package:presentech/features/hrd/profile/bindings/hrd_profile_binding.dart';
 import 'package:presentech/features/hrd/profile/view/ui/hrd_profile_page.dart';
 import 'package:presentech/features/hrd/tasks/binding/hrd_task_binding.dart';
@@ -142,7 +143,7 @@ class AppPages {
     GetPage(
       name: Routes.employeeSettings,
       page: () => EmployeeSettings(),
-      binding: EmployeeSettingBinding(),
+      binding: ProfileBinding(),
     ),
 
     //<!-- HRD Pages -->
@@ -160,6 +161,11 @@ class AppPages {
       name: Routes.hrdApproval,
       page: () => HrdPermission(),
       binding: HrdPermissionBinding(),
+    ),
+    GetPage(
+      name: Routes.hrdPermissionDetail,
+      page: () => HrdPermissionDetail(),
+      binding: HrdPermissionDetailBinding(),
     ),
     GetPage(
       name: Routes.hrdLocation,

@@ -1,41 +1,35 @@
+import 'package:presentech/shared/models/permission.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../../../../shared/models/permission.dart';
 
 class PermissionRepository {
   final SupabaseClient supabase = Supabase.instance.client;
-  Future<List<Permission>> getPermissions() async {
+  Future<List<Permission>> getPermissions(
+    String userId, {
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
     try {
-      final response = await supabase
-          .from('permissions')
-          .select()
-          .order('created_at', ascending: false);
+      var query = supabase.from('permissions').select().eq('user_id', userId);
 
+      if (startDate != null) {
+        query = query.gte('created_at', startDate.toIso8601String());
+      }
+      if (endDate != null) {
+        query = query.lte('created_at', endDate.toIso8601String());
+      }
+
+      final response = await query.order('created_at', ascending: false);
       return response.map<Permission>((e) => Permission.fromJson(e)).toList();
     } catch (e) {
       throw Exception('Error fetching permissions: $e');
     }
   }
 
-  Future<bool> insertPermission(Permission permission, userId, data) async {
-    try {
-      await supabase.from('permissions').insert(data);
-      return true;
-    } catch (e) {
-      return false;
-    }
+  Future<void> insertPermission(Map<String, dynamic> data) async {
+    await supabase.from('permissions').insert(data);
   }
 
-  Future<void> fetchPermissionsByDay(DateTime startDate, DateTime now) async {
-    try {
-      await supabase
-          .from('permissions')
-          .select()
-          .gte('created_at', startDate.toIso8601String())
-          .lte('created_at', now.toIso8601String())
-          .order('created_at', ascending: false);
-    } catch (e) {
-      throw ("Error fetching permissions by day: $e");
-    }
+  Future<void> updatePermission(int id, Map<String, dynamic> data) async {
+    await supabase.from('permissions').update(data).eq('id', id);
   }
 }

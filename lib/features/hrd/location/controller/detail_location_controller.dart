@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:get/get.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
+import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
 import 'package:presentech/features/hrd/location/controller/location_controller.dart';
 import 'package:presentech/features/hrd/location/model/office.dart';
 import 'package:presentech/features/hrd/location/repositories/hrd_location_repository.dart';
@@ -110,10 +112,7 @@ class DetailLocationController extends GetxController {
       offices.assignAll(data);
     } catch (e) {
       print("Error: $e");
-      Get.snackbar(
-        "Error Mengambil Lokasi",
-        "Tidak dapat memuat data lokasi: ${e.toString()}",
-      );
+      FailedSnackbar.show("Tidak dapat memuat data lokasi: ${e.toString()}");
     } finally {
       isLoading.value = false;
     }
@@ -142,9 +141,9 @@ class DetailLocationController extends GetxController {
       Get.back();
       await locationC.fetchOffices();
 
-      Get.snackbar('Berhasil', 'Lokasi kantor berhasil diperbarui');
+      SuccessSnackbar.show('Lokasi kantor berhasil diperbarui');
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memperbarui lokasi: ${e.toString()}');
+      FailedSnackbar.show('Gagal memperbarui lokasi: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }
@@ -158,9 +157,9 @@ class DetailLocationController extends GetxController {
       await fetchOffices();
 
       Get.back();
-      Get.snackbar('Berhasil', 'Lokasi kantor berhasil dihapus');
+      SuccessSnackbar.show('Lokasi kantor berhasil dihapus');
     } catch (e) {
-      Get.snackbar('Error', 'Gagal menghapus lokasi: ${e.toString()}');
+      FailedSnackbar.show('Gagal menghapus lokasi: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }

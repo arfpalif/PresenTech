@@ -148,7 +148,7 @@ class AppGradientButtonRed extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors =
         gradientColors ??
-        [ColorStyle.redPrimary, ColorStyle.redSecondary.withValues(alpha: 0.8)];
+        [ColorStyle.redPrimary, ColorStyle.redSecondary.withOpacity(0.8)];
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool bounded = constraints.hasBoundedWidth;
@@ -284,7 +284,7 @@ class AppOutlinedButton extends StatelessWidget {
             width: bounded ? double.infinity : null,
             decoration: BoxDecoration(
               color: colors,
-              border: Border.all(color: Colors.grey.withValues(alpha: 0.5)),
+              border: Border.all(color: Colors.grey.withOpacity(0.5)),
               borderRadius: BorderRadius.circular(borderRadius),
             ),
             child: Material(
@@ -342,7 +342,7 @@ class AppDeactivatedButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = color ?? Colors.grey.withValues(alpha: 0.3);
+    final colors = color ?? Colors.grey.withOpacity(0.3);
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool bounded = constraints.hasBoundedWidth;

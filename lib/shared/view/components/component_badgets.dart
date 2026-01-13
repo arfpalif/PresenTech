@@ -1,141 +1,138 @@
 import 'package:flutter/material.dart';
 import 'package:presentech/shared/styles/color_style.dart';
-import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
 import 'package:presentech/configs/themes/themes.dart';
 
-class ComponentBadgets extends StatelessWidget {
-  final String status;
+import 'package:presentech/utils/enum/absence_status.dart';
+import 'package:presentech/utils/enum/permission_status.dart';
 
-  const ComponentBadgets({super.key, required this.status});
+class ComponentBadgets extends StatelessWidget {
+  final dynamic status;
+  final String? text;
+  final Color? color;
+
+  const ComponentBadgets({super.key, this.status, this.text, this.color});
 
   @override
   Widget build(BuildContext context) {
+    final statusStr = _getStatusString(status);
+    final displayColor = color ?? _getStatusColor(statusStr);
+    final displayText = text ?? _getStatusText(statusStr);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: displayColor.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: displayColor.withOpacity(0.3), width: 1.2),
+      ),
+      child: Text(
+        displayText,
+        style: AppTextStyle.smallText.copyWith(
+          color: displayColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 11,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  String _getStatusString(dynamic status) {
+    if (status == null) return '';
+    if (status is AbsenceStatus) {
+      if (status == AbsenceStatus.terlambat) return 'telat';
+      return status.name;
+    }
+    if (status is PermissionStatus) {
+      return status.name;
+    }
+    return status.toString().toLowerCase().split('.').last;
+  }
+
+  Color _getStatusColor(String status) {
     switch (status) {
       case 'hadir':
-        return SizedBox(
-          height: 32,
-          width: 60,
-          child: AppGradientButtonGreen(
-            text: "Hadir",
-            textStyle: AppTextStyle.heading1.copyWith(
-              fontSize: 12,
-              color: Colors.white,
-            ),
-            onPressed: () {},
-          ),
-        );
-
-      case 'telat':
-        return SizedBox(
-          height: 32,
-          width: 60,
-          child: AppGradientButtonYellow(
-            text: "Telat",
-            textStyle: AppTextStyle.heading1.copyWith(
-              fontSize: 12,
-              color: Colors.white,
-            ),
-            onPressed: () {},
-          ),
-        );
-
-      case 'alfa':
-        return SizedBox(
-          height: 32,
-          width: 60,
-          child: AppGradientButtonRed(
-            text: "Alfa",
-            textStyle: AppTextStyle.heading1.copyWith(
-              fontSize: 12,
-              color: Colors.white,
-            ),
-            onPressed: () {}, // read-only
-          ),
-        );
-
-      case 'pending':
-        return SizedBox(
-          height: 32,
-          width: 70,
-          child: AppGradientButtonYellow(
-            text: "Pending",
-            textStyle: AppTextStyle.normal.copyWith(
-              color: Colors.white,
-              fontSize: 10,
-            ),
-            onPressed: () {},
-          ),
-        );
-
       case 'approved':
-        return SizedBox(
-          height: 32,
-          width: 90,
-          child: AppGradientButtonGreen(
-            text: "Approved",
-            textStyle: AppTextStyle.heading1.copyWith(
-              fontSize: 12,
-              color: Colors.white,
-            ),
-          ),
-        );
-
+      case 'low':
+      case 'success':
+        return ColorStyle.greenPrimary;
+      case 'telat':
+      case 'terlambat':
+      case 'pending':
+      case 'medium':
+      case 'warning':
+        return ColorStyle.yellowPrimary;
+      case 'alfa':
       case 'rejected':
-        return SizedBox(
-          height: 32,
-          width: 80,
-          child: AppGradientButtonRed(
-            text: "Rejected",
-            textStyle: AppTextStyle.heading1.copyWith(
-              fontSize: 12,
-              color: Colors.white,
-            ),
-            onPressed: () {},
-          ),
-        );
-
+      case 'high':
+      case 'error':
+        return ColorStyle.redPrimary;
       default:
-        return SizedBox(
-          height: 32,
-          width: 60,
-          child: AppGradientButton(text: "-", onPressed: () {}),
-        );
+        return Colors.grey;
     }
+  }
+
+  String _getStatusText(String status) {
+    if (status.isEmpty) return "-";
+    if (status == 'terlambat' || status == 'telat') return 'Telat';
+    return status[0].toUpperCase() + status.substring(1);
   }
 }
 
 class StatusBadge extends StatelessWidget {
-  final String status;
+  final dynamic status;
 
   const StatusBadge({super.key, required this.status});
 
   @override
   Widget build(BuildContext context) {
+    final statusStr = _getStatusString(status);
+    final color = _getStatusColor(statusStr);
+    
     return Container(
-      height: 10,
-      width: 10,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      height: 14,
+      width: 14,
       decoration: BoxDecoration(
-        color: statusColor(status),
-        borderRadius: BorderRadius.circular(20),
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 2.5),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.4),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
     );
   }
-}
 
-Color statusColor(String status) {
-  switch (status) {
-    case 'hadir':
-      return ColorStyle.greenPrimary;
-    case 'telat':
-      return ColorStyle.yellowPrimary;
-    case 'alfa':
-      return ColorStyle.redPrimary;
-    default:
-      return Colors.grey;
+  String _getStatusString(dynamic status) {
+    if (status == null) return '';
+    if (status is AbsenceStatus) {
+      if (status == AbsenceStatus.terlambat) return 'telat';
+      return status.name;
+    }
+    if (status is PermissionStatus) {
+      return status.name;
+    }
+    return status.toString().toLowerCase().split('.').last;
   }
-}
 
-String statusText(String status) {
-  return status.toUpperCase();
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'hadir':
+      case 'approved':
+        return ColorStyle.greenPrimary;
+      case 'telat':
+      case 'terlambat':
+      case 'pending':
+        return ColorStyle.yellowPrimary;
+      case 'alfa':
+      case 'rejected':
+        return ColorStyle.redPrimary;
+      default:
+        return Colors.grey;
+    }
+  }
 }

@@ -8,6 +8,7 @@ import 'package:presentech/features/employee/permissions/view/ui/employee_add_pe
 import 'package:presentech/shared/controllers/date_controller.dart';
 import 'package:presentech/configs/themes/themes.dart';
 import 'package:presentech/shared/styles/color_style.dart';
+import 'package:presentech/shared/view/components/custom_filter_chip.dart';
 
 // ignore: must_be_immutable
 class EmployeePermission extends GetView<EmployeePermissionController> {
@@ -23,7 +24,10 @@ class EmployeePermission extends GetView<EmployeePermissionController> {
       appBar: AppBar(
         title: Text(
           'Permissions',
-          style: AppTextStyle.title.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+          style: AppTextStyle.title.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -42,7 +46,9 @@ class EmployeePermission extends GetView<EmployeePermissionController> {
       ),
       floatingActionButton: OpenContainer(
         closedElevation: 6,
-        closedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        closedShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         closedColor: ColorStyle.greenPrimary,
         closedBuilder: (context, openContainer) => SizedBox(
           height: 56,
@@ -72,17 +78,35 @@ class EmployeePermission extends GetView<EmployeePermissionController> {
                 child: Row(
                   spacing: 12,
                   children: [
-                    _buildFilterChip(
-                      label: "Today",
-                      filter: PermissionFilter.today,
+                    Obx(
+                      () => CustomFilterChip(
+                        label: "Today",
+                        isSelected:
+                            controller.selectedFilter.value ==
+                            PermissionFilter.today,
+                        onSelected: (value) =>
+                            controller.changeFilter(PermissionFilter.today),
+                      ),
                     ),
-                    _buildFilterChip(
-                      label: "This Week",
-                      filter: PermissionFilter.week,
+                    Obx(
+                      () => CustomFilterChip(
+                        label: "This Week",
+                        isSelected:
+                            controller.selectedFilter.value ==
+                            PermissionFilter.week,
+                        onSelected: (value) =>
+                            controller.changeFilter(PermissionFilter.week),
+                      ),
                     ),
-                    _buildFilterChip(
-                      label: "This Month",
-                      filter: PermissionFilter.month,
+                    Obx(
+                      () => CustomFilterChip(
+                        label: "This Month",
+                        isSelected:
+                            controller.selectedFilter.value ==
+                            PermissionFilter.month,
+                        onSelected: (value) =>
+                            controller.changeFilter(PermissionFilter.month),
+                      ),
                     ),
                   ],
                 ),
@@ -94,14 +118,17 @@ class EmployeePermission extends GetView<EmployeePermissionController> {
                     child: Column(
                       children: [
                         SizedBox(height: 50),
-                        Icon(Icons.assignment_outlined, size: 60, color: Colors.grey[300]),
+                        Icon(
+                          Icons.assignment_outlined,
+                          size: 60,
+                          color: Colors.grey[300],
+                        ),
                         SizedBox(height: 16),
                         const Text("No permissions found"),
                       ],
                     ),
                   );
                 }
-
                 return PermissionList();
               }),
             ],
@@ -109,34 +136,5 @@ class EmployeePermission extends GetView<EmployeePermissionController> {
         ),
       ),
     );
-  }
-
-  Widget _buildFilterChip({required String label, required PermissionFilter filter}) {
-    return Obx(() {
-      final isSelected = controller.selectedFilter.value == filter;
-      return FilterChip(
-        label: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey[700],
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-        selected: isSelected,
-        onSelected: (bool value) {
-          controller.changeFilter(filter);
-        },
-        backgroundColor: Colors.white,
-        selectedColor: ColorStyle.colorPrimary,
-        checkmarkColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(
-            color: isSelected ? Colors.transparent : Colors.grey[300]!,
-          ),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      );
-    });
   }
 }

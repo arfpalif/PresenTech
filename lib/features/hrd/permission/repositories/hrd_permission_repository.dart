@@ -46,10 +46,10 @@ class HrdPermissionRepository {
         .eq('id', permissionId);
   }
 
-  Future<void> rejectPermission(int permissionId) async {
+  Future<void> rejectPermission(int permissionId, String feedback) async {
     await supabase
         .from('permissions')
-        .update({'status': 'rejected'})
+        .update({'status': 'rejected', 'feedback': feedback})
         .eq('id', permissionId);
   }
 }

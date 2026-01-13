@@ -1,0 +1,131 @@
+{
+  "message": "string",
+  "data": {
+    "id": "string",
+    "title": "string",
+    "created_at": "string",
+    "updated_at": "string",
+    "amount": 0,
+    "status": "string",
+    "type": "string",
+    "order": {
+      "user_name": "string",
+      "payment_method": "string",
+      "products": [
+        {
+          "name": "string",
+          "photo_url": "string",
+          "price": 0,
+          "qty": 0,
+          "subtotal": 0
+        }
+      ]
+    },
+    "withdraw": {
+      "account_number": "string",
+      "send_at": "string"
+    }
+  }
+}
+
+respons json
+
+outlet : 
+{
+  "message": "string",
+  "data": [
+    {
+      	"id": "string",
+      	"name": "string",
+      	"thumbnail_url": "string",
+      	"city": "string",
+      	"address": "string",
+      	"latitude": "number",
+      	"longitude": "number",
+      	"status": "string",
+      	"open_time": "string",
+      	"close_time": "string",
+      	"is_open_now": "boolean",
+      	"phone": "string",
+      	"whatsapp": "string"
+	"doctor_schedule": {
+"doctors": [
+        {
+          "id": "string",
+          "name": "string",
+          "specialization": "string",
+          "photo_url": "string",
+          "schedule": [
+            {
+              "day": "string",
+              "start_time": "string",
+              "end_time": "string"
+            }
+          ]
+        }}
+      	"is_available": "boolean",
+      	"message": "string",
+      	
+      ]
+    },
+  ]
+}
+
+detail outlet : 
+{
+  "message": "string",
+  "data": {
+    "id": "string",
+    "name": "string",
+    "address": "string",
+    "location": {
+      "latitude": "number",
+      "longitude": "number",
+      "map_url": "string"
+    },
+    "contact": {
+      "phone": "string",
+      "whatsapp": "string"
+    },
+    "distance": {
+      "from": "string",
+      "value_km": "number",
+      "label": "string"
+    },
+    "status": {
+      "is_open": "boolean",
+      "open_time": "string",
+      "close_time": "string"
+    },
+    "doctor_schedule": {
+      "is_available": "boolean",
+      "message": "string",
+      "doctors": [
+        {
+          "id": "string",
+          "name": "string",
+          "specialization": "string",
+          "photo_url": "string",
+          "schedule": [
+            {
+              "day": "string",
+              "start_time": "string",
+              "end_time": "string"
+            }
+          ]
+        }
+      ]
+    },
+    "outlet_schedule": [
+      {
+        "day": "string",
+        "open_time": "string",
+        "close_time": "string"
+      }
+    ],
+    "created_at": "string",
+    "updated_at": "string"
+  }
+}
+
+

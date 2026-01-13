@@ -16,6 +16,18 @@ class ProfileRepository {
     }
   }
 
+  Future<void> updateProfile({required String name, String? imageUrl}) async {
+    final userId = supabase.auth.currentUser!.id;
+    final Map<String, dynamic> updates = {
+      'name': name,
+    };
+    if (imageUrl != null) {
+      updates['profile_picture'] = imageUrl;
+    }
+
+    await supabase.from('users').update(updates).eq('id', userId);
+  }
+
   Future<void> updateProfileImage(String imageUrl) async {
     final userId = supabase.auth.currentUser!.id;
 

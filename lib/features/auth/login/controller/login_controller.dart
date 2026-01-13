@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
+import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/auth/login/repositories/login_repository.dart';
 import 'package:presentech/features/employee/homepage/controllers/employee_homepage_controller.dart';
 import 'package:presentech/features/employee/permissions/controller/employee_permission_controller.dart';
-import 'package:presentech/features/employee/settings/controller/employee_setting_controller.dart';
 import 'package:presentech/features/employee/tasks/controller/employee_task_controller.dart';
 import 'package:presentech/features/hrd/attendance/controller/hrd_attendance_controller.dart';
 import 'package:presentech/features/hrd/employee/controller/hrd_employee_controller.dart';
@@ -36,24 +37,15 @@ class LoginController extends GetxController {
       }
       final role = await loginRepo.getRole(user.id);
       if (role == 'hrd') {
-        Get.snackbar(
-          "Success",
-          "Login successful",
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        SuccessSnackbar.show("Login successful");
         Get.delete<EmployeeHomepageController>();
         Get.delete<EmployeePermissionController>();
-        Get.delete<EmployeeSettingController>();
         Get.delete<EmployeeTaskController>();
         Get.offAllNamed(Routes.hrdNavbar);
         return;
       } else {
         // If role is not 'hrd', navigate to employee navbar
-        Get.snackbar(
-          "Success",
-          "Login successful",
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        SuccessSnackbar.show("Login successful");
         Get.delete<HrdHomepageController>();
         Get.delete<HrdAttendanceController>();
         Get.delete<HrdEmployeeController>();
@@ -65,11 +57,7 @@ class LoginController extends GetxController {
       }
       // Login successful
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Unexpected error: $e",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      FailedSnackbar.show("Unexpected error: $e");
     }
   }
 

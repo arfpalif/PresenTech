@@ -5,6 +5,8 @@ import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/configs/themes/themes.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 
+import 'package:presentech/shared/bindings/initial_binding.dart';
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -15,6 +17,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       initialRoute: Routes.splash,
       getPages: AppPages.pages,
+      initialBinding: InitialBinding(),
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -39,7 +42,7 @@ class MyApp extends StatelessWidget {
         canvasColor: Colors.white,
         dialogTheme: DialogThemeData(backgroundColor: Colors.white),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          selectedItemColor: ColorStyle.colorSecondary.withValues(alpha: 0.7),
+          selectedItemColor: ColorStyle.colorSecondary.withOpacity(0.7),
           unselectedItemColor: Colors.grey,
           backgroundColor: Colors.white,
           selectedLabelStyle: AppTextStyle.smallText.copyWith(

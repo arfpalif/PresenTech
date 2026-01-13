@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/constants/api_constant.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -15,7 +15,7 @@ class HomepageRepository {
 
       return user;
     } catch (e) {
-      Get.snackbar("Error", "User tidak termasuk dalam office apapun");
+      FailedSnackbar.show("User tidak termasuk dalam office apapun");
       throw Exception("User dont have office");
     }
   }
@@ -30,7 +30,7 @@ class HomepageRepository {
 
       return office;
     } catch (e) {
-      Get.snackbar("Error", "Tidak ada office");
+      FailedSnackbar.show("Tidak ada office");
       throw Exception("Error");
     }
   }
@@ -45,7 +45,7 @@ class HomepageRepository {
 
       return response;
     } catch (e) {
-      Get.snackbar("Error", "Failed to fetch user data");
+      FailedSnackbar.show("Failed to fetch user data");
       throw Exception("Error");
     }
   }

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/features/employee/homepage/repositories/homepage_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -22,18 +23,16 @@ class EmployeeHomepageController extends GetxController {
     final userId = session?.user.id;
 
     if (userId == null) {
-      Get.snackbar("Error", "User not login");
+      FailedSnackbar.show("User not login");
       throw Exception("Error");
     }
 
     final user = await homePageRepo.getUserOffice(session, userId);
-    print("user row => $user");
-    print("office id => ${user?['office_id']}");
 
     final officeId = user?['office_id'];
 
     if (user == null || officeId == null) {
-      Get.snackbar("Error", "User tidak termasuk dalam office apapun");
+      FailedSnackbar.show("User tidak termasuk dalam office apapun");
       throw Exception("User dont have office");
     }
 
@@ -41,7 +40,7 @@ class EmployeeHomepageController extends GetxController {
     print("office row => $office");
 
     if (office == null) {
-      Get.snackbar("Error", "Tidak ada office");
+      FailedSnackbar.show("Tidak ada office");
       throw Exception("Error");
     }
     return office;
@@ -53,7 +52,7 @@ class EmployeeHomepageController extends GetxController {
 
     try {
       if (userId == null) {
-        Get.snackbar("Error", "User not login");
+        FailedSnackbar.show("User not login");
         throw Exception("Error");
       }
 

@@ -25,7 +25,7 @@ class SettingMenu extends GetView<HrdProfileController> {
           leading: Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: ColorStyle.colorPrimary.withValues(alpha: 0.2),
+              color: ColorStyle.colorPrimary.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.person, color: ColorStyle.colorPrimary),
@@ -42,7 +42,7 @@ class SettingMenu extends GetView<HrdProfileController> {
           leading: Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: ColorStyle.redPrimary.withValues(alpha: 0.2),
+              color: ColorStyle.redPrimary.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.location_pin, color: ColorStyle.redPrimary),
@@ -61,7 +61,7 @@ class SettingMenu extends GetView<HrdProfileController> {
           leading: Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.2),
+              color: Colors.grey.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.palette, color: Colors.grey),
@@ -78,7 +78,7 @@ class SettingMenu extends GetView<HrdProfileController> {
           leading: Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: ColorStyle.yellowPrimary.withValues(alpha: 0.2),
+              color: ColorStyle.yellowPrimary.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.location_pin, color: ColorStyle.yellowPrimary),

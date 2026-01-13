@@ -1,116 +1,115 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:presentech/shared/models/permission.dart';
+import 'package:presentech/shared/view/components/dialog/failed_dialog.dart';
+import 'package:presentech/shared/view/components/dialog/success_dialog.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/features/employee/permissions/repositories/permission_repository.dart';
 import 'package:presentech/shared/controllers/date_controller.dart';
-import 'package:presentech/shared/models/permission.dart';
 import 'package:presentech/features/employee/permissions/models/permission_filter.dart';
+import 'package:presentech/utils/enum/permission_status.dart';
+import 'package:presentech/utils/enum/permission_type.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EmployeePermissionController extends GetxController {
-  //repository
-  final permissionRepo = PermissionRepository();
+  // Repository
+  final _permissionRepo = PermissionRepository();
 
-  //controllers
+  // Supabase
+  final _supabase = Supabase.instance.client;
+  String get _userId => _supabase.auth.currentUser?.id ?? "";
+
+  // Controllers
   final permissionTitleController = TextEditingController();
+  DateController get dateController => Get.find<DateController>();
 
-  final Rx<PermissionType?> selectedType = Rx<PermissionType?>(null);
+  // Observables
+  final selectedType = Rxn<PermissionType>();
+  final selectedFilter = Rxn<PermissionFilter>();
+  final isLoading = false.obs;
+  final permissions = <Permission>[].obs;
 
-  //supabase client
-  final supabase = Supabase.instance.client;
-
-  //variables
-  var filteredEmployees = ''.obs;
-
-  var selectedFilter = Rxn<PermissionFilter>();
-  late final DateController dateController;
-  Object? statusAbsen;
-
-  RxBool isLoading = false.obs;
-
-  RxList<Permission> permissions = <Permission>[].obs;
   @override
   void onInit() {
     super.onInit();
-    getPermission();
-    dateController = Get.find<DateController>();
+    fetchPermissions();
   }
 
-  Future<void> getPermission() async {
-    final response = await permissionRepo.getPermissions();
-    permissions.assignAll(response);
-  }
+  Future<void> fetchPermissions() async {
+    if (_userId.isEmpty) return;
 
-  Future<bool> insertPermission(Permission permission) async {
-    final user = supabase.auth.currentSession?.user.id;
-    if (user == null) {
-      throw Exception("Error, user null");
-    }
-
-    final data = permission.toJson()..['user_id'] = user;
     try {
-      await permissionRepo.insertPermission(permission, user, data);
-      await getPermission();
-      return true;
+      isLoading.value = true;
+      DateTime? startDate;
+      final now = DateTime.now();
+
+      if (selectedFilter.value != null) {
+        switch (selectedFilter.value!) {
+          case PermissionFilter.today:
+            startDate = DateTime(now.year, now.month, now.day);
+            break;
+          case PermissionFilter.week:
+            startDate = now.subtract(const Duration(days: 7));
+            break;
+          case PermissionFilter.month:
+            startDate = DateTime(now.year, now.month, 1);
+            break;
+        }
+      }
+
+      final response = await _permissionRepo.getPermissions(
+        _userId,
+        startDate: startDate,
+        endDate: now,
+      );
+      permissions.assignAll(response);
     } catch (e) {
-      debugPrint('Error inserting permission: $e');
-      return false;
+      debugPrint('Error fetching permissions: $e');
+      FailedSnackbar.show("Gagal mengambil data ijin");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> cancelPermission(
+    String permissionId,
+    PermissionStatus status,
+  ) async {
+    if (status == PermissionStatus.cancelled) {
+      FailedDialog.show(
+        "Failed",
+        "Permintaan ijin sudah dibatalkan sebelumnya",
+        () {},
+      );
+      return;
+    }
+    try {
+      isLoading.value = true;
+
+      await _permissionRepo.updatePermission(int.parse(permissionId), {
+        'status': PermissionStatus.cancelled.name,
+      });
+
+      await fetchPermissions();
+
+      Get.back();
+
+      SuccessDialog.show(
+        "Success",
+        "Permintaan ijin berhasil dibatalkan",
+        () {},
+      );
+    } catch (e) {
+      debugPrint('Error cancelling permission: $e');
+      FailedSnackbar.show("Gagal membatalkan permintaan ijin");
+    } finally {
+      isLoading.value = false;
     }
   }
 
   void changeFilter(PermissionFilter filter) {
-    if (selectedFilter.value == filter) {
-      selectedFilter.value = null;
-    } else {
-      selectedFilter.value = filter;
-    }
-    fetchPermissionsByDay();
-  }
-
-  Future<void> fetchPermissionsByDay() async {
-    try {
-      isLoading.value = true;
-      final now = DateTime.now();
-      if (selectedFilter.value == null) {
-        final response = await permissionRepo.getPermissions();
-        permissions.assignAll(response);
-
-        final data = (response as List)
-            .map((e) => Permission.fromJson(e))
-            .toList();
-
-        permissions.assignAll(data);
-        return;
-      }
-
-      late DateTime startDate;
-
-      switch (selectedFilter.value!) {
-        case PermissionFilter.today:
-          startDate = DateTime(now.year, now.month, now.day);
-          break;
-        case PermissionFilter.week:
-          startDate = now.subtract(const Duration(days: 7));
-          break;
-        case PermissionFilter.month:
-          startDate = DateTime(now.year, now.month, 1);
-          break;
-      }
-
-      final response = await supabase
-          .from('permissions')
-          .select()
-          .gte('created_at', startDate.toIso8601String())
-          .lte('created_at', now.toIso8601String())
-          .order('created_at', ascending: false);
-
-      final data = (response as List)
-          .map((e) => Permission.fromJson(e))
-          .toList();
-
-      permissions.assignAll(data);
-    } finally {
-      isLoading.value = false;
-    }
+    selectedFilter.value = (selectedFilter.value == filter) ? null : filter;
+    fetchPermissions();
   }
 
   void submitForm() async {
@@ -118,7 +117,7 @@ class EmployeePermissionController extends GetxController {
         dateController.startDateController.text.isEmpty ||
         dateController.endDateController.text.isEmpty ||
         selectedType.value == null) {
-      Get.snackbar("Error", "Harap isi semua field");
+      FailedSnackbar.show("Harap isi semua field");
       return;
     }
 
@@ -126,10 +125,11 @@ class EmployeePermissionController extends GetxController {
       try {
         final parts = s.split('-');
         if (parts.length != 3) return null;
-        final d = int.parse(parts[0]);
-        final m = int.parse(parts[1]);
-        final y = int.parse(parts[2]);
-        return DateTime(y, m, d);
+        return DateTime(
+          int.parse(parts[2]),
+          int.parse(parts[1]),
+          int.parse(parts[0]),
+        );
       } catch (_) {
         return null;
       }
@@ -139,26 +139,31 @@ class EmployeePermissionController extends GetxController {
     final end = parseDate(dateController.endDateController.text);
 
     if (start == null || end == null) {
-      Get.snackbar("Error", "Format tanggal tidak valid");
+      FailedSnackbar.show("Format tanggal tidak valid");
       return;
     }
 
-    final newPermission = Permission(
-      createdAt: DateTime.now(),
-      startDate: start,
-      endDate: end,
-      type: selectedType.value!,
-      reason: permissionTitleController.text,
-    );
+    try {
+      isLoading.value = true;
+      final newPermission = Permission(
+        createdAt: DateTime.now(),
+        startDate: start,
+        endDate: end,
+        type: selectedType.value!,
+        reason: permissionTitleController.text,
+        status: PermissionStatus.pending,
+      );
 
-    final success = await insertPermission(newPermission);
-
-    if (success) {
-      await getPermission();
+      final data = newPermission.toJson()..['user_id'] = _userId;
+      await _permissionRepo.insertPermission(data);
       Get.back();
-      Get.snackbar("Success", "Permission berhasil ditambahkan");
-    } else {
-      Get.snackbar("Error", "Gagal menambahkan Permission");
+      await fetchPermissions();
+      SuccessDialog.show("Success", "Permintaan ijin berhasil dikirim", () {});
+    } catch (e) {
+      debugPrint('Error submitting permission: $e');
+      FailedSnackbar.show("Gagal mengirim permintaan ijin");
+    } finally {
+      isLoading.value = false;
     }
   }
 }

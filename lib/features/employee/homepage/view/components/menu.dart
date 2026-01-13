@@ -79,7 +79,7 @@ class Menu extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: colors.first.withValues(alpha: 0.3),
+                  color: colors.first.withOpacity(0.3),
                   blurRadius: 12,
                   offset: Offset(0, 6),
                 ),

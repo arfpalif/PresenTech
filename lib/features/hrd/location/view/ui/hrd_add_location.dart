@@ -6,6 +6,7 @@ import 'package:presentech/configs/themes/themes.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
 import 'package:presentech/shared/view/components/textFields/text_field_normal.dart';
+import 'package:presentech/shared/styles/input_style.dart';
 
 class HrdAddLocation extends GetView<AddLocationController> {
   const HrdAddLocation({super.key});
@@ -51,7 +52,7 @@ class HrdAddLocation extends GetView<AddLocationController> {
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: Colors.black.withOpacity(0.1),
                     blurRadius: 15,
                     offset: Offset(0, 5),
                   ),
@@ -100,7 +101,7 @@ class HrdAddLocation extends GetView<AddLocationController> {
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withValues(alpha: 0.05),
+                    color: Colors.grey.withOpacity(0.05),
                     blurRadius: 10,
                     offset: Offset(0, 5),
                   ),
@@ -119,8 +120,8 @@ class HrdAddLocation extends GetView<AddLocationController> {
 
                   TextFieldNormal(
                     controller: controller.officeNameController,
-                    decoration: _inputDecoration(
-                      label: "Nama Lokasi",
+                    decoration: AppInputStyle.decoration(
+                      labelText: "Nama Lokasi",
                       icon: Icons.location_on,
                     ),
                     readOnly: false,
@@ -131,8 +132,8 @@ class HrdAddLocation extends GetView<AddLocationController> {
                     style: AppTextStyle.normal,
                     controller: controller.addressController,
                     maxLines: 2,
-                    decoration: _inputDecoration(
-                      label: "Alamat",
+                    decoration: AppInputStyle.decoration(
+                      labelText: "Alamat",
                       icon: Icons.home,
                     ),
                   ),
@@ -146,8 +147,8 @@ class HrdAddLocation extends GetView<AddLocationController> {
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
                           ),
-                          decoration: _inputDecoration(
-                            label: "Latitude",
+                          decoration: AppInputStyle.decoration(
+                            labelText: "Latitude",
                             icon: Icons.roundabout_right,
                           ),
                         ),
@@ -159,8 +160,8 @@ class HrdAddLocation extends GetView<AddLocationController> {
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
                           ),
-                          decoration: _inputDecoration(
-                            label: "Longitude",
+                          decoration: AppInputStyle.decoration(
+                            labelText: "Longitude",
                             icon: Icons.roundabout_left,
                           ),
                         ),
@@ -176,8 +177,8 @@ class HrdAddLocation extends GetView<AddLocationController> {
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
-                    decoration: _inputDecoration(
-                      label: "Radius (meter)",
+                    decoration: AppInputStyle.decoration(
+                      labelText: "Radius (meter)",
                       icon: Icons.radar,
                     ),
                   ),
@@ -198,27 +199,6 @@ class HrdAddLocation extends GetView<AddLocationController> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  InputDecoration _inputDecoration({
-    required String label,
-    required IconData icon,
-  }) {
-    return InputDecoration(
-      labelText: label,
-      prefixIcon: Icon(icon, color: Colors.grey),
-      filled: true,
-      fillColor: Colors.grey[50],
-      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: ColorStyle.colorPrimary),
       ),
     );
   }

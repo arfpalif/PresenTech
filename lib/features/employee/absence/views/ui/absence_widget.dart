@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/features/employee/absence/controller/presence_controller.dart';
-import 'package:presentech/features/employee/absence/view/components/absence_list.dart';
-import 'package:presentech/features/employee/absence/view/components/filter_change.dart';
+import 'package:presentech/features/employee/absence/controllers/presence_controller.dart';
+import 'package:presentech/features/employee/absence/views/components/absence_list.dart';
+import 'package:presentech/features/employee/absence/views/components/card_absence.dart';
+import 'package:presentech/features/employee/absence/views/components/filter_change.dart';
 import 'package:presentech/configs/themes/themes.dart';
 
 class AbsenceWidget extends GetView<PresenceController> {
@@ -22,10 +23,18 @@ class AbsenceWidget extends GetView<PresenceController> {
         child: Column(
           children: [
             FilterChange(),
+            SizedBox(height: 16),
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                child: Column(children: [AbsenceList(), SizedBox(height: 10)]),
+                child: Column(
+                  children: [
+                    CardAbsence(),
+                    SizedBox(height: 20),
+                    AbsenceList(),
+                    SizedBox(height: 10),
+                  ],
+                ),
               ),
             ),
           ],

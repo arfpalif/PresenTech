@@ -10,4 +10,5 @@ class ColorStyle {
   static const redSecondary = Color(0xffB91C1C);
   static const yellowPrimary = Color(0xffFFB703);
   static const yellowSecondary = Color(0xffFB8500);
+  static const whiteSecondary = Color(0xFFF5F7FA);
 }

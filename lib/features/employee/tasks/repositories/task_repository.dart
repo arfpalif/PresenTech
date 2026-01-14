@@ -1,5 +1,4 @@
 import 'package:presentech/constants/api_constant.dart';
-import 'package:presentech/shared/models/tasks.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TaskRepository {

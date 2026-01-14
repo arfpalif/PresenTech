@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:presentech/utils/enum/task_status.dart';
+
 List<Tasks> tasksFromJson(String str) =>
     List<Tasks>.from(json.decode(str).map((x) => Tasks.fromMap(x)));
 
@@ -21,6 +23,7 @@ class Tasks {
   String title;
   String userId;
   String? userName;
+  TaskStatus? status;
 
   Tasks({
     required this.createdAt,
@@ -33,6 +36,7 @@ class Tasks {
     required this.title,
     required this.userId,
     this.userName,
+    this.status,
   });
 
   factory Tasks.fromMap(Map<String, dynamic> json) => Tasks(
@@ -46,6 +50,13 @@ class Tasks {
     title: json["title"],
     userId: json["user_id"],
     userName: json["users"] != null ? json["users"]["name"] : null,
+    status: json["status"] == "todo"
+        ? TaskStatus.todo
+        : json["status"] == "on_progress"
+        ? TaskStatus.on_progress
+        : json["status"] == "finished"
+        ? TaskStatus.finished
+        : null,
   );
 
   Map<String, dynamic> toMap() => {
@@ -59,5 +70,6 @@ class Tasks {
     "level": level,
     "title": title,
     "user_id": userId,
+    "status": status?.name,
   };
 }

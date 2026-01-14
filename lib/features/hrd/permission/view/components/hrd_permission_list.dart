@@ -7,7 +7,6 @@ import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
 import 'package:presentech/shared/view/components/component_badgets.dart';
 import 'package:presentech/utils/enum/permission_status.dart';
 import 'package:presentech/configs/themes/themes.dart';
-import 'package:presentech/utils/enum/permission_type.dart';
 
 class HrdPermissionList extends GetView<HrdPermissionController> {
   const HrdPermissionList({super.key});

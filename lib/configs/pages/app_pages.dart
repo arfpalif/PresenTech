@@ -21,6 +21,7 @@ import 'package:presentech/features/employee/tasks/binding/employee_task_binding
 import 'package:presentech/features/employee/tasks/view/ui/employee_add_task.dart';
 import 'package:presentech/features/employee/tasks/view/ui/employee_task.dart';
 import 'package:presentech/features/employee/tasks/view/ui/employee_task_detail.dart';
+import 'package:presentech/features/employee/tasks/binding/employee_task_detail_binding.dart';
 import 'package:presentech/features/hrd/attendance/binding/hrd_attendance_binding.dart';
 import 'package:presentech/features/hrd/attendance/view/ui/hrd_attedance.dart';
 import 'package:presentech/features/hrd/employee/binding/hrd_employee_binding.dart';
@@ -43,7 +44,7 @@ import 'package:presentech/features/hrd/profile/bindings/hrd_profile_binding.dar
 import 'package:presentech/features/hrd/profile/view/ui/hrd_profile_page.dart';
 import 'package:presentech/features/hrd/tasks/binding/hrd_task_binding.dart';
 import 'package:presentech/features/hrd/tasks/views/ui/hrd_task_detail.dart';
-import 'package:presentech/features/hrd/tasks/views/ui/hrd_task_list.dart';
+import 'package:presentech/features/hrd/tasks/views/components/hrd_task_list.dart';
 import 'package:presentech/shared/bindings/employee_nav_binding.dart';
 import 'package:presentech/shared/bindings/hrd_nav_binding.dart';
 import 'package:presentech/shared/bindings/profile_binding.dart';
@@ -132,7 +133,7 @@ class AppPages {
     GetPage(
       name: Routes.employeeTaskDetail,
       page: () => EmployeeTaskDetail(),
-      binding: EmployeeTaskBinding(),
+      binding: EmployeeTaskDetailBinding(),
     ),
     GetPage(
       name: Routes.employeeProfile,

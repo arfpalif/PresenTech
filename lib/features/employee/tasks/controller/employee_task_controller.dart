@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 import 'package:presentech/features/employee/tasks/repositories/task_repository.dart';
 import 'package:presentech/shared/controllers/date_controller.dart';
 import 'package:presentech/shared/models/tasks.dart';
+import 'package:presentech/shared/view/components/dialog/success_dialog.dart';
 import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
+import 'package:presentech/utils/enum/task_status.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EmployeeTaskController extends GetxController {
@@ -25,6 +27,26 @@ class EmployeeTaskController extends GetxController {
   final selectedPriority = RxnString();
   final tasks = <Tasks>[].obs;
   final isLoading = false.obs;
+
+  // Statistics
+  int get totalTasksCount => tasks.length;
+
+  int get todoTasksCount =>
+      tasks.where((t) => t.status == TaskStatus.todo).length;
+
+  List<Tasks> get tasksToday {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return tasks.where((t) {
+      final start = DateTime(
+        t.startDate.year,
+        t.startDate.month,
+        t.startDate.day,
+      );
+      final end = DateTime(t.endDate.year, t.endDate.month, t.endDate.day);
+      return !start.isAfter(today) && !end.isBefore(today);
+    }).toList();
+  }
 
   @override
   void onInit() {
@@ -66,28 +88,7 @@ class EmployeeTaskController extends GetxController {
   }
 
   Future<void> insertTask(Tasks task) async {
-    await _handleTaskAction(
-      () => _taskRepo.insertTask(task.toMap()),
-      "Tugas berhasil ditambahkan",
-      "Gagal menambahkan tugas",
-    );
-  }
-
-  Future<void> updateTask(Tasks task) async {
-    if (task.id == null) return;
-    await _handleTaskAction(
-      () => _taskRepo.updateTask(task.id!, task.toMap()),
-      "Tugas berhasil diperbarui",
-      "Gagal memperbarui tugas",
-    );
-  }
-
-  Future<void> deleteTask(int id) async {
-    await _handleTaskAction(
-      () => _taskRepo.deleteTask(id),
-      "Tugas berhasil dihapus",
-      "Gagal menghapus tugas",
-    );
+    await _taskRepo.insertTask(task.toMap());
   }
 
   void submitForm() async {
@@ -135,6 +136,8 @@ class EmployeeTaskController extends GetxController {
     );
 
     await insertTask(newTask);
+    await fetchTasks();
+    SuccessDialog.show("Success", "Tugas berhasil ditambahkan", () {});
     Get.back();
   }
 }

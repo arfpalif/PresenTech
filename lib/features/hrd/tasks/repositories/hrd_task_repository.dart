@@ -11,7 +11,7 @@ class HrdTaskRepository {
   Future<List<Map<String, dynamic>>> fetchTasks() async {
     final response = await supabase
         .from('tasks')
-        .select()
+        .select('*, users(name)')
         .order('created_at', ascending: false);
 
     return List<Map<String, dynamic>>.from(response);

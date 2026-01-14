@@ -11,6 +11,19 @@ class HrdTaskController extends GetxController {
   RxList<Tasks> tasks = <Tasks>[].obs;
   RxBool isLoading = false.obs;
 
+  // Grouped tasks by user name
+  Map<String, List<Tasks>> get groupedTasks {
+    final Map<String, List<Tasks>> grouped = {};
+    for (var task in tasks) {
+      final key = task.userName ?? "Unknown User";
+      if (!grouped.containsKey(key)) {
+        grouped[key] = [];
+      }
+      grouped[key]!.add(task);
+    }
+    return grouped;
+  }
+
   @override
   void onInit() {
     super.onInit();

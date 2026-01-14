@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:presentech/shared/repositories/profile_repository.dart';
 import 'package:presentech/utils/services/image_picker_service.dart';
-import 'package:presentech/features/employee/profile/repositories/profile_repository.dart';
 import 'package:presentech/shared/controllers/auth_controller.dart';
 import 'package:presentech/shared/controllers/date_controller.dart';
 import 'package:presentech/shared/models/users.dart';

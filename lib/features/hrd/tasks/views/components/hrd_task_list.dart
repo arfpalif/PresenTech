@@ -1,0 +1,170 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:presentech/configs/routes/app_routes.dart';
+import 'package:presentech/features/hrd/tasks/controller/hrd_task_controller.dart';
+import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/styles/color_style.dart';
+
+import 'package:presentech/shared/view/components/component_badgets.dart';
+
+class HrdTaskList extends GetView<HrdTaskController> {
+  const HrdTaskList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final dateFormatter = DateFormat('dd-MM-yyyy');
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
+      appBar: AppBar(
+        title: Text(
+          'Tugas HRD',
+          style: AppTextStyle.title.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: <Color>[ColorStyle.colorPrimary, ColorStyle.greenPrimary],
+            ),
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Obx(() {
+            if (controller.isLoading.value) {
+              return const SizedBox(
+                height: 200,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+
+            if (controller.tasks.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 100),
+                    Icon(
+                      Icons.assignment_outlined,
+                      size: 60,
+                      color: Colors.grey[300],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Belum ada tugas',
+                      style: AppTextStyle.heading2.copyWith(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return ListView.builder(
+              itemCount: controller.tasks.length,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                final t = controller.tasks[index];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: ListTile(
+                    onTap: () {
+                      Get.toNamed(Routes.hrdTaskDetail, arguments: t);
+                    },
+                    contentPadding: const EdgeInsets.all(16),
+                    title: Text(
+                      t.title,
+                      style: AppTextStyle.heading2.copyWith(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (t.userName != null)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 4.0),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.person_outline,
+                                    size: 14,
+                                    color: ColorStyle.colorPrimary,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    t.userName!,
+                                    style: AppTextStyle.normal.copyWith(
+                                      color: ColorStyle.colorPrimary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.calendar_today,
+                                size: 14,
+                                color: Colors.grey,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${dateFormatter.format(t.startDate)} - ${dateFormatter.format(t.endDate)}',
+                                style: AppTextStyle.smallText.copyWith(
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ComponentBadgets(status: t.status ?? "todo"),
+                        const SizedBox(height: 4),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          }),
+        ),
+      ),
+    );
+  }
+}

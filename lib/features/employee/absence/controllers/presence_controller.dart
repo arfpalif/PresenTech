@@ -33,10 +33,39 @@ class PresenceController extends GetxController {
   }
 
   Future<void> refreshPresenceData() async {
-    await Future.wait([
-      checkTodayAbsence(),
-      fetchAbsence(),
-    ]);
+    await Future.wait([checkTodayAbsence(), fetchAbsence()]);
+  }
+
+  Future<void> fetchAbsence() async {
+    if (_userId.isEmpty) return;
+
+    try {
+      isLoading.value = true;
+      final response = await _absenceRepo.getAbsencesByFilter(userId: _userId);
+      absences.assignAll(response.map((item) => Absence.fromJson(item)));
+    } catch (e) {
+      FailedSnackbar.show("Gagal mengambil riwayat absensi");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  List<Absence> get absencesToday {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return absences.where((a) {
+      final absenceDate = DateTime(
+        DateTime.parse(a.date as String).year,
+        DateTime.parse(a.date as String).month,
+        DateTime.parse(a.date as String).day,
+      );
+      final end = DateTime(
+        DateTime.parse(a.date as String).year,
+        DateTime.parse(a.date as String).month,
+        DateTime.parse(a.date as String).day,
+      );
+      return !absenceDate.isAfter(today) && !end.isBefore(today);
+    }).toList();
   }
 
   Future<Map<String, dynamic>?> _getTodayAbsenceData() async {
@@ -68,7 +97,9 @@ class PresenceController extends GetxController {
     final userOffice = await _absenceRepo.getUserOffice(userId: _userId);
     if (userOffice == null) throw Exception("User tidak memiliki kantor");
 
-    final workTime = await _absenceRepo.getOfficeHours(officeId: userOffice['office_id']);
+    final workTime = await _absenceRepo.getOfficeHours(
+      officeId: userOffice['office_id'],
+    );
     if (workTime == null) throw Exception("Jam kerja tidak ditemukan");
 
     return _compareWithWorkStart(workTime['start_time']);
@@ -77,14 +108,23 @@ class PresenceController extends GetxController {
   String _compareWithWorkStart(String startTime) {
     final now = DateTime.now();
     final parts = startTime.split(':');
-    final workStart = DateTime(now.year, now.month, now.day, int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+    final workStart = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      int.parse(parts[0]),
+      int.parse(parts[1]),
+      int.parse(parts[2]),
+    );
 
     if (now.isBefore(workStart) || now.isAtSameMomentAs(workStart)) {
       return AbsenceStatus.hadir.name;
     }
-    
+
     final lateThreshold = workStart.add(const Duration(hours: 1));
-    return now.isBefore(lateThreshold) ? AbsenceStatus.terlambat.name : AbsenceStatus.alfa.name;
+    return now.isBefore(lateThreshold)
+        ? AbsenceStatus.terlambat.name
+        : AbsenceStatus.alfa.name;
   }
 
   Future<void> _handleClockIn() async {
@@ -114,11 +154,7 @@ class PresenceController extends GetxController {
     final today = DateFormat('yyyy-MM-dd').format(now);
     final time = DateFormat('HH:mm:ss').format(now);
 
-    await _absenceRepo.clockOut(
-      userId: _userId,
-      date: today,
-      clockOut: time,
-    );
+    await _absenceRepo.clockOut(userId: _userId, date: today, clockOut: time);
     clockOut.value = true;
     SuccessSnackbar.show("Berhasil clock out");
   }
@@ -153,11 +189,11 @@ class PresenceController extends GetxController {
         return Future.error("Error, could not get location");
       }
     }
-    
+
     if (permission == LocationPermission.deniedForever) {
       return Future.error("Izin lokasi ditolak permanen");
     }
-    
+
     return await Geolocator.getCurrentPosition();
   }
 
@@ -180,14 +216,16 @@ class PresenceController extends GetxController {
   Future<void> submitAbsence() async {
     try {
       final todayAbsence = await _getTodayAbsenceData();
-      if (todayAbsence != null && todayAbsence['clock_in'] != null && todayAbsence['clock_out'] != null) {
+      if (todayAbsence != null &&
+          todayAbsence['clock_in'] != null &&
+          todayAbsence['clock_out'] != null) {
         FailedSnackbar.show("Hari ini sudah absen lengkap");
         return;
       }
 
       final position = await _getCurrentLocation();
       final office = await _getOfficeData();
-      
+
       final distance = calculateDistance(
         position!.latitude,
         position.longitude,
@@ -196,7 +234,9 @@ class PresenceController extends GetxController {
       );
 
       if (distance > (office['radius'] ?? 100)) {
-        FailedSnackbar.show("Gagal absen, di luar area kantor (${distance.toStringAsFixed(1)} m)");
+        FailedSnackbar.show(
+          "Gagal absen, di luar area kantor (${distance.toStringAsFixed(1)} m)",
+        );
         return;
       }
 
@@ -205,25 +245,11 @@ class PresenceController extends GetxController {
       } else {
         await _handleClockOut();
       }
-      
+
       await refreshPresenceData();
     } catch (e) {
       print("Absence Error: $e");
       FailedSnackbar.show(e.toString());
-    }
-  }
-
-  Future<void> fetchAbsence() async {
-    if (_userId.isEmpty) return;
-
-    try {
-      isLoading.value = true;
-      final response = await _absenceRepo.getAbsencesByFilter(userId: _userId);
-      absences.assignAll(response.map((item) => Absence.fromJson(item)));
-    } catch (e) {
-      FailedSnackbar.show("Gagal mengambil riwayat absensi");
-    } finally {
-      isLoading.value = false;
     }
   }
 
@@ -234,7 +260,7 @@ class PresenceController extends GetxController {
 
   Future<void> fetchAbsenceByDay() async {
     if (_userId.isEmpty) return;
-    
+
     try {
       isLoading.value = true;
       DateTime? startDate;

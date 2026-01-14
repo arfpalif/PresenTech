@@ -67,6 +67,12 @@ class ComponentBadgets extends StatelessWidget {
       case 'high':
       case 'error':
         return ColorStyle.redPrimary;
+      case 'todo':
+        return Colors.blue;
+      case 'on_progress':
+        return Colors.orange;
+      case 'finished':
+        return ColorStyle.greenPrimary;
       default:
         return Colors.grey;
     }
@@ -75,6 +81,8 @@ class ComponentBadgets extends StatelessWidget {
   String _getStatusText(String status) {
     if (status.isEmpty) return "-";
     if (status == 'terlambat' || status == 'telat') return 'Telat';
+    if (status == 'on_progress') return 'On Progress';
+    if (status == 'todo') return 'To Do';
     return status[0].toUpperCase() + status.substring(1);
   }
 }

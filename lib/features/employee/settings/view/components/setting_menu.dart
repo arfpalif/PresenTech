@@ -28,7 +28,7 @@ class SettingMenu extends GetView<ProfileController> {
           icon: Icons.business_rounded,
           color: ColorStyle.redPrimary,
           title: "Office Locations",
-          onTap: () => Get.toNamed(Routes.comingSoon),
+          onTap: () => Get.toNamed(Routes.employeeLocation),
         ),
         SizedBox(height: 32),
         Text("App Settings", style: AppTextStyle.heading1),

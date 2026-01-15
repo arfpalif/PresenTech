@@ -5,7 +5,6 @@ import 'package:presentech/shared/controllers/date_controller.dart';
 import 'package:presentech/shared/models/tasks.dart';
 import 'package:presentech/shared/view/components/dialog/success_dialog.dart';
 import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
-import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
 import 'package:presentech/utils/enum/task_status.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -60,7 +59,7 @@ class EmployeeTaskController extends GetxController {
     try {
       isLoading.value = true;
       final response = await _taskRepo.fetchTasks(_userId);
-      tasks.assignAll(response.map((item) => Tasks.fromMap(item)));
+      tasks.assignAll(response);
     } catch (e) {
       debugPrint("Error fetchTasks: $e");
       FailedSnackbar.show("Gagal mengambil data tugas");
@@ -69,26 +68,8 @@ class EmployeeTaskController extends GetxController {
     }
   }
 
-  Future<void> _handleTaskAction(
-    Future<void> Function() action,
-    String successMsg,
-    String errorMsg,
-  ) async {
-    try {
-      isLoading.value = true;
-      await action();
-      await fetchTasks();
-      SuccessSnackbar.show(successMsg);
-    } catch (e) {
-      debugPrint("Task Action Error: $e");
-      FailedSnackbar.show(errorMsg);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   Future<void> insertTask(Tasks task) async {
-    await _taskRepo.insertTask(task.toMap());
+    await _taskRepo.insertTask(task.toJson());
   }
 
   void submitForm() async {
@@ -135,9 +116,17 @@ class EmployeeTaskController extends GetxController {
       userId: _userId,
     );
 
-    await insertTask(newTask);
-    await fetchTasks();
-    SuccessDialog.show("Success", "Tugas berhasil ditambahkan", () {});
-    Get.back();
+    try {
+      isLoading.value = true;
+      await insertTask(newTask);
+      await fetchTasks();
+      SuccessDialog.show("Success", "Tugas berhasil ditambahkan", () {});
+      Get.back();
+    } catch (e) {
+      debugPrint("Insert Task Error: $e");
+      FailedSnackbar.show("Gagal menambahkan tugas");
+      isLoading.value = false;
+      return;
+    }
   }
 }

@@ -24,6 +24,28 @@ class HrdTaskController extends GetxController {
     return grouped;
   }
 
+  Map<String, List<Tasks>> get groupedTasksToday {
+    final Map<String, List<Tasks>> grouped = {};
+    for (var task in tasksToday) {
+      final key = task.userName ?? "Unknown User";
+      if (!grouped.containsKey(key)) {
+        grouped[key] = [];
+      }
+      grouped[key]!.add(task);
+    }
+    return grouped;
+  }
+
+  List<Tasks> get tasksToday {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return tasks.where((t) {
+      final start = DateTime(t.startDate.year, t.startDate.month, t.startDate.day);
+      final end = DateTime(t.endDate.year, t.endDate.month, t.endDate.day);
+      return !start.isAfter(today) && !end.isBefore(today);
+    }).toList();
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -34,7 +56,9 @@ class HrdTaskController extends GetxController {
     try {
       isLoading.value = true;
       final response = await taskRepo.fetchTasks();
-      tasks.value = response.map<Tasks>((item) => Tasks.fromMap(item)).toList();
+      tasks.value = response
+          .map<Tasks>((item) => Tasks.fromJson(item))
+          .toList();
     } catch (e) {
       print("Error fetchTasks: $e");
       FailedSnackbar.show("Gagal mengambil data tugas: ${e.toString()}");

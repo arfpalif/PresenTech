@@ -31,13 +31,55 @@ class HrdPermissionController extends GetxController {
     try {
       final response = await permissionRepo.fetchPermissions();
 
-      permissions.assignAll(
-        response.map((e) => Permission.fromJson(e)).toList(),
-      );
+      permissions.assignAll(response);
     } catch (e) {
       debugPrint('Error fetching permissions: $e');
       FailedSnackbar.show('Failed to fetch permissions');
     }
+  }
+
+  List<Permission> get absenceToday {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return permissions.where((t) {
+      final start = DateTime(
+        t.startDate.year,
+        t.startDate.month,
+        t.startDate.day,
+      );
+      final end = DateTime(t.endDate.year, t.endDate.month, t.endDate.day);
+      return !start.isAfter(today) && !end.isBefore(today);
+    }).toList();
+  }
+
+  List<Permission> get absenceWeekly {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final weekAgo = today.subtract(const Duration(days: 7));
+    return permissions.where((t) {
+      final start = DateTime(
+        t.startDate.year,
+        t.startDate.month,
+        t.startDate.day,
+      );
+      final end = DateTime(t.endDate.year, t.endDate.month, t.endDate.day);
+      return !start.isAfter(today) && !end.isBefore(weekAgo);
+    }).toList();
+  }
+
+  List<Permission> get absenceMonthly {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final monthAgo = DateTime(now.year, now.month - 1, now.day);
+    return permissions.where((t) {
+      final start = DateTime(
+        t.startDate.year,
+        t.startDate.month,
+        t.startDate.day,
+      );
+      final end = DateTime(t.endDate.year, t.endDate.month, t.endDate.day);
+      return !start.isAfter(today) && !end.isBefore(monthAgo);
+    }).toList();
   }
 
   void changeFilter(PermissionFilter filter) {
@@ -53,44 +95,24 @@ class HrdPermissionController extends GetxController {
     try {
       isLoading.value = true;
 
-      final now = DateTime.now();
-
       if (selectedFilter.value == null) {
         final response = await permissionRepo.fetchPermissions();
-
-        final data = (response as List)
-            .map((e) => Permission.fromJson(e))
-            .toList();
-
-        permissions.assignAll(data);
+        permissions.assignAll(response);
         return;
       }
 
-      late DateTime startDate;
-
       switch (selectedFilter.value!) {
         case PermissionFilter.today:
-          startDate = DateTime(now.year, now.month, now.day);
+          permissions.assignAll(absenceToday);
           break;
         case PermissionFilter.week:
-          startDate = now.subtract(const Duration(days: 7));
+          permissions.assignAll(absenceWeekly);
           break;
         case PermissionFilter.month:
-          startDate = DateTime(now.year, now.month, 1);
+          permissions.assignAll(absenceMonthly);
           break;
       }
-
-      final response = await permissionRepo.fetchPermissionsByDateRange(
-        startDate,
-        now,
-      );
-
-      final data = (response as List)
-          .map((e) => Permission.fromJson(e))
-          .toList();
-
-      permissions.assignAll(data);
-    } finally {
+    } catch (e) {
       isLoading.value = false;
     }
   }

@@ -4,7 +4,6 @@ import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/shared/controllers/navigation_controller.dart';
 import 'package:presentech/configs/themes/themes.dart';
 import 'package:presentech/shared/styles/color_style.dart';
-import 'package:presentech/shared/view/ui/coming_soon.dart';
 
 class Menu extends StatelessWidget {
   Menu({super.key});
@@ -33,17 +32,14 @@ class Menu extends StatelessWidget {
             _buildMenuItem(
               icon: Icons.assignment_rounded,
               label: "Permission",
-              colors: [
-                ColorStyle.colorPrimary,
-                ColorStyle.colorSecondary,
-              ],
+              colors: [ColorStyle.colorPrimary, ColorStyle.colorSecondary],
               onTap: () => navController.changePage(1),
             ),
             _buildMenuItem(
               icon: Icons.location_on_rounded,
               label: "Location",
               colors: [ColorStyle.yellowPrimary, ColorStyle.yellowSecondary],
-              onTap: () => Get.to(ComingSoon()),
+              onTap: () => Get.toNamed(Routes.employeeLocation),
             ),
             _buildMenuItem(
               icon: Icons.task_rounded,

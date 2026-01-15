@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:presentech/features/hrd/employee/repositories/hrd_employee_repository.dart';
 import 'package:presentech/shared/models/users.dart';
 
-enum AbsenceFilter { today, week, month }
+
 
 class HrdEmployeeController extends GetxController {
   //repository

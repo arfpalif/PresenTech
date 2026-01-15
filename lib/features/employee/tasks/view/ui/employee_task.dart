@@ -56,7 +56,7 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
-              const TaskSummaryCard(),
+              Obx(() => TaskSummaryCard(tasksToday: controller.tasksToday)),
               Obx(() {
                 if (controller.isLoading.value) {
                   return const SizedBox(

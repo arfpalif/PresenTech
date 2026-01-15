@@ -1,10 +1,12 @@
+import 'package:presentech/utils/enum/absence_status.dart';
+
 class Absence {
   int id;
   String? createdAt;
   DateTime date;
   String? clockIn;
   String? clockOut;
-  dynamic status;
+  AbsenceStatus? status;
   String userId;
   String? userName;
 
@@ -14,7 +16,7 @@ class Absence {
     required this.date,
     this.clockIn,
     this.clockOut,
-    required this.status,
+    this.status,
     required this.userId,
     this.userName,
   });
@@ -25,11 +27,17 @@ class Absence {
     date: DateTime.parse(json["date"]),
     clockIn: json["clock_in"],
     clockOut: json["clock_out"],
-    status: json["status"],
     userId: json["user_id"],
     userName: (json["users"] is Map<String, dynamic>)
         ? json["users"]["name"]
         : json["name"],
+    status: json["status"] == "alfa"
+        ? AbsenceStatus.alfa
+        : json["status"] == "hadir"
+        ? AbsenceStatus.hadir
+        : json["status"] == "terlambat"
+        ? AbsenceStatus.terlambat
+        : null,
   );
 
   Map<String, dynamic> toJson() => {

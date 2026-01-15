@@ -11,6 +11,8 @@ import 'package:presentech/features/employee/absence/binding/presence_binding.da
 import 'package:presentech/features/employee/absence/views/ui/absence_widget.dart';
 import 'package:presentech/features/employee/homepage/bindings/employee_homepage_binding.dart';
 import 'package:presentech/features/employee/homepage/view/ui/employee_homepage.dart';
+import 'package:presentech/features/employee/location/binding/employee_location_binding.dart';
+import 'package:presentech/features/employee/location/view/ui/employee_location_page.dart';
 import 'package:presentech/features/employee/permissions/bindings/employee_permissions_binding.dart';
 import 'package:presentech/features/employee/permissions/view/ui/employee_add_permission.dart';
 import 'package:presentech/features/employee/permissions/view/ui/employee_permission.dart';
@@ -45,6 +47,7 @@ import 'package:presentech/features/hrd/profile/view/ui/hrd_profile_page.dart';
 import 'package:presentech/features/hrd/tasks/binding/hrd_task_binding.dart';
 import 'package:presentech/features/hrd/tasks/views/ui/hrd_task_detail.dart';
 import 'package:presentech/features/hrd/tasks/views/components/hrd_task_list.dart';
+import 'package:presentech/features/hrd/tasks/views/ui/hrd_task_today.dart';
 import 'package:presentech/shared/bindings/employee_nav_binding.dart';
 import 'package:presentech/shared/bindings/hrd_nav_binding.dart';
 import 'package:presentech/shared/bindings/profile_binding.dart';
@@ -147,6 +150,12 @@ class AppPages {
       binding: ProfileBinding(),
     ),
 
+    GetPage(
+      name: Routes.employeeLocation,
+      page: () => EmployeeLocationPage(),
+      binding: EmployeeLocationBinding(),
+    ),
+
     //<!-- HRD Pages -->
     GetPage(
       name: Routes.hrdHome,
@@ -191,6 +200,11 @@ class AppPages {
     GetPage(
       name: Routes.hrdTaskDetail,
       page: () => HrdTaskDetail(),
+      binding: HrdTaskBinding(),
+    ),
+    GetPage(
+      name: Routes.HrdTaskToday,
+      page: () => HrdTaskToday(),
       binding: HrdTaskBinding(),
     ),
     GetPage(

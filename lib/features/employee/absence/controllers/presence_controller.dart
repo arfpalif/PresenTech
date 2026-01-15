@@ -22,7 +22,7 @@ class PresenceController extends GetxController {
   final clockIn = false.obs;
   final clockOut = false.obs;
   final statusAbsen = "Belum absen".obs;
-  final selectedFilter = Rxn<AbsenceFilter>();
+  final selectedFilter = Rxn<DateFilter>();
   final absences = <Absence>[].obs;
   final isLoading = false.obs;
 
@@ -54,16 +54,8 @@ class PresenceController extends GetxController {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     return absences.where((a) {
-      final absenceDate = DateTime(
-        DateTime.parse(a.date as String).year,
-        DateTime.parse(a.date as String).month,
-        DateTime.parse(a.date as String).day,
-      );
-      final end = DateTime(
-        DateTime.parse(a.date as String).year,
-        DateTime.parse(a.date as String).month,
-        DateTime.parse(a.date as String).day,
-      );
+      final absenceDate = DateTime(a.date.year, a.date.month, a.date.day);
+      final end = DateTime(a.date.year, a.date.month, a.date.day);
       return !absenceDate.isAfter(today) && !end.isBefore(today);
     }).toList();
   }
@@ -253,7 +245,7 @@ class PresenceController extends GetxController {
     }
   }
 
-  void changeFilter(AbsenceFilter filter) {
+  void changeFilter(DateFilter filter) {
     selectedFilter.value = (selectedFilter.value == filter) ? null : filter;
     fetchAbsenceByDay();
   }
@@ -268,13 +260,13 @@ class PresenceController extends GetxController {
 
       if (selectedFilter.value != null) {
         switch (selectedFilter.value!) {
-          case AbsenceFilter.today:
+          case DateFilter.today:
             startDate = DateTime(now.year, now.month, now.day);
             break;
-          case AbsenceFilter.week:
+          case DateFilter.week:
             startDate = now.subtract(const Duration(days: 7));
             break;
-          case AbsenceFilter.month:
+          case DateFilter.month:
             startDate = DateTime(now.year, now.month, 1);
             break;
         }

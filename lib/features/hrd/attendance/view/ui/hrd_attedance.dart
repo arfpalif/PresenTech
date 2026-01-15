@@ -42,7 +42,7 @@ class HrdAttedance extends GetView<HrdAttendanceController> {
                 }
 
                 if (controller.absences.isEmpty) {
-                  return Center(child: Text("Belum ada absensi"));
+                  return const Center(child: Text("Belum ada absensi"));
                 }
                 return ListView.builder(
                   itemCount: controller.absences.length,

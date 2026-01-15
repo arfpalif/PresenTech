@@ -100,7 +100,7 @@ class EmployeeTaskDetailController extends GetxController {
 
     try {
       isLoading.value = true;
-      await _taskRepo.updateTask(task.id!, updatedTask.toMap());
+      await _taskRepo.updateTask(task.id!, updatedTask.toJson());
       isChanged.value = true;
       SuccessDialog.show("Success", "Tugas berhasil diperbarui", () {
         Get.back(result: true);
@@ -118,7 +118,7 @@ class EmployeeTaskDetailController extends GetxController {
     try {
       isLoading.value = true;
       selectedStatus.value = status;
-      final updatedData = task.toMap();
+      final updatedData = task.toJson();
       updatedData["status"] = status.name;
       await _taskRepo.updateTask(task.id!, updatedData);
       isChanged.value = true;

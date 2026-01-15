@@ -16,27 +16,27 @@ class FilterChangeAttendance extends GetView<HrdAttendanceController> {
         Obx(
           () => CustomFilterChip(
             label: "Today",
-            isSelected: controller.selectedFilter.value == AbsenceFilter.today,
+            isSelected: controller.selectedFilter.value == DateFilter.today,
             onSelected: (bool value) {
-              controller.changeFilter(AbsenceFilter.today);
+              controller.changeFilter(DateFilter.today);
             },
           ),
         ),
         Obx(
           () => CustomFilterChip(
             label: "This Week",
-            isSelected: controller.selectedFilter.value == AbsenceFilter.week,
+            isSelected: controller.selectedFilter.value == DateFilter.week,
             onSelected: (bool value) {
-              controller.changeFilter(AbsenceFilter.week);
+              controller.changeFilter(DateFilter.week);
             },
           ),
         ),
         Obx(
           () => CustomFilterChip(
             label: "This Month",
-            isSelected: controller.selectedFilter.value == AbsenceFilter.month,
+            isSelected: controller.selectedFilter.value == DateFilter.month,
             onSelected: (bool value) {
-              controller.changeFilter(AbsenceFilter.month);
+              controller.changeFilter(DateFilter.month);
             },
           ),
         ),

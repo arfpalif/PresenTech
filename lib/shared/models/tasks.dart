@@ -7,10 +7,10 @@ import 'dart:convert';
 import 'package:presentech/utils/enum/task_status.dart';
 
 List<Tasks> tasksFromJson(String str) =>
-    List<Tasks>.from(json.decode(str).map((x) => Tasks.fromMap(x)));
+    List<Tasks>.from(json.decode(str).map((x) => Tasks.fromJson(x)));
 
 String tasksToJson(List<Tasks> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toMap())));
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Tasks {
   String createdAt;
@@ -39,7 +39,7 @@ class Tasks {
     this.status,
   });
 
-  factory Tasks.fromMap(Map<String, dynamic> json) => Tasks(
+  factory Tasks.fromJson(Map<String, dynamic> json) => Tasks(
     createdAt: json["created_at"],
     acceptanceCriteria: json["acceptance_criteria"],
     startDate: DateTime.parse(json["start_date"]),
@@ -59,7 +59,7 @@ class Tasks {
         : null,
   );
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toJson() => {
     "created_at": createdAt,
     "acceptance_criteria": acceptanceCriteria,
     "start_date":

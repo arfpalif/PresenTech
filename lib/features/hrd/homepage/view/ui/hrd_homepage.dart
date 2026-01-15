@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
+import 'package:presentech/features/employee/tasks/view/components/task_summary_card.dart';
+import 'package:presentech/features/hrd/permission/view/components/hrd_permission_list.dart';
+import 'package:presentech/features/hrd/tasks/controller/hrd_task_controller.dart';
 import 'package:presentech/features/hrd/attendance/controller/hrd_attendance_controller.dart';
 import 'package:presentech/features/hrd/homepage/controller/hrd_homepage_controller.dart';
 import 'package:presentech/features/hrd/homepage/view/components/absence_list.dart';
 import 'package:presentech/features/hrd/homepage/view/components/menu.dart';
 import 'package:presentech/features/hrd/homepage/view/components/summary_card.dart';
 import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/controllers/navigation_controller.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/ui/coming_soon.dart';
 import 'package:presentech/shared/view/widgets/header.dart';
@@ -17,7 +21,10 @@ class HrdHomepage extends GetView<HrdHomepageController> {
 
   @override
   Widget build(BuildContext context) {
+    final taskController = Get.find<HrdTaskController>();
     Get.find<HrdAttendanceController>();
+    final NavigationController navController = Get.find<NavigationController>();
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -57,9 +64,28 @@ class HrdHomepage extends GetView<HrdHomepageController> {
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                 child: Column(
                   children: [
-                    SizedBox(height: 10),
-                    Menu(),
-                    SizedBox(height: 32),
+                    const Menu(),
+                    const SizedBox(height: 32),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Rekap Tugas Karyawan",
+                        style: AppTextStyle.heading1,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    GestureDetector(
+                      onTap: () {
+                        Get.toNamed(Routes.HrdTaskToday);
+                      },
+                      child: Obx(
+                        () => TaskSummaryCard(
+                          tasksToday: taskController.tasksToday,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
                     Column(
                       children: [
                         Row(
@@ -101,6 +127,7 @@ class HrdHomepage extends GetView<HrdHomepageController> {
                             child: AbsenceList(),
                           ),
                         ),
+                        SizedBox(height: 32),
                       ],
                     ),
                     SizedBox(height: 100),

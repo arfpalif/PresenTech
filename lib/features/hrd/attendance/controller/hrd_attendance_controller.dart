@@ -10,7 +10,7 @@ class HrdAttendanceController extends GetxController {
 
   //variables
   var statusAbsen = "".obs;
-  var selectedFilter = Rxn<AbsenceFilter>();
+  var selectedFilter = Rxn<DateFilter>();
   RxInt telat = 0.obs;
   RxInt hadir = 0.obs;
   RxInt alfa = 0.obs;
@@ -26,16 +26,10 @@ class HrdAttendanceController extends GetxController {
     fetchAbsence();
   }
 
-  Future<Map<String, dynamic>?> getTodayAbsence() async {
-    final absence = await attendanceRepo.getTodayAbsence();
-
-    return absence;
-  }
-
   Future<void> fetchAbsence() async {
     try {
       final response = await attendanceRepo.fetchAbsence();
-      absences.assignAll(response?['data'] ?? []);
+      absences.assignAll(response);
       _updateSummary();
     } catch (e) {
       print("Error fetch Absence: $e");
@@ -43,15 +37,47 @@ class HrdAttendanceController extends GetxController {
     }
   }
 
+  List<Absence> get absenceToday {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return absences.where((t) {
+      final start = DateTime(t.date.year, t.date.month, t.date.day);
+      final end = DateTime(t.date.year, t.date.month, t.date.day);
+      return !start.isAfter(today) && !end.isBefore(today);
+    }).toList();
+  }
+
+  List<Absence> get absenceWeekly {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final weekAgo = today.subtract(const Duration(days: 7));
+    return absences.where((t) {
+      final start = DateTime(t.date.year, t.date.month, t.date.day);
+      final end = DateTime(t.date.year, t.date.month, t.date.day);
+      return !start.isAfter(today) && !end.isBefore(weekAgo);
+    }).toList();
+  }
+
+  List<Absence> get absenceMonthly {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final monthAgo = DateTime(now.year, now.month - 1, now.day);
+    return absences.where((t) {
+      final start = DateTime(t.date.year, t.date.month, t.date.day);
+      final end = DateTime(t.date.year, t.date.month, t.date.day);
+      return !start.isAfter(today) && !end.isBefore(monthAgo);
+    }).toList();
+  }
+
   void _updateSummary() {
-    print("Updating summary: absences count = ${absences.length}");
-    
     final today = DateTime.now();
-    final todayStr = "${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
+    final todayStr =
+        "${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
     print("Filtering for today: $todayStr");
 
     final todayAbsences = absences.where((a) {
-      final aDateStr = "${a.date.year}-${a.date.month.toString().padLeft(2, '0')}-${a.date.day.toString().padLeft(2, '0')}";
+      final aDateStr =
+          "${a.date.year}-${a.date.month.toString().padLeft(2, '0')}-${a.date.day.toString().padLeft(2, '0')}";
       return aDateStr == todayStr;
     }).toList();
 
@@ -71,50 +97,39 @@ class HrdAttendanceController extends GetxController {
     alfa.value = todayAbsences
         .where((absence) => absence.status == AbsenceStatus.alfa)
         .length;
-    
-    print("Summary counts -> Hadir: ${hadir.value}, Telat: ${telat.value}, Alpha: ${alfa.value}");
+
+    print(
+      "Summary counts -> Hadir: ${hadir.value}, Telat: ${telat.value}, Alpha: ${alfa.value}",
+    );
   }
 
-  void changeFilter(AbsenceFilter? filter) {
+  void changeFilter(DateFilter? filter) {
     selectedFilter.value = selectedFilter.value == filter ? null : filter;
 
     fetchAbsenceByDay(selectedFilter.value);
   }
 
-  Future<void> fetchAbsenceByDay(AbsenceFilter? selectedFilter) async {
+  Future<void> fetchAbsenceByDay(DateFilter? selectedFilter) async {
     try {
       isLoading.value = true;
 
-      final now = DateTime.now();
-
       if (selectedFilter == null) {
         final response = await attendanceRepo.fetchAbsence();
-        absences.assignAll(response?['data'] ?? []);
+        absences.assignAll(response);
         return;
       }
 
-      late DateTime startDate;
-
       switch (selectedFilter) {
-        case AbsenceFilter.today:
-          startDate = DateTime(now.year, now.month, now.day);
+        case DateFilter.today:
+          absences.assignAll(absenceToday);
           break;
-        case AbsenceFilter.week:
-          startDate = now.subtract(const Duration(days: 7));
+        case DateFilter.week:
+          absences.assignAll(absenceWeekly);
           break;
-        case AbsenceFilter.month:
-          startDate = DateTime(now.year, now.month, 1);
+        case DateFilter.month:
+          absences.assignAll(absenceMonthly);
           break;
       }
-
-      final response = await attendanceRepo.fetchAbsenceByDateRange(
-        startDate,
-        now,
-      );
-
-      final data = (response as List).map((e) => Absence.fromJson(e)).toList();
-
-      absences.assignAll(data);
     } finally {
       isLoading.value = false;
     }

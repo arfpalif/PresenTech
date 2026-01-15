@@ -4,7 +4,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HrdHomepageController extends GetxController {
   final supabase = Supabase.instance.client;
-  //repository
   final homeRepo = HrdHomepageRepository();
 
   @override

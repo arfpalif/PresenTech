@@ -1,16 +1,17 @@
 import 'package:presentech/constants/api_constant.dart';
+import 'package:presentech/shared/models/permission.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HrdPermissionRepository {
   final supabase = Supabase.instance.client;
 
-  Future<List<Map<String, dynamic>>> fetchPermissions() async {
+  Future<List<Permission>> fetchPermissions() async {
     final response = await supabase
         .from('permissions')
         .select()
         .order('created_at', ascending: false);
 
-    return List<Map<String, dynamic>>.from(response);
+    return List<Permission>.from(response.map((e) => Permission.fromJson(e)));
   }
 
   Future<List<Map<String, dynamic>>> fetchPermissionsByDateRange(

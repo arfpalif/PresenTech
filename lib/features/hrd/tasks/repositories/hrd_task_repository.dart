@@ -19,7 +19,7 @@ class HrdTaskRepository {
 
   Future<bool> insertTask(Tasks task) async {
     try {
-      await supabase.from('tasks').insert(task.toMap());
+      await supabase.from('tasks').insert(task.toJson());
       await fetchTasks();
       return true;
     } catch (e) {
@@ -31,7 +31,7 @@ class HrdTaskRepository {
 
   Future<bool> updateTask(Tasks task) async {
     try {
-      await supabase.from('tasks').update(task.toMap()).eq('id', task.id!);
+      await supabase.from('tasks').update(task.toJson()).eq('id', task.id!);
       await fetchTasks();
       return true;
     } catch (e) {

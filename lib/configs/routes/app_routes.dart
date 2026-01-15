@@ -15,6 +15,7 @@ abstract class Routes {
   static const employeePermissionAdd = '/employee/employee_permission/add';
   static const employeePermissionDetail =
       '/employee/employee_permission/detail';
+  static const employeeLocation = '/employee/employee_location';
 
   static const hrdHome = '/hrd/hrd_homepage';
   static const hrdApproval = '/hrd/hrd_permissions';
@@ -25,6 +26,7 @@ abstract class Routes {
   static const hrdProfile = '/hrd/hrd_profile';
   static const hrdTask = '/hrd/hrd_tasks';
   static const hrdTaskDetail = '/hrd/hrd_tasks/detail';
+  static const HrdTaskToday = '/hrd/hrd_tasks/today';
   static const hrdLocationDetail =
       '/features/hrd/location/view/hrd_location_detail';
   static const hrdAddLocation = '/hrd/hrd_add_location';

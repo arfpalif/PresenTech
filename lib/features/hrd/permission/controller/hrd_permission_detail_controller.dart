@@ -30,9 +30,7 @@ class HrdPermissionDetailController extends GetxController {
     try {
       final response = await permissionRepo.fetchPermissions();
 
-      permissions.assignAll(
-        response.map((e) => Permission.fromJson(e)).toList(),
-      );
+      permissions.assignAll(response);
     } catch (e) {
       debugPrint('Error fetching permissions: $e');
       FailedSnackbar.show('Failed to fetch permissions');

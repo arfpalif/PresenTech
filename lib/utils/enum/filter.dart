@@ -1,1 +1,1 @@
-enum AbsenceFilter { today, week, month }
+enum DateFilter { today, week, month }

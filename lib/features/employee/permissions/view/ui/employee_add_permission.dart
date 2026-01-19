@@ -129,10 +129,13 @@ class EmployeeAddPermission extends GetView<EmployeePermissionController> {
                       items: const [
                         PermissionType.permission,
                         PermissionType.leave,
+                        PermissionType.absence_error,
                       ],
                       labelBuilder: (type) => type == PermissionType.permission
                           ? "Permission"
-                          : "Leave",
+                          : type == PermissionType.leave
+                          ? "Leave"
+                          : "Absence Error",
                       onChanged: (val) => controller.selectedType.value = val,
                       decoration: AppInputStyle.decoration(
                         icon: Icons.category,

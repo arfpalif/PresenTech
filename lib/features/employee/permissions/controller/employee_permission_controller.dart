@@ -32,7 +32,23 @@ class EmployeePermissionController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _handleArguments();
     fetchPermissions();
+  }
+
+  void _handleArguments() {
+    final args = Get.arguments;
+    if (args != null && args is Map) {
+      if (args.containsKey('type')) {
+        selectedType.value = args['type'];
+      }
+      if (args.containsKey('date')) {
+        final DateTime date = args['date'];
+        final dateStr = "${date.day}-${date.month}-${date.year}";
+        dateController.startDateController.text = dateStr;
+        dateController.endDateController.text = dateStr;
+      }
+    }
   }
 
   Future<void> fetchPermissions() async {

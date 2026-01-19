@@ -1,9 +1,12 @@
 import 'dart:math';
 import 'package:geolocator/geolocator.dart';
+import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/employee/absence/repositories/absence_repository.dart';
 import 'package:presentech/shared/models/absence.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_form_snackbar.dart';
 import 'package:presentech/utils/enum/absence_status.dart';
 import 'package:presentech/utils/enum/filter.dart';
+import 'package:presentech/utils/enum/permission_type.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -23,17 +26,41 @@ class PresenceController extends GetxController {
   final clockOut = false.obs;
   final statusAbsen = "Belum absen".obs;
   final selectedFilter = Rxn<DateFilter>();
-  final absences = <Absence>[].obs;
+  Rx<DateTime> selectedDate = DateTime.now().obs;
+  RxList<Absence> absences = <Absence>[].obs;
   final isLoading = false.obs;
+  RxInt telat = 0.obs;
+  RxInt hadir = 0.obs;
+  RxInt alfa = 0.obs;
+  final RxBool showForm = false.obs;
 
   @override
   void onInit() {
     super.onInit();
     refreshPresenceData();
+    fetchAbsenceByDay();
   }
 
   Future<void> refreshPresenceData() async {
     await Future.wait([checkTodayAbsence(), fetchAbsence()]);
+  }
+
+  Future<void> prevMonth() async {
+    selectedDate.value = DateTime(
+      selectedDate.value.year,
+      selectedDate.value.month - 1,
+      1,
+    );
+    await fetchAbsenceByDay();
+  }
+
+  Future<void> nextMonth() async {
+    selectedDate.value = DateTime(
+      selectedDate.value.year,
+      selectedDate.value.month + 1,
+      1,
+    );
+    await fetchAbsenceByDay();
   }
 
   Future<void> fetchAbsence() async {
@@ -226,8 +253,17 @@ class PresenceController extends GetxController {
       );
 
       if (distance > (office['radius'] ?? 100)) {
-        FailedSnackbar.show(
-          "Gagal absen, di luar area kantor (${distance.toStringAsFixed(1)} m)",
+        FailedFormSnackbar.show(
+          "Anda berada di luar jangkauan kantor. Jarak Anda: ${distance.toStringAsFixed(2)} meter",
+          onCtaPressed: () {
+            Get.toNamed(
+              Routes.employeePermissionAdd,
+              arguments: {
+                'type': PermissionType.absence_error,
+                'date': DateTime.now(),
+              },
+            );
+          },
         );
         return;
       }
@@ -245,9 +281,18 @@ class PresenceController extends GetxController {
     }
   }
 
-  void changeFilter(DateFilter filter) {
-    selectedFilter.value = (selectedFilter.value == filter) ? null : filter;
-    fetchAbsenceByDay();
+  List<Absence> get izinAbsences {
+    return absences.where((a) {
+      return a.date.year == selectedDate.value.year &&
+          a.date.month == selectedDate.value.month;
+    }).toList();
+  }
+
+  List<Absence> get monthlyAbsences {
+    return absences.where((a) {
+      return a.date.year == selectedDate.value.year &&
+          a.date.month == selectedDate.value.month;
+    }).toList();
   }
 
   Future<void> fetchAbsenceByDay() async {
@@ -255,29 +300,37 @@ class PresenceController extends GetxController {
 
     try {
       isLoading.value = true;
-      DateTime? startDate;
-      final now = DateTime.now();
+      DateTime startDate = DateTime(
+        selectedDate.value.year,
+        selectedDate.value.month,
+        1,
+      );
 
-      if (selectedFilter.value != null) {
-        switch (selectedFilter.value!) {
-          case DateFilter.today:
-            startDate = DateTime(now.year, now.month, now.day);
-            break;
-          case DateFilter.week:
-            startDate = now.subtract(const Duration(days: 7));
-            break;
-          case DateFilter.month:
-            startDate = DateTime(now.year, now.month, 1);
-            break;
-        }
-      }
+      DateTime endDate = DateTime(
+        selectedDate.value.year,
+        selectedDate.value.month + 1,
+        0,
+      );
 
       final response = await _absenceRepo.getAbsencesByFilter(
         userId: _userId,
         startDate: startDate,
-        endDate: now,
+        endDate: endDate,
       );
-      absences.assignAll(response.map((e) => Absence.fromJson(e)));
+      final data = response.map((item) => Absence.fromJson(item)).toList();
+      absences.assignAll(data);
+
+      telat.value = data
+          .where((absence) => absence.status == AbsenceStatus.terlambat)
+          .length;
+
+      hadir.value = data
+          .where((absence) => absence.status == AbsenceStatus.hadir)
+          .length;
+
+      alfa.value = data
+          .where((absence) => absence.status == AbsenceStatus.alfa)
+          .length;
     } catch (e) {
       FailedSnackbar.show("Gagal memfilter absensi");
     } finally {

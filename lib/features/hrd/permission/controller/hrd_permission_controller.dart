@@ -95,24 +95,25 @@ class HrdPermissionController extends GetxController {
     try {
       isLoading.value = true;
 
-      if (selectedFilter.value == null) {
-        final response = await permissionRepo.fetchPermissions();
-        permissions.assignAll(response);
-        return;
-      }
+      final response = await permissionRepo.fetchPermissions();
+      permissions.assignAll(response);
 
-      switch (selectedFilter.value!) {
-        case PermissionFilter.today:
-          permissions.assignAll(absenceToday);
-          break;
-        case PermissionFilter.week:
-          permissions.assignAll(absenceWeekly);
-          break;
-        case PermissionFilter.month:
-          permissions.assignAll(absenceMonthly);
-          break;
+      if (selectedFilter.value != null) {
+        switch (selectedFilter.value!) {
+          case PermissionFilter.today:
+            permissions.assignAll(absenceToday);
+            break;
+          case PermissionFilter.week:
+            permissions.assignAll(absenceWeekly);
+            break;
+          case PermissionFilter.month:
+            permissions.assignAll(absenceMonthly);
+            break;
+        }
       }
     } catch (e) {
+      debugPrint('Error fetching permissions: $e');
+    } finally {
       isLoading.value = false;
     }
   }

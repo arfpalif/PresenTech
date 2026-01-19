@@ -26,9 +26,9 @@ class SummaryCard extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            SummaryItem(label: "Hadir\n ${attendaceC.hadir}"),
-            SummaryItem(label: "telat\n ${attendaceC.telat}"),
-            SummaryItem(label: "Alpha\n ${attendaceC.alfa}"),
+            SummaryItem(label: "Hadir\n ${attendaceC.hadir.value}"),
+            SummaryItem(label: "telat\n ${attendaceC.telat.value}"),
+            SummaryItem(label: "Alpha\n ${attendaceC.alfa.value}"),
           ],
         );
       }),

@@ -7,12 +7,15 @@ extension PermissionTypeX on PermissionType {
   String get value => switch (this) {
     PermissionType.permission => 'permission',
     PermissionType.leave => 'leave',
+    PermissionType.absence_error => 'absence_error',
   };
 
   static PermissionType fromString(String? s) {
     switch (s) {
       case 'leave':
         return PermissionType.leave;
+      case 'absence_error':
+        return PermissionType.absence_error;
       case 'permission':
       default:
         return PermissionType.permission;

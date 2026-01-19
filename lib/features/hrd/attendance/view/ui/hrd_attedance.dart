@@ -65,8 +65,7 @@ class HrdAttedance extends GetView<HrdAttendanceController> {
                               ),
                             ),
                             subtitle: Text(
-                              // ignore: unnecessary_null_comparison
-                              "Tanggal: ${DateFormat('dd-MM-yyyy').format(t.date)} \n Masuk : ${t.clockIn != null ? t.clockIn?.substring(0, 5) : '-'} | Keluar : ${t.clockOut != null && t.clockOut != null ? t.clockOut?.substring(0, 5) : '-'}",
+                              "Tanggal: ${DateFormat('dd-MM-yyyy').format(t.date)} \n Masuk : ${(t.clockIn != null && t.clockIn!.length >= 5) ? t.clockIn?.substring(0, 5) : (t.clockIn ?? '-')} | Keluar : ${(t.clockOut != null && t.clockOut!.length >= 5) ? t.clockOut?.substring(0, 5) : (t.clockOut ?? '-')}",
                               style: AppTextStyle.normal.copyWith(
                                 color: Colors.grey,
                               ),

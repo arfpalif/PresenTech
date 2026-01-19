@@ -14,6 +14,7 @@ import 'package:presentech/shared/view/widgets/app_card.dart';
 import 'package:presentech/shared/view/widgets/app_header.dart';
 import 'package:presentech/shared/styles/input_style.dart';
 import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/view/widgets/absence_card.dart';
 
 // ignore: must_be_immutable
 class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
@@ -258,53 +259,10 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
                   return ListView.builder(
                     itemCount: controller.absences.length,
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (_, index) {
                       final t = controller.absences[index];
-                      return AppCard(
-                        margin: EdgeInsets.only(bottom: 12),
-                        padding: EdgeInsets.zero,
-                        child: ListTile(
-                          contentPadding: EdgeInsets.all(16),
-                          leading: StatusBadge(status: t.status),
-                          title: Text(
-                            DateFormat('EEEE, dd MMM yyyy').format(t.date),
-                            style: AppTextStyle.heading2.copyWith(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.login,
-                                  size: 14,
-                                  color: Colors.green,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  t.clockIn?.substring(0, 5) ?? '-',
-                                  style: AppTextStyle.normal.copyWith(
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                SizedBox(width: 12),
-                                Icon(Icons.logout, size: 14, color: Colors.red),
-                                SizedBox(width: 4),
-                                Text(
-                                  t.clockOut?.substring(0, 5) ?? '-',
-                                  style: AppTextStyle.normal.copyWith(
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          trailing: ComponentBadgets(status: t.status),
-                        ),
-                      );
+                      return AbsenceCard(absence: t);
                     },
                   );
                 }),

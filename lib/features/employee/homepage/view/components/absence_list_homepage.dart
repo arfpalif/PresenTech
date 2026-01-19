@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/employee/absence/controllers/presence_controller.dart';
-import 'package:presentech/shared/controllers/split_time.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/components/buttons/btn_right.dart';
 import 'package:presentech/shared/view/components/component_badgets.dart';
@@ -45,6 +44,16 @@ class AbsenceListHomepage extends GetView<PresenceController> {
                 if (controller.absences.isEmpty) {
                   return Text("Belum ada absensi");
                 }
+                String formatTime(String? time) {
+                  if (time == null || time.isEmpty) return '-';
+                  try {
+                    final parsedTime = DateFormat('HH:mm').parse(time);
+                    return DateFormat('hh:mm').format(parsedTime);
+                  } catch (e) {
+                    return time;
+                  }
+                }
+
                 return ListView.builder(
                   itemCount: controller.absences.length > 3
                       ? 3
@@ -70,7 +79,7 @@ class AbsenceListHomepage extends GetView<PresenceController> {
                               ),
                             ),
                             subtitle: Text(
-                              "Absensi : ${SplitTime().formatClockInOut(t.clockIn.toString(), t.clockOut.toString())}",
+                              "Masuk : ${formatTime(t.clockIn)} | Keluar : ${formatTime(t.clockOut)}",
                               style: AppTextStyle.normal.copyWith(
                                 color: Colors.grey,
                               ),

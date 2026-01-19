@@ -84,4 +84,19 @@ class AbsenceRepository {
         .eq('user_id', userId)
         .eq('date', date);
   }
+
+  Future<void> updateAbsenceStatus({
+    required String userId,
+    required String date,
+    required String status,
+    String? clockIn,
+    String? clockOut,
+  }) async {
+    await supabase.from('absences').upsert({
+      'user_id': userId,
+      'date': date,
+      'status': status,
+      'clock_in': clockIn,
+    }, onConflict: 'user_id,date');
+  }
 }

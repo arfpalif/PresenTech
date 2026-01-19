@@ -5,9 +5,14 @@ import 'package:presentech/shared/models/permission.dart';
 import 'package:presentech/shared/view/components/dialog/success_dialog.dart';
 import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
+import 'package:presentech/features/employee/absence/repositories/absence_repository.dart';
+import 'package:presentech/utils/enum/absence_status.dart';
+import 'package:presentech/utils/enum/permission_type.dart';
+import 'package:intl/intl.dart';
 
 class HrdPermissionDetailController extends GetxController {
   final permissionRepo = HrdPermissionRepository();
+  final absenceRepo = AbsenceRepository();
 
   late Permission permission;
   final feedbackController = TextEditingController();
@@ -41,6 +46,16 @@ class HrdPermissionDetailController extends GetxController {
     try {
       isLoading.value = true;
       await permissionRepo.approvePermission(permission.id!);
+
+      if (permission.type == PermissionType.absence_error) {
+        await absenceRepo.updateAbsenceStatus(
+          userId: permission.userId!,
+          date: DateFormat('yyyy-MM-dd').format(permission.startDate),
+          status: AbsenceStatus.hadir.name,
+          clockIn: DateFormat('HH:mm:ss').format(permission.createdAt),
+        );
+      }
+
       SuccessSnackbar.show('Permission approved successfully');
       Get.back(result: true);
     } catch (e) {
@@ -60,6 +75,15 @@ class HrdPermissionDetailController extends GetxController {
       isLoading.value = true;
 
       await permissionRepo.rejectPermission(id, feedbackController.text);
+
+      if (permission.type == PermissionType.absence_error) {
+        await absenceRepo.updateAbsenceStatus(
+          userId: permission.userId!,
+          date: DateFormat('yyyy-MM-dd').format(permission.startDate),
+          status: AbsenceStatus.alfa.name,
+          clockIn: DateFormat('HH:mm:ss').format(DateTime.now()),
+        );
+      }
 
       await permissionRepo.fetchPermissions();
 

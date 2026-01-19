@@ -8,6 +8,7 @@ import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/components/component_badgets.dart';
 
 import 'package:presentech/features/employee/tasks/view/components/task_summary_card.dart';
+import 'package:presentech/shared/view/widgets/task_card.dart';
 
 class EmployeeTask extends GetView<EmployeeTaskController> {
   const EmployeeTask({super.key});
@@ -94,71 +95,17 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     final t = controller.tasks[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            blurRadius: 15,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: ListTile(
-                        onTap: () async {
-                          final result = await Get.toNamed(
-                            Routes.employeeTaskDetail,
-                            arguments: t,
-                          );
-                          if (result == true) {
-                            controller.fetchTasks();
-                          }
-                        },
-                        contentPadding: const EdgeInsets.all(16),
-                        title: Text(
-                          t.title,
-                          style: AppTextStyle.heading2.copyWith(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        subtitle: Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.calendar_today,
-                                    size: 14,
-                                    color: Colors.grey,
-                                  ),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    '${dateFormatter.format(t.startDate)} - ${dateFormatter.format(t.endDate)}',
-                                    style: AppTextStyle.smallText.copyWith(
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ComponentBadgets(status: t.status ?? "todo"),
-                            const SizedBox(height: 4),
-                          ],
-                        ),
-                      ),
+                    return TaskCard(
+                      task: t,
+                      onTap: () async {
+                        final result = await Get.toNamed(
+                          Routes.employeeTaskDetail,
+                          arguments: t,
+                        );
+                        if (result == true) {
+                          controller.fetchTasks();
+                        }
+                      },
                     );
                   },
                 );

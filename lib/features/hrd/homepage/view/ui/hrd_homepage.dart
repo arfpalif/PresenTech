@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/employee/tasks/view/components/task_summary_card.dart';
-import 'package:presentech/features/hrd/permission/view/components/hrd_permission_list.dart';
 import 'package:presentech/features/hrd/tasks/controller/hrd_task_controller.dart';
 import 'package:presentech/features/hrd/attendance/controller/hrd_attendance_controller.dart';
 import 'package:presentech/features/hrd/homepage/controller/hrd_homepage_controller.dart';

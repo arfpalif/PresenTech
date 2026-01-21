@@ -5,12 +5,21 @@ import 'package:presentech/configs/themes/themes.dart';
 
 class TaskSummaryCard extends StatelessWidget {
   final List<Tasks> tasksToday;
-  const TaskSummaryCard({super.key, required this.tasksToday});
+  final int overdueCount;
+  final int finishedCount;
+  final int todoCount;
+  final int onProgressCount;
+  const TaskSummaryCard({
+    super.key,
+    required this.tasksToday,
+    required this.overdueCount,
+    required this.finishedCount,
+    required this.todoCount,
+    required this.onProgressCount,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final totalToday = tasksToday.length;
-
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 20),
@@ -52,7 +61,7 @@ class TaskSummaryCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "$totalToday Tugas Aktif",
+                      "${todoCount + onProgressCount} Tugas Aktif",
                       style: AppTextStyle.title.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -84,31 +93,28 @@ class TaskSummaryCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  _buildStatItem(
+                  textStatItem(
                     "To Do",
-                    tasksToday
-                        .where((t) => t.status?.name == 'todo')
-                        .length
-                        .toString(),
+                    todoCount.toString(),
                     ColorStyle.colorPrimary,
                   ),
-                  _buildDivider(),
-                  _buildStatItem(
+                  divider(),
+                  textStatItem(
                     "On Progress",
-                    tasksToday
-                        .where((t) => t.status?.name == 'on_progress')
-                        .length
-                        .toString(),
+                    onProgressCount.toString(),
                     ColorStyle.yellowPrimary,
                   ),
-                  _buildDivider(),
-                  _buildStatItem(
+                  divider(),
+                  textStatItem(
                     "Finished",
-                    tasksToday
-                        .where((t) => t.status?.name == 'finished')
-                        .length
-                        .toString(),
+                    finishedCount.toString(),
                     ColorStyle.greenPrimary,
+                  ),
+                  divider(),
+                  textStatItem(
+                    "Overdue",
+                    overdueCount.toString(),
+                    ColorStyle.redPrimary,
                   ),
                 ],
               ),
@@ -120,7 +126,7 @@ class TaskSummaryCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(String label, String value, Color color) {
+  Widget textStatItem(String label, String value, Color color) {
     return Expanded(
       child: Column(
         children: [
@@ -145,7 +151,7 @@ class TaskSummaryCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDivider() {
+  Widget divider() {
     return Container(height: 30, width: 1, color: Colors.grey[200]);
   }
 }

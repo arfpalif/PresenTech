@@ -8,12 +8,8 @@ import 'package:presentech/shared/view/components/dropdowns/dropdown_field_norma
 import 'package:presentech/shared/view/components/textFields/text_field_normal.dart';
 import 'package:presentech/shared/styles/input_style.dart';
 
-// ignore: must_be_immutable
 class EmployeeAddTask extends GetView<EmployeeTaskController> {
-  String? selectedLevel;
-  String? selectedPriority;
-
-  EmployeeAddTask({super.key});
+  const EmployeeAddTask({super.key});
 
   @override
   Widget build(BuildContext context) {

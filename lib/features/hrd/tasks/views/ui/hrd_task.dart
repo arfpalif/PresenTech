@@ -120,9 +120,7 @@ class HrdTask extends GetView<HrdTaskController> {
                     ],
                   ),
                 ),
-                ...userTasks
-                    .map((t) => _buildTaskCard(t, dateFormatter))
-                    .toList(),
+                ...userTasks.map((t) => _buildTaskCard(t, dateFormatter)),
                 const SizedBox(height: 16),
               ],
             );

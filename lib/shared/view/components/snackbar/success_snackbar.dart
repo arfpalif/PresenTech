@@ -4,6 +4,10 @@ import 'package:presentech/shared/styles/color_style.dart';
 
 class SuccessSnackbar {
   static void show(String message) {
+    if (Get.testMode) {
+      debugPrint('SuccessSnackbar suppressed in test mode: $message');
+      return;
+    }
     Get.snackbar(
       "Success",
       message,

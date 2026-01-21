@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:presentech/features/employee/absence/controllers/presence_controller.dart';
 import 'package:presentech/features/employee/homepage/controllers/employee_homepage_controller.dart';
 import 'package:presentech/features/employee/permissions/controller/employee_permission_controller.dart';
 import 'package:presentech/shared/controllers/profile_controller.dart';
@@ -13,5 +14,6 @@ class EmployeeNavBinding extends Bindings {
     Get.lazyPut(() => ProfileController(), fenix: true);
     Get.lazyPut(() => EmployeeTaskController(), fenix: true);
     Get.lazyPut(() => NavigationController(), fenix: true);
+    Get.lazyPut(() => PresenceController(), fenix: true);
   }
 }

@@ -6,6 +6,11 @@ import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
 
 class SuccessDialog {
   static void show(String title, String message, VoidCallback action) {
+    if (Get.testMode) {
+      debugPrint('SuccessDialog suppressed in test mode: $title - $message');
+      action();
+      return;
+    }
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),

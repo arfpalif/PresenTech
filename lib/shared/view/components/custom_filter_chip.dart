@@ -6,12 +6,14 @@ class CustomFilterChip extends StatelessWidget {
   final String label;
   final bool isSelected;
   final Function(bool) onSelected;
+  final Color? selectedColor;
 
   const CustomFilterChip({
     super.key,
     required this.label,
     required this.isSelected,
     required this.onSelected,
+    this.selectedColor,
   });
 
   @override
@@ -28,7 +30,7 @@ class CustomFilterChip extends StatelessWidget {
       selected: isSelected,
       onSelected: onSelected,
       backgroundColor: Colors.white,
-      selectedColor: ColorStyle.colorPrimary,
+      selectedColor: selectedColor ?? ColorStyle.colorPrimary,
       checkmarkColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),

@@ -4,6 +4,7 @@ import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/configs/themes/themes.dart';
 import 'package:presentech/constants/assets_constant.dart';
 import 'package:presentech/features/auth/onBoarding/controllers/on_boarding_controller.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
 
 class OnBoardingPage extends GetView<OnBoardingController> {
@@ -12,44 +13,98 @@ class OnBoardingPage extends GetView<OnBoardingController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(AssetsConstans.imgOnBoarding, height: 400),
-              SizedBox(height: 10),
-              Text(
-                "Manage attendance and HRD systems easily",
-                style: AppTextStyle.heading1.copyWith(fontSize: 24),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 10),
-              Text(
-                "Manage HRD systems, attendance and employee easily anywhere, everywhere.",
-                style: AppTextStyle.normal.copyWith(
-                  color: Colors.grey,
-                  fontSize: 14,
+      backgroundColor: ColorStyle.whiteSecondary,
+      body: Stack(
+        children: [
+          // Background Decoration
+          Positioned(
+            top: -100,
+            right: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [
+                    ColorStyle.colorPrimary.withOpacity(0.1),
+                    ColorStyle.colorSecondary.withOpacity(0.05),
+                  ],
                 ),
-                textAlign: TextAlign.center,
               ),
-              SizedBox(height: 80),
-              AppGradientButton(
-                text: "Get Started",
-                onPressed: () => Get.toNamed(Routes.login),
-                borderRadius: 20,
-              ),
-              SizedBox(height: 10),
-              AppOutlinedButton(
-                borderRadius: 20,
-                text: "I’m new, sign me up",
-                onPressed: () => Get.toNamed(Routes.register),
-              ),
-            ],
+            ),
           ),
-        ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 20,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Spacer(),
+                  // Image with subtle shadow or container if needed
+                  Hero(
+                    tag: 'onboarding_img',
+                    child: Image.asset(
+                      AssetsConstans.imgOnBoarding,
+                      height: MediaQuery.of(context).size.height * 0.4,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  Text(
+                    "Manage attendance and HRD systems easily",
+                    style: AppTextStyle.title.copyWith(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: ColorStyle.colorSecondary,
+                      height: 1.2,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    "Manage HRD systems, attendance and employee easily anywhere, everywhere.",
+                    style: AppTextStyle.normal.copyWith(
+                      color: Colors.black.withOpacity(0.6),
+                      fontSize: 15,
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const Spacer(),
+                  const SizedBox(height: 40),
+                  AppGradientButton(
+                    text: "Get Started",
+                    onPressed: () => Get.toNamed(Routes.login),
+                    borderRadius: 30,
+                    height: 56,
+                    textStyle: AppTextStyle.title.copyWith(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  AppOutlinedButton(
+                    borderRadius: 30,
+                    height: 56,
+                    text: "I’m new, sign me up",
+                    textStyle: AppTextStyle.title.copyWith(
+                      color: ColorStyle.colorPrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    onPressed: () => Get.toNamed(Routes.register),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

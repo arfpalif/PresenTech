@@ -8,6 +8,10 @@ class FailedFormSnackbar {
     VoidCallback? onCtaPressed,
     String ctaLabel = 'ISI FORM',
   }) {
+    if (Get.testMode) {
+      debugPrint('Snackbar suppressed in test mode: $message');
+      return;
+    }
     Get.snackbar(
       "Failed",
       message,

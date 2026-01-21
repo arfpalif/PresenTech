@@ -6,7 +6,6 @@ import 'package:presentech/features/hrd/employee/controller/hrd_employee_detail_
 import 'package:presentech/features/hrd/location/model/office.dart';
 import 'package:presentech/shared/models/users.dart';
 import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
-import 'package:presentech/shared/view/components/component_badgets.dart';
 import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
 import 'package:presentech/shared/view/components/textFields/text_field_normal.dart';
@@ -60,7 +59,6 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            // Profile Image
             Center(
               child: Container(
                 decoration: BoxDecoration(

@@ -3,6 +3,7 @@ import 'package:presentech/features/hrd/tasks/repositories/hrd_task_repository.d
 import 'package:presentech/shared/models/tasks.dart';
 import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
+import 'package:presentech/utils/enum/task_status.dart';
 
 class HrdTaskController extends GetxController {
   //repository
@@ -40,10 +41,34 @@ class HrdTaskController extends GetxController {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     return tasks.where((t) {
-      final start = DateTime(t.startDate.year, t.startDate.month, t.startDate.day);
+      final start = DateTime(
+        t.startDate.year,
+        t.startDate.month,
+        t.startDate.day,
+      );
       final end = DateTime(t.endDate.year, t.endDate.month, t.endDate.day);
       return !start.isAfter(today) && !end.isBefore(today);
     }).toList();
+  }
+
+  int get overdueTasksCount => tasks.where((t) => isTaskOverdue(t)).length;
+  int get completedTasksCount =>
+      tasks.where((t) => t.status == TaskStatus.finished).length;
+  int get inProgressTasksCount =>
+      tasks.where((t) => t.status == TaskStatus.on_progress).length;
+  int get toDoProgressTasksCount =>
+      tasks.where((t) => t.status == TaskStatus.todo).length;
+
+  bool isTaskOverdue(Tasks task) {
+    if (task.status == TaskStatus.finished) return false;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final deadlineDay = DateTime(
+      task.endDate.year,
+      task.endDate.month,
+      task.endDate.day,
+    );
+    return today.isAfter(deadlineDay);
   }
 
   @override

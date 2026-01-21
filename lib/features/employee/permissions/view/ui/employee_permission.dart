@@ -2,13 +2,11 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/features/employee/permissions/controller/employee_permission_controller.dart';
-import 'package:presentech/features/employee/permissions/models/permission_filter.dart';
+import 'package:presentech/features/employee/permissions/view/components/permission_filter_btn.dart';
 import 'package:presentech/features/employee/permissions/view/components/permission_list.dart';
 import 'package:presentech/features/employee/permissions/view/ui/employee_add_permission.dart';
-import 'package:presentech/shared/controllers/date_controller.dart';
 import 'package:presentech/configs/themes/themes.dart';
 import 'package:presentech/shared/styles/color_style.dart';
-import 'package:presentech/shared/view/components/custom_filter_chip.dart';
 
 // ignore: must_be_immutable
 class EmployeePermission extends GetView<EmployeePermissionController> {
@@ -50,20 +48,16 @@ class EmployeePermission extends GetView<EmployeePermissionController> {
           borderRadius: BorderRadius.circular(16),
         ),
         closedColor: ColorStyle.greenPrimary,
-        closedBuilder: (context, openContainer) => SizedBox(
+        openColor: const Color(0xFFF5F7FA),
+        transitionDuration: const Duration(milliseconds: 500),
+        closedBuilder: (context, openContainer) => const SizedBox(
           height: 56,
           width: 56,
           child: Center(
             child: Icon(Icons.add_rounded, color: Colors.white, size: 28),
           ),
         ),
-        openBuilder: (context, closeContainer) {
-          Get.lazyPut(() => EmployeePermissionController());
-          Get.lazyPut(() => DateController());
-          return EmployeeAddPermission();
-        },
-        transitionType: ContainerTransitionType.fadeThrough,
-        transitionDuration: const Duration(milliseconds: 500),
+        openBuilder: (context, closeContainer) => const EmployeeAddPermission(),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -74,42 +68,8 @@ class EmployeePermission extends GetView<EmployeePermissionController> {
             children: [
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                physics: BouncingScrollPhysics(),
-                child: Row(
-                  spacing: 12,
-                  children: [
-                    Obx(
-                      () => CustomFilterChip(
-                        label: "Today",
-                        isSelected:
-                            controller.selectedFilter.value ==
-                            PermissionFilter.today,
-                        onSelected: (value) =>
-                            controller.changeFilter(PermissionFilter.today),
-                      ),
-                    ),
-                    Obx(
-                      () => CustomFilterChip(
-                        label: "This Week",
-                        isSelected:
-                            controller.selectedFilter.value ==
-                            PermissionFilter.week,
-                        onSelected: (value) =>
-                            controller.changeFilter(PermissionFilter.week),
-                      ),
-                    ),
-                    Obx(
-                      () => CustomFilterChip(
-                        label: "This Month",
-                        isSelected:
-                            controller.selectedFilter.value ==
-                            PermissionFilter.month,
-                        onSelected: (value) =>
-                            controller.changeFilter(PermissionFilter.month),
-                      ),
-                    ),
-                  ],
-                ),
+                physics: const BouncingScrollPhysics(),
+                child: const PermissionFilterBtn(),
               ),
               SizedBox(height: 20),
               Obx(() {

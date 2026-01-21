@@ -10,7 +10,6 @@ import 'package:presentech/features/hrd/homepage/view/components/absence_list.da
 import 'package:presentech/features/hrd/homepage/view/components/menu.dart';
 import 'package:presentech/features/hrd/homepage/view/components/summary_card.dart';
 import 'package:presentech/configs/themes/themes.dart';
-import 'package:presentech/shared/controllers/navigation_controller.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/ui/coming_soon.dart';
 import 'package:presentech/shared/view/widgets/header.dart';
@@ -22,7 +21,6 @@ class HrdHomepage extends GetView<HrdHomepageController> {
   Widget build(BuildContext context) {
     final taskController = Get.find<HrdTaskController>();
     Get.find<HrdAttendanceController>();
-    final NavigationController navController = Get.find<NavigationController>();
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -80,6 +78,10 @@ class HrdHomepage extends GetView<HrdHomepageController> {
                       child: Obx(
                         () => TaskSummaryCard(
                           tasksToday: taskController.tasksToday,
+                          overdueCount: taskController.overdueTasksCount,
+                          finishedCount: taskController.completedTasksCount,
+                          todoCount: taskController.toDoProgressTasksCount,
+                          onProgressCount: taskController.inProgressTasksCount,
                         ),
                       ),
                     ),

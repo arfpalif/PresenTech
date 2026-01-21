@@ -4,6 +4,7 @@ import 'package:presentech/features/employee/absence/controllers/presence_contro
 import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
 import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 
 class CardAbsence extends StatelessWidget {
   CardAbsence({super.key});
@@ -105,6 +106,14 @@ class CardAbsence extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Obx(() {
+                  if (controller.isIzin.value) {
+                    return AppDeactivatedButton(
+                      text: "Izin",
+                      onPressed: () {
+                        FailedSnackbar.show("Anda sedang dalam status izin");
+                      },
+                    );
+                  }
                   if (controller.clockIn.value == false) {
                     return AppGradientButtonGreen(
                       text: "Presensi masuk",

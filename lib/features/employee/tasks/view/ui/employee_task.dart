@@ -1,11 +1,11 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'package:presentech/features/employee/tasks/view/ui/employee_add_task.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/employee/tasks/controller/employee_task_controller.dart';
 import 'package:presentech/configs/themes/themes.dart';
 import 'package:presentech/shared/styles/color_style.dart';
-import 'package:presentech/shared/view/components/component_badgets.dart';
 
 import 'package:presentech/features/employee/tasks/view/components/task_summary_card.dart';
 import 'package:presentech/shared/view/widgets/task_card.dart';
@@ -15,7 +15,6 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormatter = DateFormat('dd-MM-yyyy');
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
@@ -41,15 +40,22 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        foregroundColor: Colors.white,
-        backgroundColor: ColorStyle.greenPrimary,
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        onPressed: () {
-          Get.toNamed(Routes.employeeTaskAdd);
-        },
-        child: const Icon(Icons.add_rounded, size: 30),
+      floatingActionButton: OpenContainer(
+        closedElevation: 6,
+        closedShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        closedColor: ColorStyle.greenPrimary,
+        openColor: const Color(0xFFF5F7FA),
+        transitionDuration: const Duration(milliseconds: 500),
+        closedBuilder: (context, openContainer) => const SizedBox(
+          height: 56,
+          width: 56,
+          child: Center(
+            child: Icon(Icons.add_rounded, color: Colors.white, size: 28),
+          ),
+        ),
+        openBuilder: (context, closeContainer) => EmployeeAddTask(),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -57,7 +63,15 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
-              Obx(() => TaskSummaryCard(tasksToday: controller.tasksToday)),
+              Obx(
+                () => TaskSummaryCard(
+                  tasksToday: controller.tasksToday,
+                  overdueCount: controller.overdueTasksCount,
+                  finishedCount: controller.completedTasksCount,
+                  todoCount: controller.toDoProgressTasksCount,
+                  onProgressCount: controller.inProgressTasksCount,
+                ),
+              ),
               Obx(() {
                 if (controller.isLoading.value) {
                   return const SizedBox(
@@ -97,6 +111,7 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
                     final t = controller.tasks[index];
                     return TaskCard(
                       task: t,
+                      isOverdue: controller.isTaskOverdue(t),
                       onTap: () async {
                         final result = await Get.toNamed(
                           Routes.employeeTaskDetail,

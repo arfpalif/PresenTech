@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/employee/absence/repositories/absence_repository.dart';
@@ -15,10 +16,15 @@ import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart
 
 class PresenceController extends GetxController {
   // Repository
-  final _absenceRepo = AbsenceRepository();
+  final AbsenceRepository _absenceRepo;
+  final SupabaseClient _supabase;
 
-  // Supabase
-  final _supabase = Supabase.instance.client;
+  PresenceController({
+    AbsenceRepository? absenceRepo,
+    SupabaseClient? supabaseClient,
+  })  : _absenceRepo = absenceRepo ?? AbsenceRepository(),
+        _supabase = supabaseClient ?? Supabase.instance.client;
+
   String get _userId => _supabase.auth.currentUser?.id ?? "";
 
   // Observables
@@ -32,7 +38,9 @@ class PresenceController extends GetxController {
   RxInt telat = 0.obs;
   RxInt hadir = 0.obs;
   RxInt alfa = 0.obs;
+  RxInt izin = 0.obs;
   final RxBool showForm = false.obs;
+  final isIzin = false.obs;
 
   @override
   void onInit() {
@@ -99,12 +107,16 @@ class PresenceController extends GetxController {
     if (absence == null) {
       clockIn.value = false;
       clockOut.value = false;
+      isIzin.value = false;
       statusAbsen.value = "Belum absen";
     } else {
       clockIn.value = absence['clock_in'] != null;
       clockOut.value = absence['clock_out'] != null;
+      isIzin.value = absence['status'] == AbsenceStatus.izin.name;
 
-      if (clockIn.value && !clockOut.value) {
+      if (isIzin.value) {
+        statusAbsen.value = "Izin";
+      } else if (clockIn.value && !clockOut.value) {
         statusAbsen.value = "Sudah clockIn, belum clock out";
       } else if (clockIn.value && clockOut.value) {
         statusAbsen.value = "Sudah absen dan clock out";
@@ -112,7 +124,7 @@ class PresenceController extends GetxController {
     }
   }
 
-  Future<String> _determineAbsenceStatus() async {
+  Future<String> _determineAbsenceStatus({DateTime? customNow}) async {
     final userOffice = await _absenceRepo.getUserOffice(userId: _userId);
     if (userOffice == null) throw Exception("User tidak memiliki kantor");
 
@@ -121,11 +133,16 @@ class PresenceController extends GetxController {
     );
     if (workTime == null) throw Exception("Jam kerja tidak ditemukan");
 
-    return _compareWithWorkStart(workTime['start_time']);
+    return _compareWithWorkStart(workTime['start_time'], customNow: customNow);
   }
 
-  String _compareWithWorkStart(String startTime) {
-    final now = DateTime.now();
+  @visibleForTesting
+  String compareWithWorkStartForTest(String startTime, {DateTime? customNow}) {
+    return _compareWithWorkStart(startTime, customNow: customNow);
+  }
+
+  String _compareWithWorkStart(String startTime, {DateTime? customNow}) {
+    final now = customNow ?? DateTime.now();
     final parts = startTime.split(':');
     final workStart = DateTime(
       now.year,
@@ -232,9 +249,15 @@ class PresenceController extends GetxController {
     return R * c;
   }
 
-  Future<void> submitAbsence() async {
+  Future<void> submitAbsence({Position? customPosition, Map<String, dynamic>? customOffice}) async {
     try {
       final todayAbsence = await _getTodayAbsenceData();
+      if (todayAbsence != null &&
+          todayAbsence['status'] == AbsenceStatus.izin.name) {
+        FailedSnackbar.show("Anda sedang izin hari ini");
+        return;
+      }
+
       if (todayAbsence != null &&
           todayAbsence['clock_in'] != null &&
           todayAbsence['clock_out'] != null) {
@@ -242,8 +265,8 @@ class PresenceController extends GetxController {
         return;
       }
 
-      final position = await _getCurrentLocation();
-      final office = await _getOfficeData();
+      final position = customPosition ?? await _getCurrentLocation();
+      final office = customOffice ?? await _getOfficeData();
 
       final distance = calculateDistance(
         position!.latitude,
@@ -330,6 +353,9 @@ class PresenceController extends GetxController {
 
       alfa.value = data
           .where((absence) => absence.status == AbsenceStatus.alfa)
+          .length;
+      izin.value = data
+          .where((absence) => absence.status == AbsenceStatus.izin)
           .length;
     } catch (e) {
       FailedSnackbar.show("Gagal memfilter absensi");

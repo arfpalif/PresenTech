@@ -39,13 +39,6 @@ class Tasks {
     this.status,
   });
 
-  bool get isOverdue {
-    if (status == TaskStatus.finished) return false;
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final deadlineDay = DateTime(endDate.year, endDate.month, endDate.day);
-    return today.isAfter(deadlineDay);
-  }
 
   factory Tasks.fromJson(Map<String, dynamic> json) => Tasks(
     createdAt: json["created_at"],

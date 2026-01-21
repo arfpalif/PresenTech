@@ -30,7 +30,12 @@ class EmployeeTaskController extends GetxController {
   // Statistics
   int get totalTasksCount => tasks.length;
 
-  int get todoTasksCount =>
+  int get overdueTasksCount => tasks.where((t) => isTaskOverdue(t)).length;
+  int get completedTasksCount =>
+      tasks.where((t) => t.status == TaskStatus.finished).length;
+  int get inProgressTasksCount =>
+      tasks.where((t) => t.status == TaskStatus.on_progress).length;
+  int get toDoProgressTasksCount =>
       tasks.where((t) => t.status == TaskStatus.todo).length;
 
   List<Tasks> get tasksToday {
@@ -45,6 +50,18 @@ class EmployeeTaskController extends GetxController {
       final end = DateTime(t.endDate.year, t.endDate.month, t.endDate.day);
       return !start.isAfter(today) && !end.isBefore(today);
     }).toList();
+  }
+
+  bool isTaskOverdue(Tasks task) {
+    if (task.status == TaskStatus.finished) return false;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final deadlineDay = DateTime(
+      task.endDate.year,
+      task.endDate.month,
+      task.endDate.day,
+    );
+    return today.isAfter(deadlineDay);
   }
 
   @override
@@ -105,6 +122,11 @@ class EmployeeTaskController extends GetxController {
       return;
     }
 
+    if (start.isAfter(end)) {
+      FailedSnackbar.show("Tanggal mulai tidak boleh lebih lama dari tanggal selesai");
+      return;
+    }
+
     final newTask = Tasks(
       createdAt: DateTime.now().toIso8601String(),
       acceptanceCriteria: acceptanceController.text,
@@ -120,8 +142,9 @@ class EmployeeTaskController extends GetxController {
       isLoading.value = true;
       await insertTask(newTask);
       await fetchTasks();
-      SuccessDialog.show("Success", "Tugas berhasil ditambahkan", () {});
-      Get.back();
+      SuccessDialog.show("Success", "Tugas berhasil ditambahkan", () {
+        Get.back(result: true);
+      });
     } catch (e) {
       debugPrint("Insert Task Error: $e");
       FailedSnackbar.show("Gagal menambahkan tugas");

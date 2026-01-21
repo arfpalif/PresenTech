@@ -37,6 +37,8 @@ class Absence {
         ? AbsenceStatus.hadir
         : json["status"] == "terlambat"
         ? AbsenceStatus.terlambat
+        : json["status"] == "izin"
+        ? AbsenceStatus.izin
         : null,
   );
 

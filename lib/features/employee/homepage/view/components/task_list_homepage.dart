@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/employee/tasks/controller/employee_task_controller.dart';
 import 'package:presentech/shared/controllers/navigation_controller.dart';
 import 'package:presentech/shared/view/components/buttons/btn_right.dart';
-import 'package:presentech/shared/view/components/component_badgets.dart';
 import 'package:presentech/configs/themes/themes.dart';
 import 'package:presentech/shared/view/widgets/task_card.dart';
 
@@ -16,7 +14,6 @@ class TaskListHomepage extends GetView<EmployeeTaskController> {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormatter = DateFormat('dd-MM-yyyy');
     return Card(
       elevation: 0,
       child: Container(
@@ -67,9 +64,15 @@ class TaskListHomepage extends GetView<EmployeeTaskController> {
                     final t = controller.tasks[index];
                     return TaskCard(
                       task: t,
-                      showPriority: true,
-                      onTap: () {
-                        Get.toNamed(Routes.employeeTaskDetail, arguments: t);
+                      isOverdue: controller.isTaskOverdue(t),
+                      onTap: () async {
+                        final result = await Get.toNamed(
+                          Routes.employeeTaskDetail,
+                          arguments: t,
+                        );
+                        if (result == true) {
+                          controller.fetchTasks();
+                        }
                       },
                     );
                   },

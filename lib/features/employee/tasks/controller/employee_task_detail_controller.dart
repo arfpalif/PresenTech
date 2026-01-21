@@ -85,6 +85,11 @@ class EmployeeTaskDetailController extends GetxController {
       return;
     }
 
+    if (start.isAfter(end)) {
+      FailedSnackbar.show("Tanggal mulai tidak boleh lebih lama dari tanggal selesai");
+      return;
+    }
+
     final updatedTask = Tasks(
       id: task.id,
       createdAt: task.createdAt,

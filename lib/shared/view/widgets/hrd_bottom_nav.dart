@@ -9,7 +9,7 @@ import 'package:presentech/features/hrd/profile/view/ui/hrd_profile_page.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 
 class HrdBottomNav extends GetView<NavigationController> {
-  HrdBottomNav({super.key});
+  const HrdBottomNav({super.key});
 
   List<Widget> get pages => [
     HrdHomepage(),

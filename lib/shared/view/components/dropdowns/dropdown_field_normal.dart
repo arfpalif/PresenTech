@@ -22,13 +22,13 @@ class DropdownFieldNormal<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<T>(
-      value: value,
+      initialValue: value,
       items: items.map((T item) {
         return DropdownMenuItem<T>(
           value: item,
           child: Text(
             labelBuilder != null ? labelBuilder!(item) : item.toString(),
-            style: AppTextStyle.normal,
+            style: AppTextStyle.normal.copyWith(color: Colors.black),
           ),
         );
       }).toList(),
@@ -39,7 +39,7 @@ class DropdownFieldNormal<T> extends StatelessWidget {
             hintText: hint,
             hintStyle: AppTextStyle.normal.copyWith(color: Colors.grey),
           ),
-      style: AppTextStyle.normal,
+      style: AppTextStyle.normal.copyWith(color: Colors.black),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
     );
   }

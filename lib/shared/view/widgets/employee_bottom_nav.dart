@@ -8,7 +8,7 @@ import 'package:presentech/features/employee/tasks/view/ui/employee_task.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 
 class EmployeeBottomNav extends GetView<NavigationController> {
-  EmployeeBottomNav({super.key});
+  const EmployeeBottomNav({super.key});
 
   List<Widget> get pages => [
     EmployeeHomepage(),

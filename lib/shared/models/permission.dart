@@ -8,6 +8,7 @@ extension PermissionTypeX on PermissionType {
     PermissionType.permission => 'permission',
     PermissionType.leave => 'leave',
     PermissionType.absence_error => 'absence_error',
+    PermissionType.sick => 'sick',
   };
 
   static PermissionType fromString(String? s) {
@@ -16,6 +17,8 @@ extension PermissionTypeX on PermissionType {
         return PermissionType.leave;
       case 'absence_error':
         return PermissionType.absence_error;
+      case 'sick':
+        return PermissionType.sick;
       case 'permission':
       default:
         return PermissionType.permission;

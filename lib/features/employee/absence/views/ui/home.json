@@ -1,0 +1,34 @@
+{
+  "message": "string",
+  "data": [
+    {
+      "id": "string",
+      "name": "string",
+      "photo_url": "string",
+      "address": {
+        "city": "string",
+        "detail_address": "string"
+      },
+      "phone": "string",
+      "whatsapp": "string",
+      "is_open_now": "boolean",
+      "outlet_schedule": [
+        {
+          "day": "Monday",
+          "open_time": "08.00",
+          "close_time": "22.00"
+        },
+        {
+          "day": "Tuesday",
+          "open_time": "08.00",
+          "close_time": "22.00"
+        },
+        {
+          "day": "Saturday",
+          "open_time": "08.00",
+          "close_time": "16.00"
+        }
+      ]
+    }
+  ]
+}

@@ -54,6 +54,20 @@ class HrdPermissionDetailController extends GetxController {
           status: AbsenceStatus.hadir.name,
           clockIn: DateFormat('HH:mm:ss').format(permission.createdAt),
         );
+      } else if (permission.type == PermissionType.sick ||
+          permission.type == PermissionType.leave ||
+          permission.type == PermissionType.permission) {
+        DateTime currentDate = permission.startDate;
+        final DateTime endDate = permission.endDate;
+
+        while (!currentDate.isAfter(endDate)) {
+          await absenceRepo.updateAbsenceStatus(
+            userId: permission.userId!,
+            date: DateFormat('yyyy-MM-dd').format(currentDate),
+            status: AbsenceStatus.izin.name,
+          );
+          currentDate = currentDate.add(const Duration(days: 1));
+        }
       }
 
       SuccessSnackbar.show('Permission approved successfully');

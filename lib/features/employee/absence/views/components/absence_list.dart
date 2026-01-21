@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:presentech/features/employee/absence/controllers/presence_controller.dart';
-import 'package:presentech/shared/styles/color_style.dart';
-import 'package:presentech/shared/view/components/component_badgets.dart';
+
 import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/view/widgets/absence_card.dart';
 
 class AbsenceList extends GetView<PresenceController> {
   const AbsenceList({super.key});
@@ -13,48 +13,38 @@ class AbsenceList extends GetView<PresenceController> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (controller.isLoading.value) {
-        return Center(child: CircularProgressIndicator());
+        return const Center(child: CircularProgressIndicator());
       }
 
       if (controller.absences.isEmpty) {
-        return Text("Belum ada absensi");
-      }
-      String formatTime(String? time) {
-        if (time == null || time.isEmpty) return '-';
-        try {
-          return time.length >= 5 ? time.substring(0, 5) : time;
-        } catch (_) {
-          return time;
-        }
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 40),
+          child: Column(
+            children: [
+              Icon(Icons.history_rounded, size: 48, color: Colors.grey[300]),
+              const SizedBox(height: 12),
+              Text(
+                "Belum ada riwayat absensi",
+                style: AppTextStyle.normal.copyWith(color: Colors.grey[500]),
+              ),
+            ],
+          ),
+        );
       }
 
       return ListView.builder(
         itemCount: controller.absences.length,
         shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+        physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (_, index) {
           final t = controller.absences[index];
-          return Card(
-            shadowColor: Colors.transparent,
-            color: ColorStyle.greyprimary,
-            margin: EdgeInsets.only(bottom: 15),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                ListTile(
-                  contentPadding: EdgeInsets.all(10),
-                  leading: StatusBadge(status: t.status),
-                  title: Text(
-                    "${DateFormat('dd-MMM-yyyy').format(t.date) ?? 'Unknown user'} ",
-                    style: AppTextStyle.heading2.copyWith(color: Colors.black),
-                  ),
-                  subtitle: Text(
-                    "Masuk : ${formatTime(t.clockIn)} | Keluar : ${formatTime(t.clockOut)}",
-                    style: AppTextStyle.normal.copyWith(color: Colors.grey),
-                  ),
-                  trailing: ComponentBadgets(status: t.status),
-                ),
-              ],
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            child: AbsenceCard(
+              absence: t,
+              title: DateFormat('EEEE, dd MMM yyyy').format(t.date),
             ),
           );
         },

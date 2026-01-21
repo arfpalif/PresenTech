@@ -1,1 +1,1 @@
-enum AbsenceStatus { alfa, hadir, terlambat }
+enum AbsenceStatus { alfa, hadir, terlambat, izin }

@@ -1,0 +1,80 @@
+{
+    "message": "string",
+    "data": {
+        "id": "string",
+        "name": "string",
+        "address": {
+            "latitude": "number",
+            "longitude": "number",
+            "map_url": "string",
+            "detail_address": "string"
+        },
+        "phone": "string",
+        "whatsapp": "string",
+        "distance": {
+            "from": "string",
+            "value_km": "number"
+        },
+        "status": {
+            "is_open": "boolean",
+            "open_time": "string",
+            "close_time": "string"
+        },
+        "doctor_schedule": {
+            "is_available": "boolean",
+            "message": "string",
+            "doctors": [
+                {
+                    "id": "string",
+                    "name": "string",
+                    "specialization": "string",
+                    "photo_url": "string",
+                    "schedule": [
+                        {
+                            "day": "monday",
+                            "start_time": "09.00",
+                            "end_time": "10.00"
+                        },
+                        {
+                            "day": "saturday",
+                            "start_time": "09.00",
+                            "end_time": "10.00"
+                        },
+                        {
+                            "day": "sunday",
+                            "start_time": "09.00",
+                            "end_time": "22.00"
+                        }
+                    ]
+                }
+            ]
+        },
+        "outlet_schedule": [
+            {
+                "day": "Monday",
+                "open_time": "10.00",
+                "close_time": "18.00"
+            },
+            {
+                "day": "Tuesday",
+                "open_time": "10.00",
+                "close_time": "18.00"
+            },
+            {
+                "day": "Wednesday",
+                "open_time": "10.00",
+                "close_time": "18.00"
+            },
+            {
+                "day": "Friday",
+                "open_time": "10.00",
+                "close_time": "18.00"
+            },
+            {
+                "day": "Saturday",
+                "open_time": "10.00",
+                "close_time": "18.00"
+            }
+        ]
+    }
+}

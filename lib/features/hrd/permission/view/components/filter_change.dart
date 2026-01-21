@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/features/employee/permissions/models/permission_filter.dart';
+import 'package:presentech/utils/enum/permission_filter.dart';
 import 'package:presentech/features/hrd/permission/controller/hrd_permission_controller.dart';
 
 import 'package:presentech/shared/view/components/custom_filter_chip.dart';
@@ -16,7 +16,8 @@ class FilterChange extends GetView<HrdPermissionController> {
         Obx(
           () => CustomFilterChip(
             label: "Today",
-            isSelected: controller.selectedFilter.value == PermissionFilter.today,
+            isSelected:
+                controller.selectedFilter.value == PermissionFilter.today,
             onSelected: (bool value) {
               controller.changeFilter(PermissionFilter.today);
             },
@@ -25,7 +26,8 @@ class FilterChange extends GetView<HrdPermissionController> {
         Obx(
           () => CustomFilterChip(
             label: "This Week",
-            isSelected: controller.selectedFilter.value == PermissionFilter.week,
+            isSelected:
+                controller.selectedFilter.value == PermissionFilter.week,
             onSelected: (bool value) {
               controller.changeFilter(PermissionFilter.week);
             },
@@ -34,7 +36,8 @@ class FilterChange extends GetView<HrdPermissionController> {
         Obx(
           () => CustomFilterChip(
             label: "This Month",
-            isSelected: controller.selectedFilter.value == PermissionFilter.month,
+            isSelected:
+                controller.selectedFilter.value == PermissionFilter.month,
             onSelected: (bool value) {
               controller.changeFilter(PermissionFilter.month);
             },

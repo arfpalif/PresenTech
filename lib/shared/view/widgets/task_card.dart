@@ -10,18 +10,19 @@ class TaskCard extends StatelessWidget {
   final Tasks task;
   final VoidCallback? onTap;
   final bool showPriority;
+  final bool isOverdue;
 
   const TaskCard({
     super.key,
     required this.task,
     this.onTap,
     this.showPriority = false,
+    this.isOverdue = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final dateFormatter = DateFormat('dd-MM-yyyy');
-    final isOverdue = task.isOverdue;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),

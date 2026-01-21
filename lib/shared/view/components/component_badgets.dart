@@ -73,6 +73,8 @@ class ComponentBadgets extends StatelessWidget {
         return Colors.orange;
       case 'finished':
         return ColorStyle.greenPrimary;
+      case 'izin':
+        return Colors.grey;
       default:
         return Colors.grey;
     }
@@ -83,6 +85,9 @@ class ComponentBadgets extends StatelessWidget {
     if (status == 'terlambat' || status == 'telat') return 'Telat';
     if (status == 'on_progress') return 'On Progress';
     if (status == 'todo') return 'To Do';
+    if (status == 'alfa') return 'Alfa';
+    if (status == 'hadir') return 'Hadir';
+    if (status == 'izin') return 'Izin';
     return status[0].toUpperCase() + status.substring(1);
   }
 }
@@ -96,7 +101,7 @@ class StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final statusStr = _getStatusString(status);
     final color = _getStatusColor(statusStr);
-    
+
     return Container(
       height: 14,
       width: 14,
@@ -119,6 +124,7 @@ class StatusBadge extends StatelessWidget {
     if (status == null) return '';
     if (status is AbsenceStatus) {
       if (status == AbsenceStatus.terlambat) return 'telat';
+      if (status == AbsenceStatus.izin) return 'izin';
       return status.name;
     }
     if (status is PermissionStatus) {
@@ -139,6 +145,8 @@ class StatusBadge extends StatelessWidget {
       case 'alfa':
       case 'rejected':
         return ColorStyle.redPrimary;
+      case 'izin':
+        return Colors.grey;
       default:
         return Colors.grey;
     }

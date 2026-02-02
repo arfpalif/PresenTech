@@ -10,6 +10,7 @@ import 'package:presentech/shared/controllers/date_controller.dart';
 import 'package:presentech/utils/enum/permission_filter.dart';
 import 'package:presentech/utils/enum/permission_status.dart';
 import 'package:presentech/utils/enum/permission_type.dart';
+import 'package:presentech/utils/services/connectivity_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EmployeePermissionController extends GetxController {
@@ -20,8 +21,8 @@ class EmployeePermissionController extends GetxController {
   EmployeePermissionController({
     PermissionRepository? permissionRepo,
     SupabaseClient? supabaseClient,
-  })  : _permissionRepo = permissionRepo ?? PermissionRepository(),
-        _supabase = supabaseClient ?? Supabase.instance.client;
+  }) : _permissionRepo = permissionRepo ?? PermissionRepository(),
+       _supabase = supabaseClient ?? Supabase.instance.client;
 
   String get _userId => _supabase.auth.currentUser?.id ?? "";
 
@@ -42,6 +43,14 @@ class EmployeePermissionController extends GetxController {
     super.onInit();
     _handleArguments();
     fetchPermissions();
+
+    final connectivityService = Get.find<ConnectivityService>();
+    ever(connectivityService.isOnline, (bool isOnline) {
+      if (isOnline) {
+        print("Connection restored, triggering auto-sync (Permissions)");
+        fetchPermissions();
+      }
+    });
   }
 
   void _handleArguments() {
@@ -200,38 +209,52 @@ class EmployeePermissionController extends GetxController {
       );
       return;
     }
-    try {
-      isLoading.value = true;
 
-      await _permissionRepo.updatePermission(int.parse(permissionId), {
-        'status': PermissionStatus.cancelled.name,
+    final id = int.parse(permissionId);
+
+    try {
+      // Optimistic Update: Update status in UI immediately
+      final index = _allPermissions.indexWhere((p) => p.id == id);
+      if (index != -1) {
+        _allPermissions[index] = Permission(
+          id: _allPermissions[index].id,
+          createdAt: _allPermissions[index].createdAt,
+          type: _allPermissions[index].type,
+          reason: _allPermissions[index].reason,
+          status: PermissionStatus.cancelled,
+          startDate: _allPermissions[index].startDate,
+          endDate: _allPermissions[index].endDate,
+          userId: _allPermissions[index].userId,
+          feedback: _allPermissions[index].feedback,
+        );
+        applyFilters();
+      }
+
+      SuccessDialog.show("Success", "Permintaan ijin berhasil dibatalkan", () {
+        Get.back();
       });
 
-      await fetchPermissions();
-
-      Get.back();
-
-      SuccessDialog.show(
-        "Success",
-        "Permintaan ijin berhasil dibatalkan",
-        () {},
-      );
+      // Background update
+      _permissionRepo
+          .updatePermission(id, {'status': PermissionStatus.cancelled.name})
+          .catchError((e) {
+            debugPrint('Background cancel error: $e');
+            fetchPermissions(); // Refresh if failed
+          });
     } catch (e) {
       debugPrint('Error cancelling permission: $e');
       FailedSnackbar.show("Gagal membatalkan permintaan ijin");
-    } finally {
-      isLoading.value = false;
     }
   }
 
   void changeFilter(PermissionFilter filter) {
     selectedFilter.value = (selectedFilter.value == filter) ? null : filter;
-    fetchPermissions();
+    applyFilters();
   }
 
   void changeStatusFilter(PermissionStatus status) {
     selectedStatus.value = (selectedStatus.value == status) ? null : status;
-    fetchPermissions();
+    applyFilters();
   }
 
   Future<void> submitForm() async {
@@ -265,27 +288,31 @@ class EmployeePermissionController extends GetxController {
       return;
     }
 
-    try {
-      isLoading.value = true;
-      final newPermission = Permission(
-        createdAt: DateTime.now(),
-        startDate: start,
-        endDate: end,
-        type: selectedType.value!,
-        reason: permissionTitleController.text,
-        status: PermissionStatus.pending,
-      );
+    final newPermission = Permission(
+      createdAt: DateTime.now(),
+      startDate: start,
+      endDate: end,
+      type: selectedType.value!,
+      reason: permissionTitleController.text,
+      status: PermissionStatus.pending,
+      userId: _userId,
+    );
 
+    try {
+      // Optimistic Update: Add to list UI immediately
+      _allPermissions.insert(0, newPermission);
+      applyFilters();
+
+      SuccessDialog.show("Success", "Permintaan ijin berhasil dikirim", () {
+        Get.back(); // Tutup form
+      });
+
+      // Background processing
       final data = newPermission.toJson()..['user_id'] = _userId;
-      await _permissionRepo.insertPermission(data);
-      Get.back();
-      await fetchPermissions();
-      SuccessDialog.show("Success", "Permintaan ijin berhasil dikirim", () {});
+      _permissionRepo.insertPermission(data);
     } catch (e) {
       debugPrint('Error submitting permission: $e');
       FailedSnackbar.show("Gagal mengirim permintaan ijin");
-    } finally {
-      isLoading.value = false;
     }
   }
 }

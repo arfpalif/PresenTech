@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 import 'package:presentech/shared/controllers/auth_controller.dart';
 import 'package:presentech/shared/controllers/date_controller.dart';
 import 'package:presentech/shared/controllers/navigation_controller.dart';
+import 'package:presentech/utils/services/connectivity_service.dart';
+import 'package:presentech/utils/services/database_service.dart';
 import 'package:presentech/utils/services/image_picker_service.dart';
 
 class InitialBinding extends Bindings {
@@ -11,5 +13,7 @@ class InitialBinding extends Bindings {
     Get.lazyPut(() => AuthController(), fenix: true);
     Get.lazyPut(() => DateController(), fenix: true);
     Get.lazyPut(() => ImagePickerService(), fenix: true);
+    Get.put(ConnectivityService(), permanent: true);
+    Get.lazyPut(() => DatabaseService.instance, fenix: true);
   }
 }

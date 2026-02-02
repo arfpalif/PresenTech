@@ -17,7 +17,6 @@ Future<void> main() async {
       throw Exception("SUPABASE_URL or SUPABASE_ANON_KEY missing from .env");
     }
 
-    // Initialize Supabase
     await Supabase.initialize(url: url, anonKey: anonKey);
 
     runApp(const MyApp());
@@ -25,7 +24,6 @@ Future<void> main() async {
     debugPrint("Fatal error during initialization: $e");
     debugPrint(stackTrace.toString());
 
-    // Fallback UI to show the error instead of a black screen
     runApp(
       MaterialApp(
         home: Scaffold(

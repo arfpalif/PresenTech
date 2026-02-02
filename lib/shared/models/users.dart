@@ -18,6 +18,9 @@ class Users {
   int officeId;
   String name;
   dynamic profilePicture;
+  int? isSynced;
+  String? syncAction;
+  String? localImagePath;
 
   Users({
     required this.id,
@@ -27,16 +30,22 @@ class Users {
     required this.officeId,
     required this.name,
     required this.profilePicture,
+    this.isSynced,
+    this.syncAction,
+    this.localImagePath,
   });
 
   factory Users.fromJson(Map<String, dynamic> json) => Users(
-    id: json["id"],
-    createdAt: json["created_at"],
-    email: json["email"],
-    role: json["role"],
-    officeId: json["office_id"],
-    name: json["name"],
+    id: json["id"] ?? "",
+    createdAt: json["created_at"] ?? "",
+    email: json["email"] ?? "",
+    role: json["role"] ?? "",
+    officeId: json["office_id"] is int ? json["office_id"] : (int.tryParse(json["office_id"]?.toString() ?? "") ?? 0),
+    name: json["name"] ?? "",
     profilePicture: json["profile_picture"],
+    isSynced: json["is_synced"],
+    syncAction: json["sync_action"],
+    localImagePath: json["local_image_path"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -47,5 +56,8 @@ class Users {
     "office_id": officeId,
     "name": name,
     "profile_picture": profilePicture,
+    "is_synced": isSynced,
+    "sync_action": syncAction,
+    "local_image_path": localImagePath,
   };
 }

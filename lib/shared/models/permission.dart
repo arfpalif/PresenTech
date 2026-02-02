@@ -42,6 +42,8 @@ class Permission {
   DateTime endDate;
   String? userId;
   String? feedback;
+  int? isSynced;
+  String? syncAction;
 
   Permission({
     this.id,
@@ -53,6 +55,8 @@ class Permission {
     required this.endDate,
     this.userId,
     this.feedback,
+    this.isSynced,
+    this.syncAction,
   });
 
   factory Permission.fromJson(Map<String, dynamic> json) {
@@ -82,17 +86,25 @@ class Permission {
       endDate: toYmd(end),
       userId: json["user_id"],
       feedback: json["feedback"],
+      isSynced: json["is_synced"],
+      syncAction: json["sync_action"],
     );
   }
 
   Map<String, dynamic> toJson() => {
+    "id": id,
     "created_at": createdAt.toIso8601String(),
     "type": type.value,
     "reason": reason,
+    "status": status is PermissionStatus
+        ? (status as PermissionStatus).name
+        : status.toString(),
     "start_date": DateFormat('yyyy-MM-dd').format(startDate),
     "end_date": DateFormat('yyyy-MM-dd').format(endDate),
     "user_id": userId,
     "feedback": feedback,
+    "is_synced": isSynced,
+    "sync_action": syncAction,
   };
 
   String get createdAtYmd => DateFormat('dd-MMM-yyyy').format(createdAt);

@@ -6,4 +6,5 @@ class ApiConstant {
   static const String tableTasks = "tasks";
   static const String tableSchedules = "work_schedules";
   static const String tableOffices = "offices";
+  static const String tableAuth = "auth";
 }

@@ -6,6 +6,7 @@ import 'package:presentech/shared/models/tasks.dart';
 import 'package:presentech/shared/view/components/dialog/success_dialog.dart';
 import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/utils/enum/task_status.dart';
+import 'package:presentech/utils/services/connectivity_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EmployeeTaskController extends GetxController {
@@ -15,6 +16,8 @@ class EmployeeTaskController extends GetxController {
   // Supabase
   final _supabase = Supabase.instance.client;
   String get _userId => _supabase.auth.currentUser?.id ?? "";
+
+  //local db
 
   // Controllers
   final titleController = TextEditingController();
@@ -68,6 +71,14 @@ class EmployeeTaskController extends GetxController {
   void onInit() {
     super.onInit();
     fetchTasks();
+
+    final connectivityService = Get.find<ConnectivityService>();
+    ever(connectivityService.isOnline, (bool isOnline) {
+      if (isOnline) {
+        debugPrint("Connection restored, triggering auto-sync...");
+        fetchTasks();
+      }
+    });
   }
 
   Future<void> fetchTasks() async {
@@ -85,8 +96,32 @@ class EmployeeTaskController extends GetxController {
     }
   }
 
-  Future<void> insertTask(Tasks task) async {
-    await _taskRepo.insertTask(task.toJson());
+  Future<int?> insertTask(Tasks task) async {
+    return await _taskRepo.insertTask(task.toJson());
+  }
+
+  // Future<void> deleteTask(int id) async {
+  //   try {
+  //     // Optimistic Update: Hapus dari list UI dulu
+  //     tasks.removeWhere((t) => t.id == id);
+
+  //     // Jalankan hapus di repository (background)
+  //     _taskRepo.deleteTask(id).catchError((e) {
+  //       debugPrint("Background Delete Error: $e");
+  //       fetchTasks(); // Jika gagal total, refresh data
+  //     });
+  //   } catch (e) {
+  //     debugPrint("Error deleteTask: $e");
+  //     FailedSnackbar.show("Gagal menghapus tugas");
+  //   }
+  // }
+
+  void onTaskUpdated(Tasks updatedTask) {
+    final index = tasks.indexWhere((t) => t.id == updatedTask.id);
+    if (index != -1) {
+      tasks[index] = updatedTask;
+      tasks.refresh();
+    }
   }
 
   void submitForm() async {
@@ -123,7 +158,9 @@ class EmployeeTaskController extends GetxController {
     }
 
     if (start.isAfter(end)) {
-      FailedSnackbar.show("Tanggal mulai tidak boleh lebih lama dari tanggal selesai");
+      FailedSnackbar.show(
+        "Tanggal mulai tidak boleh lebih lama dari tanggal selesai",
+      );
       return;
     }
 
@@ -139,16 +176,27 @@ class EmployeeTaskController extends GetxController {
     );
 
     try {
-      isLoading.value = true;
-      await insertTask(newTask);
-      await fetchTasks();
+      tasks.insert(0, newTask);
+
+      insertTask(newTask)
+          .then((id) {
+            if (id != null) {
+              newTask.id = id;
+              tasks.refresh();
+              print("Optimistic ID Updated: $id");
+            }
+          })
+          .catchError((e) {
+            debugPrint("Background Insert Error: $e");
+            fetchTasks();
+          });
+
       SuccessDialog.show("Success", "Tugas berhasil ditambahkan", () {
-        Get.back(result: true);
+        Get.back(); // Tutup dialog
       });
     } catch (e) {
       debugPrint("Insert Task Error: $e");
       FailedSnackbar.show("Gagal menambahkan tugas");
-      isLoading.value = false;
       return;
     }
   }

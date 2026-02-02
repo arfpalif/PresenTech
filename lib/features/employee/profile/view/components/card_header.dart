@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:presentech/configs/themes/themes.dart';
 
@@ -5,6 +6,7 @@ class CardHeader extends StatelessWidget {
   final String imageUrl;
   final String name;
   final String role;
+  final String? localImagePath;
 
   // ignore: prefer_const_constructors_in_immutables
   CardHeader({
@@ -12,6 +14,7 @@ class CardHeader extends StatelessWidget {
     required this.imageUrl,
     required this.name,
     required this.role,
+    this.localImagePath,
   });
 
   @override
@@ -37,14 +40,7 @@ class CardHeader extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(100),
-                child: Image.network(
-                  imageUrl.isNotEmpty
-                      ? imageUrl
-                      : 'https://www.gravatar.com/avatar/?d=mp',
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
+                child: _buildProfileImage(),
               ),
               SizedBox(height: 20),
               Text(name, style: AppTextStyle.heading1),
@@ -57,6 +53,27 @@ class CardHeader extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildProfileImage() {
+    if (localImagePath != null && localImagePath!.isNotEmpty) {
+      final file = File(localImagePath!);
+      if (file.existsSync()) {
+        return Image.file(
+          file,
+          width: 100,
+          height: 100,
+          fit: BoxFit.cover,
+        );
+      }
+    }
+
+    return Image.network(
+      imageUrl.isNotEmpty ? imageUrl : 'https://www.gravatar.com/avatar/?d=mp',
+      width: 100,
+      height: 100,
+      fit: BoxFit.cover,
     );
   }
 }

@@ -45,9 +45,35 @@ class PermissionList<T> extends GetView<EmployeePermissionController> {
               ),
               subtitle: Padding(
                 padding: const EdgeInsets.only(top: 8.0),
-                child: Text(
-                  "Created : ${t.createdAtYmd} | ${t.type.name}",
-                  style: AppTextStyle.normal.copyWith(color: Colors.grey[600]),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Created : ${t.createdAtYmd} | ${t.type.name}",
+                      style: AppTextStyle.normal.copyWith(color: Colors.grey[600]),
+                    ),
+                    if (t.isSynced == 0) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.cloud_off_outlined,
+                            size: 14,
+                            color: Colors.orange[700],
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            "Menunggu Sinkronisasi",
+                            style: AppTextStyle.smallText.copyWith(
+                              color: Colors.orange[700],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 9,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
                 ),
               ),
               trailing: ComponentBadgets(status: t.status),

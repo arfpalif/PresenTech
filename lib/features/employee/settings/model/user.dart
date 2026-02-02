@@ -19,6 +19,7 @@ class UserProfile {
   int officeId;
   String name;
   String? profilePicture;
+  String? localImagePath;
 
   UserProfile({
     required this.id,
@@ -28,6 +29,7 @@ class UserProfile {
     required this.officeId,
     required this.name,
     this.profilePicture,
+    this.localImagePath,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
@@ -38,6 +40,7 @@ class UserProfile {
     officeId: json["office_id"],
     name: json["name"],
     profilePicture: json["profile_picture"],
+    localImagePath: json["local_image_path"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -48,5 +51,6 @@ class UserProfile {
     "office_id": officeId,
     "name": name,
     "profile_picture": profilePicture,
+    "local_image_path": localImagePath,
   };
 }

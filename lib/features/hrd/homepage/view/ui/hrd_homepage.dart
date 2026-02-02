@@ -10,7 +10,6 @@ import 'package:presentech/features/hrd/homepage/view/components/absence_list.da
 import 'package:presentech/features/hrd/homepage/view/components/menu.dart';
 import 'package:presentech/features/hrd/homepage/view/components/summary_card.dart';
 import 'package:presentech/configs/themes/themes.dart';
-import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/ui/coming_soon.dart';
 import 'package:presentech/shared/view/widgets/header.dart';
 
@@ -89,46 +88,8 @@ class HrdHomepage extends GetView<HrdHomepageController> {
 
                     Column(
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              "Rekap Absensi Karyawan",
-                              style: AppTextStyle.heading1,
-                            ),
-                            Spacer(),
-                            GestureDetector(
-                              onTap: () {
-                                Get.toNamed(Routes.hrdAbsen);
-                              },
-                              child: Text(
-                                "View All",
-                                style: AppTextStyle.normal.copyWith(
-                                  color: ColorStyle.colorPrimary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                blurRadius: 20,
-                                offset: Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: AbsenceList(),
-                          ),
-                        ),
-                        SizedBox(height: 32),
+                        const AbsenceList(),
+                        const SizedBox(height: 32),
                       ],
                     ),
                     SizedBox(height: 100),

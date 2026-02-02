@@ -38,6 +38,7 @@ class EmployeeHomepage extends GetView<EmployeeHomepageController> {
                   Get.to(ComingSoon());
                 },
                 imageUrl: profileController.profilePictureUrl.value,
+                localImagePath: profileController.localImagePath.value,
                 name: profileController.name.value,
                 role: profileController.role.value,
               );

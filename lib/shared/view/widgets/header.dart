@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:presentech/configs/themes/themes.dart';
 import 'package:presentech/shared/styles/color_style.dart';
@@ -8,6 +9,7 @@ class Header extends StatelessWidget {
   final String imageUrl;
   final String name;
   final String role;
+  final String? localImagePath;
   final double? height;
 
   const Header({
@@ -17,6 +19,7 @@ class Header extends StatelessWidget {
     required this.imageUrl,
     required this.name,
     required this.role,
+    this.localImagePath,
     this.height,
   });
 
@@ -115,37 +118,8 @@ class Header extends StatelessWidget {
                             ],
                           ),
                           child: ClipOval(
-                            child: imageUrl.isEmpty
-                                ? CircleAvatar(
-                                    radius: 28,
-                                    backgroundColor: Colors.white.withOpacity(
-                                      0.2,
-                                    ),
-                                    child: Icon(
-                                      Icons.person,
-                                      color: Colors.white,
-                                      size: 30,
-                                    ),
-                                  )
-                                : Image.network(
-                                    imageUrl,
-                                    width: 56,
-                                    height: 56,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return CircleAvatar(
-                                        radius: 28,
-                                        backgroundColor: Colors.white
-                                            .withOpacity(0.2),
-                                        child: Icon(
-                                          Icons.person,
-                                          color: Colors.white,
-                                          size: 30,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                          ),
+                            child: _buildProfileImage(),
+                        ),
                         ),
                         SizedBox(width: 16),
                         Column(
@@ -187,6 +161,44 @@ class Header extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildProfileImage() {
+    if (localImagePath != null && localImagePath!.isNotEmpty) {
+      final file = File(localImagePath!);
+      if (file.existsSync()) {
+        return Image.file(
+          file,
+          width: 56,
+          height: 56,
+          fit: BoxFit.cover,
+        );
+      }
+    }
+
+    if (imageUrl.isNotEmpty) {
+      return Image.network(
+        imageUrl,
+        width: 56,
+        height: 56,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+      );
+    }
+
+    return _buildPlaceholder();
+  }
+
+  Widget _buildPlaceholder() {
+    return CircleAvatar(
+      radius: 28,
+      backgroundColor: Colors.white.withOpacity(0.2),
+      child: Icon(
+        Icons.person,
+        color: Colors.white,
+        size: 30,
       ),
     );
   }

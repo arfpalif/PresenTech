@@ -59,22 +59,26 @@ class CardAbsence extends StatelessWidget {
                   ],
                 ),
                 Obx(
-                  () => Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      controller.statusAbsen.value,
-                      style: AppTextStyle.smallText.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                  () => Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          controller.statusAbsen.value,
+                          style: AppTextStyle.smallText.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ],

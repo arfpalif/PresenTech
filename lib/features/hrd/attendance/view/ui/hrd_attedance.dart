@@ -42,7 +42,25 @@ class HrdAttedance extends GetView<HrdAttendanceController> {
                 }
 
                 if (controller.absences.isEmpty) {
-                  return const Center(child: Text("Belum ada absensi"));
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          size: 60,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "Belum ada absensi",
+                          style: AppTextStyle.heading2.copyWith(
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
                 }
                 return ListView.builder(
                   itemCount: controller.absences.length,

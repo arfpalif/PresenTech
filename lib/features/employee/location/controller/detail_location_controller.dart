@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:get/get.dart';
 import 'package:presentech/features/employee/location/repositories/employee_location_repository.dart';
-import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/features/hrd/location/controller/location_controller.dart';
 import 'package:presentech/features/hrd/location/model/office.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -40,6 +39,8 @@ class DetailLocationController extends GetxController {
     if (args != null && args is Office) {
       office.value = args;
       _populateFields();
+    } else {
+      fetchOffices();
     }
 
     final initialPosition = office.value != null
@@ -108,14 +109,13 @@ class DetailLocationController extends GetxController {
 
       final response = await locationRepo.fetchUserOffice(userId);
 
-      final data = (response as List).map((e) {
-        return Office.fromJson(e);
-      }).toList();
-
-      offices.assignAll(data);
+      if (response != null) {
+        offices.assignAll([response]);
+        office.value = response;
+        _populateFields();
+      }
     } catch (e) {
-      print("Error: $e");
-      FailedSnackbar.show("Tidak dapat memuat data lokasi: ${e.toString()}");
+      print("Error in DetailLocationController fetchOffices: $e");
     } finally {
       isLoading.value = false;
     }

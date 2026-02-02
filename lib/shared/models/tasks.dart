@@ -24,6 +24,8 @@ class Tasks {
   String userId;
   String? userName;
   TaskStatus? status;
+  int? isSynced;
+  String? syncAction;
 
   Tasks({
     required this.createdAt,
@@ -37,6 +39,8 @@ class Tasks {
     required this.userId,
     this.userName,
     this.status,
+    this.isSynced,
+    this.syncAction,
   });
 
 
@@ -58,9 +62,12 @@ class Tasks {
         : json["status"] == "finished"
         ? TaskStatus.finished
         : null,
+    isSynced: json["is_synced"],
+    syncAction: json["sync_action"],
   );
 
   Map<String, dynamic> toJson() => {
+    "id": id,
     "created_at": createdAt,
     "acceptance_criteria": acceptanceCriteria,
     "start_date":
@@ -72,5 +79,7 @@ class Tasks {
     "title": title,
     "user_id": userId,
     "status": status?.name,
+    "is_synced": isSynced,
+    "sync_action": syncAction,
   };
 }

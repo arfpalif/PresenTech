@@ -22,8 +22,8 @@ class PresenceController extends GetxController {
   PresenceController({
     AbsenceRepository? absenceRepo,
     SupabaseClient? supabaseClient,
-  })  : _absenceRepo = absenceRepo ?? AbsenceRepository(),
-        _supabase = supabaseClient ?? Supabase.instance.client;
+  }) : _absenceRepo = absenceRepo ?? AbsenceRepository(),
+       _supabase = supabaseClient ?? Supabase.instance.client;
 
   String get _userId => _supabase.auth.currentUser?.id ?? "";
 
@@ -46,10 +46,10 @@ class PresenceController extends GetxController {
   void onInit() {
     super.onInit();
     refreshPresenceData();
-    fetchAbsenceByDay();
   }
 
   Future<void> refreshPresenceData() async {
+    await _absenceRepo.syncUnsyncedAbsences();
     await Future.wait([checkTodayAbsence(), fetchAbsence()]);
   }
 
@@ -79,7 +79,8 @@ class PresenceController extends GetxController {
       final response = await _absenceRepo.getAbsencesByFilter(userId: _userId);
       absences.assignAll(response.map((item) => Absence.fromJson(item)));
     } catch (e) {
-      FailedSnackbar.show("Gagal mengambil riwayat absensi");
+      print("gagal fetch absence: $e");
+      FailedSnackbar.show("Gagal memuat data absensi");
     } finally {
       isLoading.value = false;
     }
@@ -249,7 +250,10 @@ class PresenceController extends GetxController {
     return R * c;
   }
 
-  Future<void> submitAbsence({Position? customPosition, Map<String, dynamic>? customOffice}) async {
+  Future<void> submitAbsence({
+    Position? customPosition,
+    Map<String, dynamic>? customOffice,
+  }) async {
     try {
       final todayAbsence = await _getTodayAbsenceData();
       if (todayAbsence != null &&
@@ -275,7 +279,7 @@ class PresenceController extends GetxController {
         office['longitude'] ?? 0.0,
       );
 
-      if (distance > (office['radius'] ?? 100)) {
+      if (distance > (office['radius'] ?? 200)) {
         FailedFormSnackbar.show(
           "Anda berada di luar jangkauan kantor. Jarak Anda: ${distance.toStringAsFixed(2)} meter",
           onCtaPressed: () {

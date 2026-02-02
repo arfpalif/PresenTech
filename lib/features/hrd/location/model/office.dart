@@ -12,7 +12,7 @@ class Office {
   String name;
   double longitude;
   double latitude;
-  int radius;
+  double radius;
 
   Office({
     required this.id,
@@ -24,12 +24,12 @@ class Office {
   });
 
   factory Office.fromJson(Map<String, dynamic> json) => Office(
-    id: json["id"],
-    address: json["address"],
-    name: json["name"],
+    id: json["id"] is String ? int.parse(json["id"]) : (json["id"] ?? 0),
+    address: json["address"] ?? "",
+    name: json["name"] ?? "",
     longitude: json["longitude"]?.toDouble() ?? 0.0,
     latitude: json["latitude"]?.toDouble() ?? 0.0,
-    radius: json["radius"] ?? 0,
+    radius: json["radius"]?.toDouble() ?? 0.0,
   );
 
   Map<String, dynamic> toJson() => {

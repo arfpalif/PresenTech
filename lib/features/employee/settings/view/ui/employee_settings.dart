@@ -21,6 +21,7 @@ class EmployeeSettings extends GetView<ProfileController> {
               height: 180,
               onComingSoonTap: () => Get.to(ComingSoon()),
               imageUrl: controller.profilePictureUrl.value,
+              localImagePath: controller.localImagePath.value,
               name: controller.name.value,
               role: controller.role.value,
             ),

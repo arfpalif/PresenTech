@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:presentech/features/employee/tasks/controller/employee_task_controller.dart';
 import 'package:presentech/features/employee/tasks/repositories/task_repository.dart';
 import 'package:presentech/shared/controllers/date_controller.dart';
 import 'package:presentech/shared/models/tasks.dart';
@@ -86,7 +87,9 @@ class EmployeeTaskDetailController extends GetxController {
     }
 
     if (start.isAfter(end)) {
-      FailedSnackbar.show("Tanggal mulai tidak boleh lebih lama dari tanggal selesai");
+      FailedSnackbar.show(
+        "Tanggal mulai tidak boleh lebih lama dari tanggal selesai",
+      );
       return;
     }
 
@@ -106,6 +109,12 @@ class EmployeeTaskDetailController extends GetxController {
     try {
       isLoading.value = true;
       await _taskRepo.updateTask(task.id!, updatedTask.toJson());
+
+      try {
+        final mainController = Get.find<EmployeeTaskController>();
+        mainController.onTaskUpdated(updatedTask);
+      } catch (_) {}
+
       isChanged.value = true;
       SuccessDialog.show("Success", "Tugas berhasil diperbarui", () {
         Get.back(result: true);
@@ -126,6 +135,13 @@ class EmployeeTaskDetailController extends GetxController {
       final updatedData = task.toJson();
       updatedData["status"] = status.name;
       await _taskRepo.updateTask(task.id!, updatedData);
+
+      try {
+        task.status = status;
+        final mainController = Get.find<EmployeeTaskController>();
+        mainController.onTaskUpdated(task);
+      } catch (_) {}
+
       isChanged.value = true;
       SuccessSnackbar.show(
         "Status berhasil diperbarui ke ${status.name.replaceAll('_', ' ')}",
@@ -144,6 +160,12 @@ class EmployeeTaskDetailController extends GetxController {
     try {
       isLoading.value = true;
       await _taskRepo.deleteTask(task.id!);
+
+      try {
+        // final mainController = Get.find<EmployeeTaskController>();
+        // mainController.deleteTask(task.id!);
+      } catch (_) {}
+
       isChanged.value = true;
       SuccessDialog.show("Sukses", "Tugas berhasil dihapus", () {
         Get.back(result: true);

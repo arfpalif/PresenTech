@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:presentech/shared/repositories/profile_repository.dart';
+import 'package:presentech/utils/services/connectivity_service.dart';
 import 'package:presentech/utils/services/image_picker_service.dart';
 import 'package:presentech/shared/controllers/auth_controller.dart';
 import 'package:presentech/shared/controllers/date_controller.dart';
@@ -16,6 +18,7 @@ class ProfileController extends GetxController {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final DateController dateController = Get.find<DateController>();
+  final ConnectivityService connectivityService = Get.find<ConnectivityService>();
   RxBool isFormValid = false.obs;
 
   //Variables
@@ -28,12 +31,22 @@ class ProfileController extends GetxController {
   final ImagePickerService _imagePickerService = Get.find<ImagePickerService>();
   final Rx<File?> localImage = Rx<File?>(null);
   final RxString profilePictureUrl = ''.obs;
+  final RxString localImagePath = ''.obs;
   final RxString role = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
     getUser();
+
+    // Auto-sync when coming back online
+    ever(connectivityService.isOnline, (bool online) async {
+      if (online) {
+        debugPrint("ProfileController: Online detected, syncing profile...");
+        await profileRepo.syncOfflineProfiles();
+        await getUser();
+      }
+    });
   }
 
   Future<void> signOut() async {
@@ -44,14 +57,29 @@ class ProfileController extends GetxController {
   Future<void> getUser() async {
     final currentUser = supabase.auth.currentUser;
     if (currentUser != null) {
-      final response = await profileRepo.getUserProfile(currentUser.id);
-      user.value = Users.fromJson(response);
-      nameController.text = user.value?.name ?? '';
-      emailController.text = user.value?.email ?? '';
-      profilePictureUrl.value = user.value?.profilePicture ?? '';
-      role.value = user.value?.role ?? '';
-      name.value = user.value?.name ?? '';
-      validateForm();
+      try {
+        final response = await profileRepo.getUserProfile(currentUser.id);
+        user.value = Users.fromJson(response);
+        nameController.text = user.value?.name ?? '';
+        emailController.text = user.value?.email ?? '';
+        profilePictureUrl.value = user.value?.profilePicture ?? '';
+        role.value = user.value?.role ?? '';
+        name.value = user.value?.name ?? '';
+
+        // If there's a local unsynced image, show it
+        final savedLocalPath = response['local_image_path'] as String?;
+        if (savedLocalPath != null && savedLocalPath.isNotEmpty) {
+          final file = File(savedLocalPath);
+          if (await file.exists()) {
+            localImage.value = file;
+            localImagePath.value = savedLocalPath;
+          }
+        }
+
+        validateForm();
+      } catch (e) {
+        debugPrint('Error getting user: $e');
+      }
     }
   }
 
@@ -67,58 +95,54 @@ class ProfileController extends GetxController {
     }
   }
 
-  Future<String?> uploadImageToSupabase(File file) async {
-    final authUser = supabase.auth.currentUser;
-    if (authUser == null) return null;
+  /// Save image to local storage for persistent offline access
+  Future<String> saveImageLocally(File file) async {
+    final userId = supabase.auth.currentUser?.id ?? 'unknown';
+    final appDir = await getApplicationDocumentsDirectory();
+    final fileName = 'profile_$userId.jpg';
+    final savedPath = '${appDir.path}/$fileName';
 
-    try {
-      final filePath = 'profile-${authUser.id}.jpg';
-
-      await supabase.storage
-          .from('avatars')
-          .upload(
-            filePath,
-            file,
-            fileOptions: const FileOptions(
-              upsert: true,
-              contentType: 'image/jpeg',
-            ),
-          );
-      return supabase.storage.from('avatars').getPublicUrl(filePath);
-    } catch (e) {
-      debugPrint('Upload error: $e');
-      return null;
-    }
+    // Copy file to app documents directory
+    final savedFile = await file.copy(savedPath);
+    print('Image saved locally: ${savedFile.path}');
+    return savedFile.path;
   }
 
   Future<void> updateProfileData() async {
     try {
-      String? imageUrl;
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) return;
+
+      String? savedLocalPath;
+
+      // 1. If user picked a new image, save it locally first
       if (localImage.value != null) {
-        final rawUrl = await uploadImageToSupabase(localImage.value!);
-        if (rawUrl != null) {
-          imageUrl = '$rawUrl?t=${DateTime.now().millisecondsSinceEpoch}';
-        }
+        savedLocalPath = await saveImageLocally(localImage.value!);
+        localImagePath.value = savedLocalPath;
       }
 
+      // 2. Call repository to update (saves locally first, syncs in background if online)
       await profileRepo.updateProfile(
         name: nameController.text,
-        imageUrl: imageUrl,
+        localImagePath: savedLocalPath,
       );
+
+      // 3. Refresh UI from local
       await getUser();
-      localImage.value = null;
-      SuccessSnackbar.show('Profile updated successfully.');
+
+      if (connectivityService.isOnline.value) {
+        SuccessSnackbar.show('Profile updated successfully.');
+      } else {
+        SuccessSnackbar.show('Profile saved offline. Will sync when online.');
+      }
     } catch (e) {
       debugPrint('Update error: $e');
     }
   }
 
   void validateForm() {
-    final hasImage =
-        localImage.value != null || profilePictureUrl.value.isNotEmpty;
-    if (nameController.text.isNotEmpty &&
-        emailController.text.isNotEmpty &&
-        hasImage) {
+    final hasImage = localImage.value != null || profilePictureUrl.value.isNotEmpty;
+    if (nameController.text.isNotEmpty && emailController.text.isNotEmpty && hasImage) {
       isFormValid.value = true;
     } else {
       isFormValid.value = false;

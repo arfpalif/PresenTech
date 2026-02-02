@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:presentech/constants/api_constant.dart';
+import 'package:presentech/shared/repositories/auth_repository.dart';
 import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
@@ -36,6 +38,19 @@ class LoginController extends GetxController {
         throw Exception("Login failed, check your email and password");
       }
       final role = await loginRepo.getRole(user.id);
+
+      print("LoginController: Preparing to save auth locally...");
+      final authRepo = AuthRepository();
+      await authRepo.saveAuthData({
+        'id': user.id,
+        'email': user.email,
+        'role': role,
+      });
+      print(
+        "LoginController: Auth data saved locally successfully to ${ApiConstant.tableAuth}.",
+      );
+      print("LoginController: Auth data saved locally successfully.");
+
       if (role == 'hrd') {
         SuccessSnackbar.show("Login successful");
         Get.delete<EmployeeHomepageController>();
@@ -44,7 +59,6 @@ class LoginController extends GetxController {
         Get.offAllNamed(Routes.hrdNavbar);
         return;
       } else {
-        // If role is not 'hrd', navigate to employee navbar
         SuccessSnackbar.show("Login successful");
         Get.delete<HrdHomepageController>();
         Get.delete<HrdAttendanceController>();
@@ -55,7 +69,6 @@ class LoginController extends GetxController {
         Get.offAllNamed(Routes.employeeNavbar);
         return;
       }
-      // Login successful
     } catch (e) {
       FailedSnackbar.show("Unexpected error: $e");
     }

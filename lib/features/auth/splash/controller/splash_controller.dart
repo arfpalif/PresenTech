@@ -17,21 +17,48 @@ class SplashController extends GetxController {
     try {
       final session = splashRepo.getSession();
 
-      if (session == null) {
-        Get.offAllNamed(Routes.onBoarding);
-      } else {
-        final role = await splashRepo.getRole(session.user.id);
-        if (role == null) {
-          Get.offAllNamed(Routes.onBoarding);
-        } else {
-          role == 'employee'
-              ? Get.offAllNamed(Routes.employeeNavbar)
-              : Get.offAllNamed(Routes.hrdNavbar);
+      if (session != null) {
+        print(
+          "SplashController: Supabase session found, checking connectivity",
+        );
+        try {
+          final role = await splashRepo.getRole(session.user.id);
+          print("SplashController: Online role fetched: $role");
+          if (role != null) {
+            _navigateByRole(role);
+            return;
+          }
+        } catch (e) {
+          print(
+            "SplashController: Online fetch failed ($e), using local auth...",
+          );
         }
+      } else {
+        print("SplashController: No Supabase session found");
       }
+
+      final localAuth = await splashRepo.getLocalAuth();
+      print(
+        "SplashController: Local auth check: ${localAuth != null ? 'Found' : 'NULL'}",
+      );
+      if (localAuth != null && localAuth['role'] != null) {
+        print("SplashController: Using local auth for ${localAuth['email']}");
+        _navigateByRole(localAuth['role']);
+        return;
+      }
+
+      Get.offAllNamed(Routes.onBoarding);
     } catch (e) {
       debugPrint("SplashController handleAuth error: $e");
       Get.offAllNamed(Routes.onBoarding);
+    }
+  }
+
+  void _navigateByRole(String role) {
+    if (role == 'employee') {
+      Get.offAllNamed(Routes.employeeNavbar);
+    } else {
+      Get.offAllNamed(Routes.hrdNavbar);
     }
   }
 }

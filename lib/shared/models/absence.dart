@@ -9,6 +9,8 @@ class Absence {
   AbsenceStatus? status;
   String userId;
   String? userName;
+  int? isSynced;
+  String? syncAction;
 
   Absence({
     required this.id,
@@ -19,10 +21,12 @@ class Absence {
     this.status,
     required this.userId,
     this.userName,
+    this.isSynced,
+    this.syncAction,
   });
 
   factory Absence.fromJson(Map<String, dynamic> json) => Absence(
-    id: json["id"],
+    id: json["id"] ?? 0,
     createdAt: json["created_at"],
     date: DateTime.parse(json["date"]),
     clockIn: json["clock_in"],
@@ -40,6 +44,8 @@ class Absence {
         : json["status"] == "izin"
         ? AbsenceStatus.izin
         : null,
+    isSynced: json["is_synced"],
+    syncAction: json["sync_action"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -49,7 +55,9 @@ class Absence {
         "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}",
     "clock_in": clockIn,
     "clock_out": clockOut,
-    "status": status,
+    "status": status?.name,
     "user_id": userId,
+    "is_synced": isSynced,
+    "sync_action": syncAction,
   };
 }

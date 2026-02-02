@@ -113,13 +113,10 @@ class EmployeeTask extends GetView<EmployeeTaskController> {
                       task: t,
                       isOverdue: controller.isTaskOverdue(t),
                       onTap: () async {
-                        final result = await Get.toNamed(
+                        await Get.toNamed(
                           Routes.employeeTaskDetail,
                           arguments: t,
                         );
-                        if (result == true) {
-                          controller.fetchTasks();
-                        }
                       },
                     );
                   },

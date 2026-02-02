@@ -28,6 +28,7 @@ class ProfilePage extends GetView<ProfileController> {
                   padding: const EdgeInsets.only(top: 30.0),
                   child: CardHeader(
                     imageUrl: user.profilePicture ?? '',
+                    localImagePath: user.localImagePath,
                     name: user.name,
                     role: user.role,
                   ),

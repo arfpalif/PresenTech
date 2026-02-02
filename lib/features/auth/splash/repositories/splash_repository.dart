@@ -1,7 +1,9 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:presentech/utils/services/database_service.dart';
 
 class SplashRepository {
   final SupabaseClient supabase = Supabase.instance.client;
+  final dbService = DatabaseService.instance;
 
   Session? getSession() {
     return supabase.auth.currentSession;
@@ -15,5 +17,9 @@ class SplashRepository {
         .single();
 
     return response['role'] as String?;
+  }
+
+  Future<Map<String, dynamic>?> getLocalAuth() async {
+    return await dbService.getAuthData();
   }
 }

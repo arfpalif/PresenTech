@@ -50,7 +50,9 @@ class PermissionList<T> extends GetView<EmployeePermissionController> {
                   children: [
                     Text(
                       "Created : ${t.createdAtYmd} | ${t.type.name}",
-                      style: AppTextStyle.normal.copyWith(color: Colors.grey[600]),
+                      style: AppTextStyle.normal.copyWith(
+                        color: Colors.grey[600],
+                      ),
                     ),
                     if (t.isSynced == 0) ...[
                       const SizedBox(height: 6),

@@ -13,9 +13,9 @@ class DatabaseService {
   static Database? _database;
 
   Future<Database> get database async {
-    if (_database != null)
+    if (_database != null) {
       return _database!;
-    else {
+    } else {
       _database = await getDatabase();
       return _database!;
     }
@@ -77,6 +77,19 @@ class DatabaseService {
             created_at TEXT NOT NULL,
             is_synced INTEGER DEFAULT 0,
             sync_action TEXT
+          )
+        ''');
+        await db.execute('''
+          CREATE TABLE ${ApiConstant.tableOffices}(
+            id INTEGER PRIMARY KEY,
+            created_at TEXT,
+            name TEXT,
+            address TEXT,
+            latitude REAL,
+            longitude REAL,
+            radius REAL,
+            start_time TEXT,
+            end_time TEXT
           )
         ''');
         await db.execute('''
@@ -206,9 +219,9 @@ class DatabaseService {
             }
           }
         }
-        if (oldVersion < 9) {
+        if (oldVersion < 12) {
           print(
-            "DatabaseService: Upgrading to version 9 - adding offices table",
+            "DatabaseService: Upgrading to version 12 - adding offices table if not exists",
           );
           await db.execute('''
             CREATE TABLE IF NOT EXISTS ${ApiConstant.tableOffices}(
@@ -217,43 +230,32 @@ class DatabaseService {
               address TEXT,
               latitude REAL,
               longitude REAL,
-              radius REAL
+              radius REAL,
+              created_at TEXT,
+              start_time TEXT,
+              end_time TEXT
             )
           ''');
         }
-        if (oldVersion < 10) {
+
+        if (oldVersion < 13) {
           print(
-            "DatabaseService: Upgrading to version 10 - adding absences table",
+            "DatabaseService: Upgrading to version 13 - adding start_time and end_time to offices",
           );
-          await db.execute('''
-            CREATE TABLE IF NOT EXISTS ${ApiConstant.tableOffices}(
-              id INTEGER PRIMARY KEY,
-              created_at TEXT,
-              name TEXT,
-              address TEXT,
-              latitude REAL,
-              longitude REAL,
-              radius REAL
-            )
-          ''');
-        }
-        if (oldVersion < 11) {
-          await db.execute('''
-            CREATE TABLE IF NOT EXISTS ${ApiConstant.tableOffices}(
-              id INTEGER PRIMARY KEY,
-              created_at TEXT,
-              name TEXT,
-              address TEXT,
-              latitude REAL,
-              longitude REAL,
-              radius REAL
-            )
-          ''');
+          try {
+            await db.execute(
+              'ALTER TABLE ${ApiConstant.tableOffices} ADD COLUMN start_time TEXT',
+            );
+            await db.execute(
+              'ALTER TABLE ${ApiConstant.tableOffices} ADD COLUMN end_time TEXT',
+            );
+          } catch (e) {
+            print("DatabaseService: Error adding hours to offices: $e");
+          }
         }
       },
-      version: 9,
+      version: 13,
     );
-
     return database;
   }
 
@@ -372,7 +374,7 @@ class DatabaseService {
   }
 
   //Permission Sync Queue
-  Future<void> addPermissionToSyncQueue(
+  Future<int> addPermissionToSyncQueue(
     Map<String, dynamic> permissionData,
     String action,
   ) async {
@@ -381,7 +383,7 @@ class DatabaseService {
     permissionData['is_synced'] = 0;
     permissionData['sync_action'] = action;
 
-    await db.insert(
+    return await db.insert(
       ApiConstant.tablePermissions,
       permissionData,
       conflictAlgorithm: ConflictAlgorithm.replace,

@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:presentech/constants/api_constant.dart';
 import 'package:presentech/shared/models/permission.dart';
-import 'package:presentech/utils/enum/permission_status.dart';
 import 'package:presentech/utils/services/connectivity_service.dart';
 import 'package:presentech/utils/services/database_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,12 +11,7 @@ class PermissionRepository {
       Get.find<ConnectivityService>();
   final DatabaseService databaseService = Get.find<DatabaseService>();
 
-  Future<List<Permission>> getPermissions(
-    String userId, {
-    DateTime? startDate,
-    DateTime? endDate,
-    PermissionStatus? status,
-  }) async {
+  Future<List<Permission>> getPermissions(String userId) async {
     List<Permission> remotePermissions = [];
 
     if (connectivityService.isOnline.value) {
@@ -26,22 +20,16 @@ class PermissionRepository {
 
     try {
       if (connectivityService.isOnline.value) {
-        var query = supabase.from('permissions').select().eq('user_id', userId);
+        final response = await supabase
+            .from('permissions')
+            .select()
+            .eq('user_id', userId)
+            .order('created_at', ascending: false);
 
-        if (startDate != null) {
-          query = query.gte('created_at', startDate.toIso8601String());
-        }
-        if (endDate != null) {
-          query = query.lte('created_at', endDate.toIso8601String());
-        }
-        if (status != null) {
-          query = query.eq('status', status.name);
-        }
+        remotePermissions = (response as List)
+            .map((e) => Permission.fromJson(e))
+            .toList();
 
-        final response = await query.order('created_at', ascending: false);
-        remotePermissions = (response
-            .map<Permission>((e) => Permission.fromJson(e))
-            .toList());
         if (remotePermissions.isNotEmpty) {
           await databaseService.syncPermissionToLocal(
             remotePermissions,
@@ -50,83 +38,144 @@ class PermissionRepository {
         }
       }
     } catch (e) {
-      throw Exception('Error fetching permissions: $e');
+      print("Gagal fetch Supabase (Permissions): $e");
     }
+
     try {
       return await databaseService.getPermissionsLocally(userId);
     } catch (e) {
-      print("Gagal fetch local: $e");
+      print("Gagal fetch local (Permissions): $e");
       return remotePermissions;
     }
   }
 
   Future<void> syncOfflinePermissions() async {
     try {
-      final unsyncedTasks = await databaseService.getUnsyncedPermissions();
-      if (unsyncedTasks.isEmpty) return;
-      print("${unsyncedTasks.length} permission untuk disinkronisasi.");
+      final unsyncedPermissions = await databaseService
+          .getUnsyncedPermissions();
+      if (unsyncedPermissions.isEmpty) return;
 
-      print("Memulai Sync: ${unsyncedTasks.length} task...");
-
-      for (var task in unsyncedTasks) {
+      for (var permission in unsyncedPermissions) {
         try {
-          if (task.syncAction == 'insert') {
-            await syncInsertToSupabase(task.toJson());
-          } else if (task.syncAction == 'update' && task.id != null) {
-            final data = task.toJson();
-            data.remove('id');
-            await syncUpdateToSupabase(task.id!, data);
-          }
+          if (permission.id != null)
+            if (permission.syncAction == 'insert') {
+              await syncInsertToSupabase(permission.toJson());
+            } else if (permission.syncAction == 'update' &&
+                permission.id != null) {
+              final data = permission.toJson();
+              data.remove('id');
+              await syncUpdateToSupabase(permission.id!, data);
+            }
         } catch (e) {
-          print("Gagal sync task ${task.id}: $e");
+          print("Gagal sync permission ${permission.id}: $e");
         }
       }
-      print("Sync Selesai!");
     } catch (e) {
-      print("Error Sync: $e");
+      print("Error Sync Permissions: $e");
     }
   }
 
-  Future<void> insertPermission(Map<String, dynamic> data) async {
+  Future<int?> insertPermission(Map<String, dynamic> data) async {
+    final localId = await databaseService.addPermissionToSyncQueue(
+      data,
+      'insert',
+    );
+    print("Permission disimpan di HP (Mode Instan). ID: $localId");
+
     if (connectivityService.isOnline.value) {
-      await supabase.from('permissions').insert(data);
-    } else {
-      await databaseService.addPermissionToSyncQueue(data, 'insert');
+      syncInsertToSupabase({...data, 'id': localId});
     }
+    return localId;
   }
 
   Future<void> updatePermission(int id, Map<String, dynamic> data) async {
-    await supabase.from('permissions').update(data).eq('id', id);
+    try {
+      final db = await databaseService.database;
+      await db.update(
+        ApiConstant.tablePermissions,
+        {...data, 'is_synced': 0, 'sync_action': 'update'},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+      if (connectivityService.isOnline.value) {
+        syncUpdateToSupabase(id, data);
+      }
+    } catch (e) {
+      print("Gagal update local (Permission): $e");
+    }
   }
 
-  Future<void> syncInsertToSupabase(Map<String, dynamic> json) async {
+  Future<void> syncInsertToSupabase(Map<String, dynamic> data) async {
+    final localId = data['id'];
+
     try {
-      final Map<String, dynamic> supabaseData = Map.from(json);
+      final Map<String, dynamic> supabaseData = Map.from(data);
       supabaseData.remove('id');
       supabaseData.remove('is_synced');
       supabaseData.remove('sync_action');
+
+      final createdAt = data['created_at'];
 
       final response = await supabase
           .from(ApiConstant.tablePermissions)
           .insert(supabaseData)
           .select()
           .single();
+
       final remoteId = response['id'];
-      print("Background: Berhasil kirim ke Supabase!");
+      print("Background Permission Sync: Success! Remote ID: $remoteId");
 
       final db = await databaseService.database;
-      await db.update(
-        ApiConstant.tablePermissions,
-        {'id': remoteId, 'is_synced': 1, 'sync_action': null},
-        where: 'created_at = ? AND user_id = ?',
-        whereArgs: [json['created_at'], json['user_id']],
-      );
+
+      await db.transaction((txn) async {
+        final existing = await txn.query(
+          ApiConstant.tablePermissions,
+          where: 'id = ?',
+          whereArgs: [remoteId],
+        );
+
+        if (existing.isNotEmpty) {
+          if (localId != null) {
+            await txn.delete(
+              ApiConstant.tablePermissions,
+              where: 'id = ?',
+              whereArgs: [localId],
+            );
+            print(
+              "Background: Found duplicate remote ID $remoteId, removed local ID $localId",
+            );
+          } else {
+            await txn.delete(
+              ApiConstant.tablePermissions,
+              where: 'created_at = ? AND user_id = ?',
+              whereArgs: [createdAt, data['user_id']],
+            );
+          }
+        } else {
+          if (localId != null) {
+            await txn.update(
+              ApiConstant.tablePermissions,
+              {'id': remoteId, 'is_synced': 1, 'sync_action': null},
+              where: 'id = ?',
+              whereArgs: [localId],
+            );
+          } else {
+            await txn.update(
+              ApiConstant.tablePermissions,
+              {'id': remoteId, 'is_synced': 1, 'sync_action': null},
+              where: 'created_at = ? AND user_id = ?',
+              whereArgs: [createdAt, data['user_id']],
+            );
+          }
+        }
+      });
     } catch (e) {
-      print("Background: Gagal ke Supabase (akan disync nanti): $e");
+      print("Background Permission Sync Failed: $e");
     }
   }
 
-  Future<void> syncUpdateToSupabase(int i, Map<String, dynamic> data) async {
+  Future<void> syncUpdateToSupabase(int id, Map<String, dynamic> data) async {
     try {
       final Map<String, dynamic> supabaseData = Map.from(data)
         ..remove('id')
@@ -136,28 +185,26 @@ class PermissionRepository {
       await supabase
           .from(ApiConstant.tablePermissions)
           .update(supabaseData)
-          .eq('id', i);
-      print("Background: Berhasil kirim ke Supabase!");
+          .eq('id', id);
 
       final db = await databaseService.database;
       await db.update(
         ApiConstant.tablePermissions,
         {'is_synced': 1, 'sync_action': null},
-        where: 'created_at = ? AND user_id = ?',
-        whereArgs: [data['created_at'], data['user_id']],
+        where: 'id = ?',
+        whereArgs: [id],
       );
     } catch (e) {
-      print("Background: Gagal ke Supabase (akan disync nanti): $e");
+      print("Background Permission Update Failed: $e");
     }
   }
 
-  Future<void> syncDeleteToSupabase(int i) async {
+  Future<void> syncDeleteToSupabase(int id) async {
     try {
-      await supabase.from(ApiConstant.tablePermissions).delete().eq('id', i);
-      await databaseService.deletePermissionLocally(i);
-      print("Background: Berhasil hapus ke Supabase!");
+      await supabase.from(ApiConstant.tablePermissions).delete().eq('id', id);
+      await databaseService.deletePermissionLocally(id);
     } catch (e) {
-      print("Background: Gagal ke Supabase (akan disync nanti): $e");
+      print("Background Permission Delete Failed: $e");
     }
   }
 }

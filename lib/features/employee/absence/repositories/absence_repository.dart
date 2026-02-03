@@ -132,6 +132,8 @@ class AbsenceRepository {
             'radius': response['radius'] is String
                 ? double.parse(response['radius'])
                 : response['radius']?.toDouble(),
+            'start_time': response['start_time'],
+            'end_time': response['end_time'],
           };
         }
       } catch (e) {
@@ -152,13 +154,15 @@ class AbsenceRepository {
         'radius': localOffice['radius'] is String
             ? double.parse(localOffice['radius'])
             : localOffice['radius']?.toDouble(),
+        'start_time': localOffice['start_time'],
+        'end_time': localOffice['end_time'],
       };
     }
     return null;
   }
 
   Future<Map<String, dynamic>?> getOfficeHours({required int officeId}) async {
-    if (connectivityService.isOnline.value) {
+     if (connectivityService.isOnline.value) {
       try {
         final response = await supabase
             .from('work_schedules')
@@ -170,7 +174,51 @@ class AbsenceRepository {
         print("AbsenceRepository: Error fetching office hours: $e");
       }
     }
+
+    // Try to get from local offices table
+    final localOffice = await databaseService.getOfficeLocallyById(officeId);
+    if (localOffice != null &&
+        localOffice['start_time'] != null &&
+        localOffice['end_time'] != null) {
+      return {
+        'start_time': localOffice['start_time'],
+        'end_time': localOffice['end_time'],
+      };
+    }
+
     return {'start_time': '09:00:00', 'end_time': '17:00:00'};
+  }
+
+  Future<void> syncOfficeData(String userId) async {
+    if (!connectivityService.isOnline.value) return;
+
+    try {
+      print("AbsenceRepository: Proactively syncing office data for $userId");
+
+      // 1. Sync Profile & Get Office ID
+      final officeData = await getUserOffice(userId: userId);
+      if (officeData == null || officeData['office_id'] == null) return;
+
+      final officeId = officeData['office_id'] as int;
+
+      // 2. Get Office Details
+      final officeDetails = await getOffice(officeId: officeId);
+      if (officeDetails == null) return;
+
+      // 3. Get Office Hours
+      final hours = await getOfficeHours(officeId: officeId);
+
+      // 4. Save combined data to local
+      await databaseService.saveOfficeLocally({
+        ...officeDetails,
+        'start_time': hours?['start_time'],
+        'end_time': hours?['end_time'],
+      });
+
+      print("AbsenceRepository: Office data sync completed for $userId");
+    } catch (e) {
+      print("AbsenceRepository: Error proactive sync office data: $e");
+    }
   }
 
   Future<void> clockIn({

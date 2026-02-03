@@ -63,15 +63,15 @@ class EmployeePermission extends GetView<EmployeePermissionController> {
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
           physics: BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: const PermissionFilterBtn(),
-              ),
-              SizedBox(height: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: const PermissionFilterBtn(),
+            ),
+            SizedBox(height: 20),
               Obx(() {
                 if (controller.permissions.isEmpty) {
                   return Center(
@@ -91,9 +91,9 @@ class EmployeePermission extends GetView<EmployeePermissionController> {
                 }
                 return PermissionList();
               }),
-            ],
-          ),
+          ],
         ),
+      ),
       ),
     );
   }

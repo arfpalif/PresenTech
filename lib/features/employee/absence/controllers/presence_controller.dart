@@ -8,6 +8,7 @@ import 'package:presentech/shared/view/components/snackbar/failed_form_snackbar.
 import 'package:presentech/utils/enum/absence_status.dart';
 import 'package:presentech/utils/enum/filter.dart';
 import 'package:presentech/utils/enum/permission_type.dart';
+import 'package:presentech/utils/services/connectivity_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -41,15 +42,26 @@ class PresenceController extends GetxController {
   RxInt izin = 0.obs;
   final RxBool showForm = false.obs;
   final isIzin = false.obs;
+  final connectivityService = Get.find<ConnectivityService>();
 
   @override
   void onInit() {
     super.onInit();
     refreshPresenceData();
+
+    ever(connectivityService.isOnline, (bool isOnline) {
+      if (isOnline) {
+        print("Connection restored, triggering auto-sync (Absences)");
+        refreshPresenceData();
+      }
+    });
   }
 
   Future<void> refreshPresenceData() async {
     await _absenceRepo.syncUnsyncedAbsences();
+    if (_userId.isNotEmpty) {
+      await _absenceRepo.syncOfficeData(_userId);
+    }
     await Future.wait([checkTodayAbsence(), fetchAbsence()]);
   }
 

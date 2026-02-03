@@ -18,7 +18,8 @@ class ProfileController extends GetxController {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final DateController dateController = Get.find<DateController>();
-  final ConnectivityService connectivityService = Get.find<ConnectivityService>();
+  final ConnectivityService connectivityService =
+      Get.find<ConnectivityService>();
   RxBool isFormValid = false.obs;
 
   //Variables
@@ -39,7 +40,6 @@ class ProfileController extends GetxController {
     super.onInit();
     getUser();
 
-    // Auto-sync when coming back online
     ever(connectivityService.isOnline, (bool online) async {
       if (online) {
         debugPrint("ProfileController: Online detected, syncing profile...");
@@ -141,8 +141,11 @@ class ProfileController extends GetxController {
   }
 
   void validateForm() {
-    final hasImage = localImage.value != null || profilePictureUrl.value.isNotEmpty;
-    if (nameController.text.isNotEmpty && emailController.text.isNotEmpty && hasImage) {
+    final hasImage =
+        localImage.value != null || profilePictureUrl.value.isNotEmpty;
+    if (nameController.text.isNotEmpty &&
+        emailController.text.isNotEmpty &&
+        hasImage) {
       isFormValid.value = true;
     } else {
       isFormValid.value = false;

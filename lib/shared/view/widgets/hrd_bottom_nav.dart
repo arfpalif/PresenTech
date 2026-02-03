@@ -8,6 +8,8 @@ import 'package:presentech/features/hrd/location/view/ui/hrd_location.dart';
 import 'package:presentech/features/hrd/profile/view/ui/hrd_profile_page.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 
+import 'package:presentech/shared/view/widgets/lazy_indexed_stack.dart';
+
 class HrdBottomNav extends GetView<NavigationController> {
   const HrdBottomNav({super.key});
 
@@ -23,8 +25,10 @@ class HrdBottomNav extends GetView<NavigationController> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Obx(
-        () =>
-            IndexedStack(index: controller.currentIndex.value, children: pages),
+        () => LazyIndexedStack(
+          index: controller.currentIndex.value,
+          children: pages,
+        ),
       ),
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(

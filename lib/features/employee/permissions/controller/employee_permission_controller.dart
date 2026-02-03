@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:presentech/shared/models/permission.dart';
@@ -37,14 +36,15 @@ class EmployeePermissionController extends GetxController {
   final isLoading = false.obs;
   final permissions = <Permission>[].obs;
   final _allPermissions = <Permission>[].obs;
+  final connectivityService = Get.find<ConnectivityService>();
 
   @override
   void onInit() {
     super.onInit();
+    print("EmployeePermissionController: onInit called");
     _handleArguments();
     fetchPermissions();
 
-    final connectivityService = Get.find<ConnectivityService>();
     ever(connectivityService.isOnline, (bool isOnline) {
       if (isOnline) {
         print("Connection restored, triggering auto-sync (Permissions)");
@@ -141,7 +141,13 @@ class EmployeePermissionController extends GetxController {
 
     try {
       isLoading.value = true;
+      print(
+        "EmployeePermissionController: Fetching permissions for user: $_userId",
+      );
       final response = await _permissionRepo.getPermissions(_userId);
+      print(
+        "EmployeePermissionController: Received ${response.length} permissions",
+      );
       _allPermissions.assignAll(response);
       applyFilters();
     } catch (e) {
@@ -234,7 +240,6 @@ class EmployeePermissionController extends GetxController {
         Get.back();
       });
 
-      // Background update
       _permissionRepo
           .updatePermission(id, {'status': PermissionStatus.cancelled.name})
           .catchError((e) {
@@ -258,6 +263,8 @@ class EmployeePermissionController extends GetxController {
   }
 
   Future<void> submitForm() async {
+    if (isLoading.value) return;
+
     if (permissionTitleController.text.isEmpty ||
         dateController.startDateController.text.isEmpty ||
         dateController.endDateController.text.isEmpty ||
@@ -289,7 +296,7 @@ class EmployeePermissionController extends GetxController {
     }
 
     final newPermission = Permission(
-      createdAt: DateTime.now(),
+      createdAt: DateTime.now().toUtc(),
       startDate: start,
       endDate: end,
       type: selectedType.value!,
@@ -303,15 +310,29 @@ class EmployeePermissionController extends GetxController {
       _allPermissions.insert(0, newPermission);
       applyFilters();
 
+      _permissionRepo
+          .insertPermission(newPermission.toJson())
+          .then((id) {
+            if (id != null) {
+              newPermission.id = id;
+              _allPermissions.refresh();
+              print("EmployeePermissionController: Optimistic ID Updated: $id");
+            }
+          })
+          .catchError((e) {
+            debugPrint(
+              'EmployeePermissionController: Background Insert Error: $e',
+            );
+            fetchPermissions();
+          });
+
       SuccessDialog.show("Success", "Permintaan ijin berhasil dikirim", () {
         Get.back(); // Tutup form
       });
-
-      // Background processing
-      final data = newPermission.toJson()..['user_id'] = _userId;
-      _permissionRepo.insertPermission(data);
     } catch (e) {
-      debugPrint('Error submitting permission: $e');
+      debugPrint(
+        'EmployeePermissionController: Error submitting permission: $e',
+      );
       FailedSnackbar.show("Gagal mengirim permintaan ijin");
     }
   }

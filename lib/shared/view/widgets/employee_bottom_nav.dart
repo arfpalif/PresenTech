@@ -7,6 +7,8 @@ import 'package:presentech/features/employee/settings/view/ui/employee_settings.
 import 'package:presentech/features/employee/tasks/view/ui/employee_task.dart';
 import 'package:presentech/shared/styles/color_style.dart';
 
+import 'package:presentech/shared/view/widgets/lazy_indexed_stack.dart';
+
 class EmployeeBottomNav extends GetView<NavigationController> {
   const EmployeeBottomNav({super.key});
 
@@ -21,8 +23,10 @@ class EmployeeBottomNav extends GetView<NavigationController> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Obx(
-        () =>
-            IndexedStack(index: controller.currentIndex.value, children: pages),
+        () => LazyIndexedStack(
+          index: controller.currentIndex.value,
+          children: pages,
+        ),
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(

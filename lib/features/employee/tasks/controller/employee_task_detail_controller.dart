@@ -162,8 +162,8 @@ class EmployeeTaskDetailController extends GetxController {
       await _taskRepo.deleteTask(task.id!);
 
       try {
-        // final mainController = Get.find<EmployeeTaskController>();
-        // mainController.deleteTask(task.id!);
+        final mainController = Get.find<EmployeeTaskController>();
+        mainController.deleteTask(task.id!);
       } catch (_) {}
 
       isChanged.value = true;

@@ -8,7 +8,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileRepository {
   final SupabaseClient supabase = Supabase.instance.client;
-  final ConnectivityService connectivityService = Get.find<ConnectivityService>();
+  final ConnectivityService connectivityService =
+      Get.find<ConnectivityService>();
   final DatabaseService databaseService = Get.find<DatabaseService>();
 
   Future<Map<String, dynamic>> getUserProfile(String userId) async {
@@ -21,7 +22,7 @@ class ProfileRepository {
             .select()
             .eq('id', userId)
             .single();
-        
+
         // Sync remote data to local
         await databaseService.syncUserToLocal(response, userId);
       } catch (e) {
@@ -34,7 +35,7 @@ class ProfileRepository {
     if (localProfile != null) {
       return localProfile;
     }
-    
+
     throw Exception('Profile not found locally or on remote');
   }
 
@@ -45,7 +46,6 @@ class ProfileRepository {
     final userId = supabase.auth.currentUser!.id;
     final existingProfile = await databaseService.getProfileLocally(userId);
 
-    // 1. Prepare data for local save (is_synced = 0)
     final profileData = {
       'id': userId,
       'name': name,
@@ -54,12 +54,12 @@ class ProfileRepository {
       'office_id': existingProfile?['office_id'],
       'profile_picture': existingProfile?['profile_picture'],
       'created_at': existingProfile?['created_at'],
-      'local_image_path': localImagePath ?? existingProfile?['local_image_path'],
+      'local_image_path':
+          localImagePath ?? existingProfile?['local_image_path'],
       'is_synced': 0,
       'sync_action': 'update',
     };
 
-    // 2. Save locally first (instant feedback)
     await databaseService.saveProfileLocally(profileData);
     print("Profile saved locally (Offline mode)");
 
@@ -69,11 +69,14 @@ class ProfileRepository {
     }
   }
 
-  Future<void> _syncToSupabase(String userId, String name, String? localImagePath) async {
+  Future<void> _syncToSupabase(
+    String userId,
+    String name,
+    String? localImagePath,
+  ) async {
     try {
       String? imageUrl;
 
-      // Upload image if there's a new local image
       if (localImagePath != null) {
         final file = File(localImagePath);
         if (await file.exists()) {
@@ -85,14 +88,13 @@ class ProfileRepository {
       if (imageUrl != null) {
         updates['profile_picture'] = imageUrl;
       }
+      await supabase
+          .from(ApiConstant.tableUsers)
+          .update(updates)
+          .eq('id', userId);
 
-      // Update Supabase
-      await supabase.from(ApiConstant.tableUsers).update(updates).eq('id', userId);
-
-      // Mark locally as synced
       await databaseService.markProfileAsSynced(userId);
 
-      // If image was uploaded, update local profile_picture with the URL
       if (imageUrl != null) {
         final db = await databaseService.database;
         await db.update(
@@ -102,7 +104,7 @@ class ProfileRepository {
           whereArgs: [userId],
         );
       }
-      
+
       print("Profile synced to Supabase successfully");
     } catch (e) {
       print("Failed to sync profile to Supabase (Background): $e");
@@ -112,10 +114,15 @@ class ProfileRepository {
   Future<String?> _uploadImageToSupabase(String userId, File file) async {
     try {
       final filePath = 'profile-$userId.jpg';
-      await supabase.storage.from('avatars').upload(
+      await supabase.storage
+          .from('avatars')
+          .upload(
             filePath,
             file,
-            fileOptions: const FileOptions(upsert: true, contentType: 'image/jpeg'),
+            fileOptions: const FileOptions(
+              upsert: true,
+              contentType: 'image/jpeg',
+            ),
           );
       final url = supabase.storage.from('avatars').getPublicUrl(filePath);
       return '$url?t=${DateTime.now().millisecondsSinceEpoch}';
@@ -144,6 +151,9 @@ class ProfileRepository {
 
   Future<void> updateProfileImage(String imageUrl) async {
     final userId = supabase.auth.currentUser!.id;
-    await supabase.from('users').update({'profile_picture': imageUrl}).eq('id', userId);
+    await supabase
+        .from('users')
+        .update({'profile_picture': imageUrl})
+        .eq('id', userId);
   }
 }

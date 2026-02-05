@@ -66,7 +66,6 @@ class ProfileController extends GetxController {
         role.value = user.value?.role ?? '';
         name.value = user.value?.name ?? '';
 
-        // If there's a local unsynced image, show it
         final savedLocalPath = response['local_image_path'] as String?;
         if (savedLocalPath != null && savedLocalPath.isNotEmpty) {
           final file = File(savedLocalPath);

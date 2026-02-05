@@ -191,7 +191,7 @@ class TaskRepository {
       if (taskData.isEmpty) return;
       final bool isSynced = taskData.first['is_synced'] == 1;
 
-      if (!isSynced && id > 1000000) {
+      if (!isSynced) {
         await databaseService.deleteTaskLocally(id);
       } else {
         await databaseService.markTaskAsDeleted(id);

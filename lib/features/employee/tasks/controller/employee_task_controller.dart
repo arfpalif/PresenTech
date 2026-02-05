@@ -17,20 +17,17 @@ class EmployeeTaskController extends GetxController {
   final _supabase = Supabase.instance.client;
   String get _userId => _supabase.auth.currentUser?.id ?? "";
 
-  //local db
+  final connectivityService = Get.find<ConnectivityService>();
 
-  // Controllers
   final titleController = TextEditingController();
   final acceptanceController = TextEditingController();
   DateController get dateController => Get.find<DateController>();
 
-  // Observables
   final selectedLevel = RxnString();
   final selectedPriority = RxnString();
   final tasks = <Tasks>[].obs;
   final isLoading = false.obs;
 
-  // Statistics
   int get totalTasksCount => tasks.length;
 
   int get overdueTasksCount => tasks.where((t) => isTaskOverdue(t)).length;
@@ -72,10 +69,8 @@ class EmployeeTaskController extends GetxController {
     super.onInit();
     fetchTasks();
 
-    final connectivityService = Get.find<ConnectivityService>();
     ever(connectivityService.isOnline, (bool isOnline) {
       if (isOnline) {
-        debugPrint("Connection restored, triggering auto-sync...");
         fetchTasks();
       }
     });
@@ -100,21 +95,19 @@ class EmployeeTaskController extends GetxController {
     return await _taskRepo.insertTask(task.toJson());
   }
 
-  // Future<void> deleteTask(int id) async {
-  //   try {
-  //     // Optimistic Update: Hapus dari list UI dulu
-  //     tasks.removeWhere((t) => t.id == id);
+  Future<void> deleteTask(int id) async {
+    try {
+      tasks.removeWhere((t) => t.id == id);
 
-  //     // Jalankan hapus di repository (background)
-  //     _taskRepo.deleteTask(id).catchError((e) {
-  //       debugPrint("Background Delete Error: $e");
-  //       fetchTasks(); // Jika gagal total, refresh data
-  //     });
-  //   } catch (e) {
-  //     debugPrint("Error deleteTask: $e");
-  //     FailedSnackbar.show("Gagal menghapus tugas");
-  //   }
-  // }
+      _taskRepo.deleteTask(id).catchError((e) {
+        debugPrint("Background Delete Error: $e");
+        fetchTasks();
+      });
+    } catch (e) {
+      debugPrint("Error deleteTask: $e");
+      FailedSnackbar.show("Gagal menghapus tugas");
+    }
+  }
 
   void onTaskUpdated(Tasks updatedTask) {
     final index = tasks.indexWhere((t) => t.id == updatedTask.id);
@@ -192,7 +185,7 @@ class EmployeeTaskController extends GetxController {
           });
 
       SuccessDialog.show("Success", "Tugas berhasil ditambahkan", () {
-        Get.back(); // Tutup dialog
+        Get.back();
       });
     } catch (e) {
       debugPrint("Insert Task Error: $e");

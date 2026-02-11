@@ -38,7 +38,11 @@ class HrdAttedance extends GetView<HrdAttendanceController> {
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: ColorStyle.greyprimary,
+                    ),
+                  );
                 }
 
                 if (controller.absences.isEmpty) {

@@ -80,10 +80,7 @@ class AddLocationController extends GetxController {
   Future<void> fetchOffices() async {
     try {
       isLoading.value = true;
-      final response = await hrdLocationRepo.fetchOffices();
-
-      final data = response.map((e) => Office.fromJson(e)).toList();
-
+      final data = await hrdLocationRepo.fetchOffices();
       offices.assignAll(data);
     } catch (e) {
       print("Error mengambil lokasi: $e");

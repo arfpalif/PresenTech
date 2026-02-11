@@ -1,20 +1,48 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:presentech/constants/api_constant.dart';
 import 'package:presentech/shared/models/tasks.dart';
 import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
+import 'package:presentech/utils/database/dao/task_dao.dart';
+import 'package:presentech/utils/services/connectivity_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HrdTaskRepository {
   final SupabaseClient supabase = Supabase.instance.client;
   RxList<Tasks> tasks = <Tasks>[].obs;
+  final ConnectivityService connectivityService =
+      Get.find<ConnectivityService>();
+  final TaskDao _taskDao = Get.find<TaskDao>();
 
-  Future<List<Map<String, dynamic>>> fetchTasks() async {
-    final response = await supabase
-        .from('tasks')
-        .select('*, users(name)')
-        .order('created_at', ascending: false);
+  Future<List<Tasks>> fetchTasks() async {
+    List<Tasks> remoteTasks = [];
 
-    return List<Map<String, dynamic>>.from(response);
+    try {
+      if (connectivityService.isOnline.value) {
+        final response = await supabase
+            .from(ApiConstant.tableTasks)
+            .select('*, users(name)')
+            .order('id', ascending: false);
+        remoteTasks = (response as List).map((e) => Tasks.fromJson(e)).toList();
+
+        if (remoteTasks.isNotEmpty) {
+          await _taskDao.syncTasksToLocal(
+            remoteTasks.map((t) => t.toDrift()).toList(),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint("Gagal fetch Supabase: $e");
+    }
+
+    try {
+      final localData = await _taskDao.getAllTasks();
+      return localData.map((e) => Tasks.fromDrift(e)).toList();
+    } catch (e) {
+      debugPrint("Gagal fetch local: $e");
+      return remoteTasks;
+    }
   }
 
   Future<bool> insertTask(Tasks task) async {

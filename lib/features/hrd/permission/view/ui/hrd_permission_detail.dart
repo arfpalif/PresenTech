@@ -202,7 +202,7 @@ class HrdPermissionDetail extends GetView<HrdPermissionDetailController> {
                           child: AppGradientButtonGreen(
                             text: "Accept",
                             onPressed: () {
-                              controller.approvePermission(permission.id!);
+                              controller.approvePermission();
                             },
                           ),
                         ),

@@ -1,19 +1,20 @@
 import 'dart:io';
 
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide Value;
 import 'package:presentech/constants/api_constant.dart';
+import 'package:presentech/utils/database/dao/profile_dao.dart';
+import 'package:presentech/utils/database/database.dart';
 import 'package:presentech/utils/services/connectivity_service.dart';
-import 'package:presentech/utils/services/database_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:drift/drift.dart';
 
 class ProfileRepository {
   final SupabaseClient supabase = Supabase.instance.client;
   final ConnectivityService connectivityService =
       Get.find<ConnectivityService>();
-  final DatabaseService databaseService = Get.find<DatabaseService>();
+  final ProfileDao profileDao = Get.find<ProfileDao>();
 
   Future<Map<String, dynamic>> getUserProfile(String userId) async {
-    // 1. If online, try to sync offline data first, then fetch latest from remote
     if (connectivityService.isOnline.value) {
       await syncOfflineProfiles();
       try {
@@ -23,20 +24,70 @@ class ProfileRepository {
             .eq('id', userId)
             .single();
 
-        // Sync remote data to local
-        await databaseService.syncUserToLocal(response, userId);
+        await _syncUserToLocal(response, userId);
       } catch (e) {
         print("Error fetching profile from Supabase: $e");
       }
     }
-
-    // 2. Always return data from local database
-    final localProfile = await databaseService.getProfileLocally(userId);
+    await syncOfflineProfiles();
+    final localProfile = await profileDao.getProfileLocally(userId);
     if (localProfile != null) {
-      return localProfile;
+      return _driftToMap(localProfile);
     }
 
     throw Exception('Profile not found locally or on remote');
+  }
+
+  Future<void> _syncUserToLocal(
+    Map<String, dynamic> userData,
+    String userId,
+  ) async {
+    final existing = await profileDao.getProfileLocally(userId);
+    String? localImagePath;
+    if (existing != null && existing.localImagePath != null) {
+      localImagePath = existing.localImagePath;
+    }
+
+    await profileDao.saveProfile(
+      UsersTableCompanion(
+        id: Value(userId),
+        name: Value(userData['name']),
+        email: Value(userData['email']),
+        role: Value(userData['role']),
+        profilePicture: Value(userData['profile_picture']),
+        officeId: Value(
+          userData['office_id'] is int
+              ? userData['office_id']
+              : int.tryParse(userData['office_id']?.toString() ?? ''),
+        ),
+        createdAt: Value(
+          userData['created_at'] != null
+              ? DateTime.tryParse(userData['created_at'])
+              : null,
+        ),
+        isSynced: const Value(1),
+        syncAction: const Value(null),
+        localImagePath: Value(localImagePath),
+      ),
+    );
+    print(
+      "Berhasil sinkronisasi profile user ke local (local_image_path preserved).",
+    );
+  }
+
+  Map<String, dynamic> _driftToMap(UsersTableData data) {
+    return {
+      'id': data.id,
+      'name': data.name,
+      'email': data.email,
+      'role': data.role,
+      'profile_picture': data.profilePicture,
+      'office_id': data.officeId,
+      'created_at': data.createdAt?.toIso8601String(),
+      'is_synced': data.isSynced,
+      'sync_action': data.syncAction,
+      'local_image_path': data.localImagePath,
+    };
   }
 
   Future<void> updateProfile({
@@ -44,23 +95,25 @@ class ProfileRepository {
     String? localImagePath,
   }) async {
     final userId = supabase.auth.currentUser!.id;
-    final existingProfile = await databaseService.getProfileLocally(userId);
+    final existingProfile = await profileDao.getProfileLocally(userId);
 
-    final profileData = {
-      'id': userId,
-      'name': name,
-      'email': existingProfile?['email'] ?? '',
-      'role': existingProfile?['role'] ?? '',
-      'office_id': existingProfile?['office_id'],
-      'profile_picture': existingProfile?['profile_picture'],
-      'created_at': existingProfile?['created_at'],
-      'local_image_path':
-          localImagePath ?? existingProfile?['local_image_path'],
-      'is_synced': 0,
-      'sync_action': 'update',
-    };
+    await profileDao.saveProfile(
+      UsersTableCompanion(
+        id: Value(userId),
+        name: Value(name),
+        email: Value(existingProfile?.email),
+        role: Value(existingProfile?.role),
+        officeId: Value(existingProfile?.officeId),
+        profilePicture: Value(existingProfile?.profilePicture),
+        createdAt: Value(existingProfile?.createdAt),
+        localImagePath: Value(
+          localImagePath ?? existingProfile?.localImagePath,
+        ),
+        isSynced: const Value(0),
+        syncAction: const Value('update'),
+      ),
+    );
 
-    await databaseService.saveProfileLocally(profileData);
     print("Profile saved locally (Offline mode)");
 
     // 3. Trigger sync if online
@@ -93,15 +146,14 @@ class ProfileRepository {
           .update(updates)
           .eq('id', userId);
 
-      await databaseService.markProfileAsSynced(userId);
+      await profileDao.markProfileAsSynced(userId);
 
       if (imageUrl != null) {
-        final db = await databaseService.database;
-        await db.update(
-          ApiConstant.tableUsers,
-          {'profile_picture': imageUrl},
-          where: 'id = ?',
-          whereArgs: [userId],
+        await profileDao.saveProfile(
+          UsersTableCompanion(
+            id: Value(userId),
+            profilePicture: Value(imageUrl),
+          ),
         );
       }
 
@@ -134,13 +186,13 @@ class ProfileRepository {
 
   Future<void> syncOfflineProfiles() async {
     try {
-      final unsyncedProfiles = await databaseService.getUnsyncedProfiles();
+      final unsyncedProfiles = await profileDao.getUnsyncedProfiles();
       if (unsyncedProfiles.isEmpty) return;
 
       for (var profile in unsyncedProfiles) {
-        final userId = profile['id'] as String;
-        final name = profile['name'] as String? ?? '';
-        final localImagePath = profile['local_image_path'] as String?;
+        final userId = profile.id;
+        final name = profile.name ?? '';
+        final localImagePath = profile.localImagePath;
 
         await _syncToSupabase(userId, name, localImagePath);
       }

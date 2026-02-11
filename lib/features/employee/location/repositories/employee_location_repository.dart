@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/constants/api_constant.dart';
 import 'package:presentech/features/hrd/location/model/office.dart';
@@ -23,7 +24,9 @@ class EmployeeLocationRepository {
             .eq('id', userId)
             .maybeSingle();
 
-        print("EmployeeLocationRepository: Supabase response: $response");
+        debugPrint(
+          "EmployeeLocationRepository: Remote user profile response: $response",
+        );
 
         if (response != null && response['office_id'] != null) {
           final officeData = response['office_id'];
@@ -33,15 +36,17 @@ class EmployeeLocationRepository {
           );
 
           final office = Office.fromJson(Map<String, dynamic>.from(officeData));
-          print("EmployeeLocationRepository: Parsed office: ${office.name}");
+          debugPrint(
+            "EmployeeLocationRepository: Parsed office: ${office.name}",
+          );
           return office;
         } else {
-          print(
+          debugPrint(
             "EmployeeLocationRepository: No office assigned to user in Supabase.",
           );
         }
       } catch (e) {
-        print(
+        debugPrint(
           "EmployeeLocationRepository: Error fetching office from remote: $e",
         );
       }
@@ -49,7 +54,7 @@ class EmployeeLocationRepository {
 
     try {
       final localUser = await databaseService.getProfileLocally(userId);
-      print("EmployeeLocationRepository: Local user profile: $localUser");
+      debugPrint("EmployeeLocationRepository: Local user profile: $localUser");
 
       if (localUser != null && localUser['office_id'] != null) {
         final officeIdRaw = localUser['office_id'];
@@ -57,32 +62,36 @@ class EmployeeLocationRepository {
             ? officeIdRaw
             : int.tryParse(officeIdRaw.toString());
 
-        print("EmployeeLocationRepository: Local officeId parsed: $officeId");
+        debugPrint(
+          "EmployeeLocationRepository: Local officeId parsed: $officeId",
+        );
 
         if (officeId != null) {
           final localOffice = await databaseService.getOfficeLocallyById(
             officeId,
           );
           if (localOffice != null) {
-            print(
+            debugPrint(
               "EmployeeLocationRepository: Office loaded from local database: ${localOffice['name']}",
             );
             return Office.fromJson(localOffice);
           } else {
-            print(
+            debugPrint(
               "EmployeeLocationRepository: Office with id $officeId not found in local DB.",
             );
           }
         } else {
-          print("EmployeeLocationRepository: Parsed officeId is null.");
+          debugPrint("EmployeeLocationRepository: Parsed officeId is null.");
         }
       } else {
-        print(
+        debugPrint(
           "EmployeeLocationRepository: No office_id found in local user profile.",
         );
       }
     } catch (e) {
-      print("EmployeeLocationRepository: Error fetching office from local: $e");
+      debugPrint(
+        "EmployeeLocationRepository: Error fetching office from local: $e",
+      );
     }
 
     return null;

@@ -5,6 +5,8 @@
   import 'dart:convert';
 
   import 'package:presentech/utils/enum/task_status.dart';
+import 'package:drift/drift.dart' hide Column;
+import 'package:presentech/utils/database/database.dart';
 
   List<Tasks> tasksFromJson(String str) =>
       List<Tasks>.from(json.decode(str).map((x) => Tasks.fromJson(x)));
@@ -82,4 +84,40 @@
       "is_synced": isSynced,
       "sync_action": syncAction,
     };
+
+    factory Tasks.fromDrift(TasksTableData data) => Tasks(
+          id: data.id,
+          userId: data.userId,
+          title: data.title,
+          acceptanceCriteria: data.acceptanceCriteria ?? "",
+          startDate: data.startDate ?? DateTime.now(),
+          endDate: data.endDate ?? DateTime.now(),
+          priority: data.priority ?? "Low",
+          level: data.level ?? "Easy",
+          status: data.status == "todo"
+              ? TaskStatus.todo
+              : data.status == "on_progress"
+                  ? TaskStatus.on_progress
+                  : data.status == "finished"
+                      ? TaskStatus.finished
+                      : null,
+          createdAt: data.createdAt,
+          isSynced: data.isSynced,
+          syncAction: data.syncAction,
+        );
+
+    TasksTableCompanion toDrift() => TasksTableCompanion(
+          id: id != null ? Value(id!) : const Value.absent(),
+          userId: Value(userId),
+          title: Value(title),
+          acceptanceCriteria: Value(acceptanceCriteria),
+          startDate: Value(startDate),
+          endDate: Value(endDate),
+          priority: Value(priority),
+          level: Value(level),
+          status: Value(status?.name),
+          createdAt: Value(createdAt),
+          isSynced: Value(isSynced ?? 0),
+          syncAction: Value(syncAction),
+        );
   }

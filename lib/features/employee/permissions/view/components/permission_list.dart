@@ -55,24 +55,38 @@ class PermissionList<T> extends GetView<EmployeePermissionController> {
                       ),
                     ),
                     if (t.isSynced == 0) ...[
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.cloud_off_outlined,
-                            size: 14,
-                            color: Colors.orange[700],
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: Colors.orange.withOpacity(0.3),
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            "Menunggu Sinkronisasi",
-                            style: AppTextStyle.smallText.copyWith(
-                              color: Colors.orange[700],
-                              fontWeight: FontWeight.bold,
-                              fontSize: 9,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.cloud_off_rounded,
+                              size: 14,
+                              color: Colors.orange[800],
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 6),
+                            Text(
+                              "Menunggu Sinkronisasi",
+                              style: AppTextStyle.smallText.copyWith(
+                                color: Colors.orange[800],
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ],

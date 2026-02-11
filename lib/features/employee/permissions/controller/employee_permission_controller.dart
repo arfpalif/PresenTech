@@ -204,7 +204,7 @@ class EmployeePermissionController extends GetxController {
   }
 
   Future<void> cancelPermission(
-    String permissionId,
+    int permissionId,
     PermissionStatus status,
   ) async {
     if (status == PermissionStatus.cancelled) {
@@ -216,10 +216,9 @@ class EmployeePermissionController extends GetxController {
       return;
     }
 
-    final id = int.parse(permissionId);
+    final id = permissionId;
 
     try {
-      // Optimistic Update: Update status in UI immediately
       final index = _allPermissions.indexWhere((p) => p.id == id);
       if (index != -1) {
         _allPermissions[index] = Permission(
@@ -244,8 +243,9 @@ class EmployeePermissionController extends GetxController {
           .updatePermission(id, {'status': PermissionStatus.cancelled.name})
           .catchError((e) {
             debugPrint('Background cancel error: $e');
-            fetchPermissions(); // Refresh if failed
+            fetchPermissions();
           });
+      print("berhasil membatalkan permission id: $id");
     } catch (e) {
       debugPrint('Error cancelling permission: $e');
       FailedSnackbar.show("Gagal membatalkan permintaan ijin");
@@ -306,7 +306,6 @@ class EmployeePermissionController extends GetxController {
     );
 
     try {
-      // Optimistic Update: Add to list UI immediately
       _allPermissions.insert(0, newPermission);
       applyFilters();
 
@@ -315,7 +314,6 @@ class EmployeePermissionController extends GetxController {
           .then((id) {
             if (id != null) {
               newPermission.id = id;
-              _allPermissions.refresh();
               print("EmployeePermissionController: Optimistic ID Updated: $id");
             }
           })
@@ -327,7 +325,7 @@ class EmployeePermissionController extends GetxController {
           });
 
       SuccessDialog.show("Success", "Permintaan ijin berhasil dikirim", () {
-        Get.back(); // Tutup form
+        Get.back();
       });
     } catch (e) {
       debugPrint(

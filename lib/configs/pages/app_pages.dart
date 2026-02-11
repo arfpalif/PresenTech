@@ -203,7 +203,7 @@ class AppPages {
       binding: HrdTaskBinding(),
     ),
     GetPage(
-      name: Routes.HrdTaskToday,
+      name: Routes.hrdTaskToday,
       page: () => HrdTaskToday(),
       binding: HrdTaskBinding(),
     ),

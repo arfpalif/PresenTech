@@ -39,17 +39,17 @@ class LoginController extends GetxController {
       }
       final role = await loginRepo.getRole(user.id);
 
-      print("LoginController: Preparing to save auth locally...");
+      debugPrint("LoginController: Preparing to save auth locally...");
       final authRepo = AuthRepository();
       await authRepo.saveAuthData({
         'id': user.id,
         'email': user.email,
         'role': role,
       });
-      print(
+      debugPrint(
         "LoginController: Auth data saved locally successfully to ${ApiConstant.tableAuth}.",
       );
-      print("LoginController: Auth data saved locally successfully.");
+      debugPrint("LoginController: Auth data saved locally successfully.");
 
       if (role == 'hrd') {
         SuccessSnackbar.show("Login successful");

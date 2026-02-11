@@ -82,7 +82,7 @@ class HrdTaskController extends GetxController {
       isLoading.value = true;
       final response = await taskRepo.fetchTasks();
       tasks.value = response
-          .map<Tasks>((item) => Tasks.fromJson(item))
+          .map<Tasks>((item) => Tasks.fromJson(item.toJson()))
           .toList();
     } catch (e) {
       print("Error fetchTasks: $e");

@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/configs/routes/app_routes.dart';
-import 'package:presentech/features/hrd/profile/repositories/hrd_profile_repository.dart';
 import 'package:presentech/shared/controllers/auth_controller.dart';
+import 'package:presentech/shared/repositories/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HrdProfileController extends GetxController {
   //repository
-  final profileRepo = HrdProfileRepository();
+  final profileRepo = ProfileRepository();
 
   //variables
   final AuthController authC = Get.find<AuthController>();
   final supabase = Supabase.instance.client;
-  var profilePic = "".obs;
-  var name = "".obs;
-  var role = "".obs;
-  var isLoading = false.obs;
+  final profilePic = "".obs;
+  final profilePicLocal = "".obs;
+  final name = "".obs;
+  final role = "".obs;
+  final isLoading = false.obs;
 
   @override
   void onInit() {
@@ -31,9 +32,10 @@ class HrdProfileController extends GetxController {
         return;
       }
 
-      final response = await profileRepo.getUser(userId);
+      final response = await profileRepo.getUserProfile(userId);
 
       profilePic.value = response['profile_picture'] ?? '';
+      profilePicLocal.value = response['local_image_path'] ?? '';
       name.value = response['name'] ?? '';
       role.value = response['role'] ?? '';
     } catch (e) {

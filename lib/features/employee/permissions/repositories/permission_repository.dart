@@ -1,15 +1,17 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/constants/api_constant.dart';
 import 'package:presentech/shared/models/permission.dart';
+import 'package:presentech/utils/database/dao/permission_dao.dart';
+import 'package:presentech/utils/enum/permission_status.dart';
 import 'package:presentech/utils/services/connectivity_service.dart';
-import 'package:presentech/utils/services/database_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PermissionRepository {
   final SupabaseClient supabase = Supabase.instance.client;
   final ConnectivityService connectivityService =
       Get.find<ConnectivityService>();
-  final DatabaseService databaseService = Get.find<DatabaseService>();
+  final PermissionDao _permissionDao = Get.find<PermissionDao>();
 
   Future<List<Permission>> getPermissions(String userId) async {
     List<Permission> remotePermissions = [];
@@ -31,9 +33,8 @@ class PermissionRepository {
             .toList();
 
         if (remotePermissions.isNotEmpty) {
-          await databaseService.syncPermissionToLocal(
-            remotePermissions,
-            userId,
+          await _permissionDao.syncPermissionToLocal(
+            remotePermissions.map((e) => e.toDrift()).toList(),
           );
         }
       }
@@ -42,7 +43,8 @@ class PermissionRepository {
     }
 
     try {
-      return await databaseService.getPermissionsLocally(userId);
+      final localData = await _permissionDao.getPermissionsByUser(userId);
+      return localData.map((e) => Permission.fromDrift(e)).toList();
     } catch (e) {
       print("Gagal fetch local (Permissions): $e");
       return remotePermissions;
@@ -51,21 +53,24 @@ class PermissionRepository {
 
   Future<void> syncOfflinePermissions() async {
     try {
-      final unsyncedPermissions = await databaseService
-          .getUnsyncedPermissions();
+      final unsyncedData = await _permissionDao.getUnsyncedPermissions();
+      final unsyncedPermissions = unsyncedData
+          .map((e) => Permission.fromDrift(e))
+          .toList();
+
       if (unsyncedPermissions.isEmpty) return;
 
       for (var permission in unsyncedPermissions) {
         try {
-          if (permission.id != null)
+          if (permission.id != null) {
             if (permission.syncAction == 'insert') {
               await syncInsertToSupabase(permission.toJson());
-            } else if (permission.syncAction == 'update' &&
-                permission.id != null) {
+            } else if (permission.syncAction == 'update') {
               final data = permission.toJson();
               data.remove('id');
               await syncUpdateToSupabase(permission.id!, data);
             }
+          }
         } catch (e) {
           print("Gagal sync permission ${permission.id}: $e");
         }
@@ -76,10 +81,11 @@ class PermissionRepository {
   }
 
   Future<int?> insertPermission(Map<String, dynamic> data) async {
-    final localId = await databaseService.addPermissionToSyncQueue(
-      data,
-      'insert',
-    );
+    final permission = Permission.fromJson(data);
+    permission.isSynced = 0;
+    permission.syncAction = 'insert';
+
+    final localId = await _permissionDao.insertPermission(permission.toDrift());
     print("Permission disimpan di HP (Mode Instan). ID: $localId");
 
     if (connectivityService.isOnline.value) {
@@ -90,19 +96,36 @@ class PermissionRepository {
 
   Future<void> updatePermission(int id, Map<String, dynamic> data) async {
     try {
-      final db = await databaseService.database;
-      await db.update(
-        ApiConstant.tablePermissions,
-        {...data, 'is_synced': 0, 'sync_action': 'update'},
-        where: 'id = ?',
-        whereArgs: [id],
+      final local = await _permissionDao.getPermissionById(id);
+      if (local == null) return;
+
+      final updated = Permission.fromDrift(local);
+
+      if (data.containsKey('status')) {
+        final statusVal = data['status'];
+        updated.status = statusVal is PermissionStatus
+            ? statusVal
+            : PermissionStatusX.fromString(statusVal.toString());
+      }
+      if (data.containsKey('feedback')) {
+        updated.feedback = data['feedback'];
+      }
+
+      if (updated.syncAction != 'insert') {
+        updated.syncAction = 'update';
+      }
+      updated.isSynced = 0;
+
+      await _permissionDao.updatePermissionData(id, updated.toDrift());
+      debugPrint(
+        "Local Update Success (ID: $id, Action: ${updated.syncAction})",
       );
 
-      if (connectivityService.isOnline.value) {
-        syncUpdateToSupabase(id, data);
+      if (connectivityService.isOnline.value && local.isSynced == 1) {
+        await syncUpdateToSupabase(id, data);
       }
     } catch (e) {
-      print("Gagal update local (Permission): $e");
+      debugPrint("Update Error: $e");
     }
   }
 
@@ -115,8 +138,6 @@ class PermissionRepository {
       supabaseData.remove('is_synced');
       supabaseData.remove('sync_action');
 
-      final createdAt = data['created_at'];
-
       final response = await supabase
           .from(ApiConstant.tablePermissions)
           .insert(supabaseData)
@@ -124,54 +145,18 @@ class PermissionRepository {
           .single();
 
       final remoteId = response['id'];
-      print("Background Permission Sync: Success! Remote ID: $remoteId");
+      debugPrint("Background Permission Sync: Success! Remote ID: $remoteId");
 
-      final db = await databaseService.database;
+      await _permissionDao.deletePermissionLocally(localId);
+      final permission = Permission.fromJson(data);
+      permission.id = remoteId;
+      permission.isSynced = 1;
+      permission.syncAction = null;
+      await _permissionDao.insertPermission(permission.toDrift());
 
-      await db.transaction((txn) async {
-        final existing = await txn.query(
-          ApiConstant.tablePermissions,
-          where: 'id = ?',
-          whereArgs: [remoteId],
-        );
-
-        if (existing.isNotEmpty) {
-          if (localId != null) {
-            await txn.delete(
-              ApiConstant.tablePermissions,
-              where: 'id = ?',
-              whereArgs: [localId],
-            );
-            print(
-              "Background: Found duplicate remote ID $remoteId, removed local ID $localId",
-            );
-          } else {
-            await txn.delete(
-              ApiConstant.tablePermissions,
-              where: 'created_at = ? AND user_id = ?',
-              whereArgs: [createdAt, data['user_id']],
-            );
-          }
-        } else {
-          if (localId != null) {
-            await txn.update(
-              ApiConstant.tablePermissions,
-              {'id': remoteId, 'is_synced': 1, 'sync_action': null},
-              where: 'id = ?',
-              whereArgs: [localId],
-            );
-          } else {
-            await txn.update(
-              ApiConstant.tablePermissions,
-              {'id': remoteId, 'is_synced': 1, 'sync_action': null},
-              where: 'created_at = ? AND user_id = ?',
-              whereArgs: [createdAt, data['user_id']],
-            );
-          }
-        }
-      });
+      debugPrint("Background: Local ID $localId updated to $remoteId");
     } catch (e) {
-      print("Background Permission Sync Failed: $e");
+      debugPrint("Background Permission Sync Failed: $e");
     }
   }
 
@@ -187,24 +172,18 @@ class PermissionRepository {
           .update(supabaseData)
           .eq('id', id);
 
-      final db = await databaseService.database;
-      await db.update(
-        ApiConstant.tablePermissions,
-        {'is_synced': 1, 'sync_action': null},
-        where: 'id = ?',
-        whereArgs: [id],
-      );
+      await _permissionDao.updatePermissionSyncStatus(id, 1, null);
     } catch (e) {
-      print("Background Permission Update Failed: $e");
+      debugPrint("Background Permission Update Failed: $e");
     }
   }
 
   Future<void> syncDeleteToSupabase(int id) async {
     try {
       await supabase.from(ApiConstant.tablePermissions).delete().eq('id', id);
-      await databaseService.deletePermissionLocally(id);
+      await _permissionDao.deletePermissionLocally(id);
     } catch (e) {
-      print("Background Permission Delete Failed: $e");
+      debugPrint("Background Permission Delete Failed: $e");
     }
   }
 }

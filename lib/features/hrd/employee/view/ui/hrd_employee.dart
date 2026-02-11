@@ -138,11 +138,37 @@ class HrdEmployee extends GetView<HrdEmployeeController> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        subtitle: Text(
-                          t.role,
-                          style: AppTextStyle.normal.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              t.role,
+                              style: AppTextStyle.normal.copyWith(
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            if (t.officeName != null) ...[
+                              SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.business_rounded,
+                                    size: 14,
+                                    color: ColorStyle.colorPrimary,
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    t.officeName!,
+                                    style: AppTextStyle.normal.copyWith(
+                                      color: ColorStyle.colorPrimary,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
                         ),
                         trailing: Container(
                           padding: EdgeInsets.all(8),

@@ -7,7 +7,6 @@ Future<void> main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // Load .env
     await dotenv.load(fileName: ".env");
 
     final url = dotenv.env['SUPABASE_URL'];

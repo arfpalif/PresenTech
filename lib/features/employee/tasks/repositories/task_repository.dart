@@ -1,15 +1,16 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presentech/constants/api_constant.dart';
 import 'package:presentech/shared/models/tasks.dart';
 import 'package:presentech/utils/services/connectivity_service.dart';
-import 'package:presentech/utils/services/database_service.dart';
+import 'package:presentech/utils/database/dao/task_dao.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TaskRepository {
   final SupabaseClient supabase = Supabase.instance.client;
   final ConnectivityService connectivityService =
       Get.find<ConnectivityService>();
-  final DatabaseService databaseService = Get.find<DatabaseService>();
+  final TaskDao _taskDao = Get.find<TaskDao>();
 
   static final Set<int> _syncingIds = {};
   static bool _isSyncingQueue = false;
@@ -17,9 +18,6 @@ class TaskRepository {
   Future<List<Tasks>> fetchTasks(String userId) async {
     List<Tasks> remoteTasks = [];
 
-    if (connectivityService.isOnline.value) {
-      await syncOfflineTasks();
-    }
     try {
       if (connectivityService.isOnline.value) {
         final response = await supabase
@@ -30,17 +28,20 @@ class TaskRepository {
         remoteTasks = (response as List).map((e) => Tasks.fromJson(e)).toList();
 
         if (remoteTasks.isNotEmpty) {
-          await databaseService.syncTasksToLocal(remoteTasks, userId);
+          await _taskDao.syncTasksToLocal(
+            remoteTasks.map((t) => t.toDrift()).toList(),
+          );
         }
       }
     } catch (e) {
-      print("Gagal fetch Supabase: $e");
+      debugPrint("Gagal fetch Supabase: $e");
     }
 
     try {
-      return await databaseService.getTasksLocally(userId);
+      final localData = await _taskDao.getTasksByUser(userId);
+      return localData.map((e) => Tasks.fromDrift(e)).toList();
     } catch (e) {
-      print("Gagal fetch local: $e");
+      debugPrint("Gagal fetch local: $e");
       return remoteTasks;
     }
   }
@@ -50,7 +51,11 @@ class TaskRepository {
     _isSyncingQueue = true;
 
     try {
-      final unsyncedTasks = await databaseService.getUnsyncedTasks();
+      final unsyncedData = await _taskDao.getUnsyncedTasks();
+      final unsyncedTasks = unsyncedData
+          .map((e) => Tasks.fromDrift(e))
+          .toList();
+
       if (unsyncedTasks.isEmpty) return;
 
       for (var task in unsyncedTasks) {
@@ -67,11 +72,11 @@ class TaskRepository {
             await _syncDeleteToSupabase(task.id!);
           }
         } catch (e) {
-          print("Gagal sync task ${task.id}: $e");
+          debugPrint("Gagal sync task ${task.id}: $e");
         }
       }
     } catch (e) {
-      print("Error Sync: $e");
+      debugPrint("Error Sync: $e");
       throw Exception("Gagal Bulk Sync Tasks: $e");
     } finally {
       _isSyncingQueue = false;
@@ -79,8 +84,12 @@ class TaskRepository {
   }
 
   Future<int?> insertTask(Map<String, dynamic> data) async {
-    final localId = await databaseService.addTaskToSyncQueue(data, 'insert');
-    print("Task disimpan di HP dulu (insert - Mode Instan). ID: $localId");
+    final task = Tasks.fromJson(data);
+    task.isSynced = 0;
+    task.syncAction = 'insert';
+
+    final localId = await _taskDao.insertTask(task.toDrift());
+    debugPrint("Task disimpan di HP dulu (insert - Mode Instan). ID: $localId");
 
     if (connectivityService.isOnline.value) {
       _syncInsertToSupabase({...data, 'id': localId});
@@ -106,28 +115,21 @@ class TaskRepository {
           .single();
 
       final remoteId = response['id'];
-      print("Background: Berhasil kirim ke Supabase! Remote ID: $remoteId");
-
-      final db = await databaseService.database;
+      debugPrint(
+        "Background: Berhasil kirim ke Supabase! Remote ID: $remoteId",
+      );
 
       if (localId != null) {
-        await db.update(
-          ApiConstant.tableTasks,
-          {'id': remoteId, 'is_synced': 1, 'sync_action': null},
-          where: 'id = ?',
-          whereArgs: [localId],
-        );
-      } else {
-        await db.update(
-          ApiConstant.tableTasks,
-          {'id': remoteId, 'is_synced': 1, 'sync_action': null},
-          where: 'created_at = ? AND user_id = ? AND title = ?',
-          whereArgs: [data['created_at'], data['user_id'], data['title']],
-        );
+        await _taskDao.deleteTaskLocally(localId);
+        final task = Tasks.fromJson(data);
+        task.id = remoteId;
+        task.isSynced = 1;
+        task.syncAction = null;
+        await _taskDao.insertTask(task.toDrift());
       }
-      print("Background: Local ID updated to $remoteId");
+      debugPrint("Background: Local ID updated to $remoteId");
     } catch (e) {
-      print("Background: Gagal ke Supabase (akan disync nanti): $e");
+      debugPrint("Background: Gagal ke Supabase (akan disync nanti): $e");
     } finally {
       if (localId != null) _syncingIds.remove(localId);
     }
@@ -135,19 +137,18 @@ class TaskRepository {
 
   Future<void> updateTask(int id, Map<String, dynamic> data) async {
     try {
-      final db = await databaseService.database;
-      await db.update(
-        ApiConstant.tableTasks,
-        {...data, 'is_synced': 0, 'sync_action': 'update'},
-        where: 'id = ?',
-        whereArgs: [id],
-      );
+      final task = Tasks.fromJson(data);
+      task.id = id;
+      task.isSynced = 0;
+      task.syncAction = 'update';
+
+      await _taskDao.updateTaskData(id, task.toDrift());
 
       if (connectivityService.isOnline.value) {
         _syncUpdateToSupabase(id, data);
       }
     } catch (e) {
-      print("Gagal update local: $e");
+      debugPrint("Gagal update local: $e");
     }
   }
 
@@ -165,15 +166,10 @@ class TaskRepository {
           .from(ApiConstant.tableTasks)
           .update(supabaseData)
           .eq('id', id);
-      final db = await databaseService.database;
-      await db.update(
-        ApiConstant.tableTasks,
-        {'is_synced': 1, 'sync_action': null},
-        where: 'id = ?',
-        whereArgs: [id],
-      );
+
+      await _taskDao.updateTaskSyncStatus(id, 1, null);
     } catch (e) {
-      print("Background Update Gagal: $e");
+      debugPrint("Background Update Gagal: $e");
     } finally {
       _syncingIds.remove(id);
     }
@@ -181,27 +177,22 @@ class TaskRepository {
 
   Future<void> deleteTask(int id) async {
     try {
-      final db = await databaseService.database;
-      final taskData = await db.query(
-        ApiConstant.tableTasks,
-        where: 'id = ?',
-        whereArgs: [id],
-      );
+      final taskData = await _taskDao.getTaskById(id);
 
-      if (taskData.isEmpty) return;
-      final bool isSynced = taskData.first['is_synced'] == 1;
+      if (taskData == null) return;
+      final bool isSynced = taskData.isSynced == 1;
 
       if (!isSynced) {
-        await databaseService.deleteTaskLocally(id);
+        await _taskDao.deleteTaskLocally(id);
       } else {
-        await databaseService.markTaskAsDeleted(id);
+        await _taskDao.updateTaskSyncStatus(id, 0, 'delete');
 
         if (connectivityService.isOnline.value) {
           _syncDeleteToSupabase(id);
         }
       }
     } catch (e) {
-      print("Gagal delete (Local): $e");
+      debugPrint("Gagal delete (Local): $e");
     }
   }
 
@@ -211,10 +202,12 @@ class TaskRepository {
 
     try {
       await supabase.from(ApiConstant.tableTasks).delete().eq('id', id);
-      await databaseService.deleteTaskLocally(id);
-      print("Background: Task $id terhapus permanen dari Supabase & Local.");
+      await _taskDao.deleteTaskLocally(id);
+      debugPrint(
+        "Background: Task $id terhapus permanen dari Supabase & Local.",
+      );
     } catch (e) {
-      print("Background Delete Gagal (akan dicoba lagi nanti): $e");
+      debugPrint("Background Delete Gagal (akan dicoba lagi nanti): $e");
     } finally {
       _syncingIds.remove(id);
     }

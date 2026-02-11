@@ -42,10 +42,13 @@ class HrdPermissionDetailController extends GetxController {
     }
   }
 
-  Future<void> approvePermission(int i) async {
+  Future<void> approvePermission() async {
     try {
       isLoading.value = true;
-      await permissionRepo.approvePermission(permission.id!);
+      await permissionRepo.approvePermission(
+        permission.id!,
+        permission.feedback,
+      );
 
       if (permission.type == PermissionType.absence_error) {
         await absenceRepo.updateAbsenceStatus(
@@ -73,7 +76,8 @@ class HrdPermissionDetailController extends GetxController {
       SuccessSnackbar.show('Permission approved successfully');
       Get.back(result: true);
     } catch (e) {
-      FailedSnackbar.show('Failed to approve permission');
+      debugPrint('Error approving permission: $e');
+      FailedSnackbar.show('Failed to approve permission $e');
     } finally {
       isLoading.value = false;
     }

@@ -5,15 +5,15 @@ import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/features/employee/tasks/view/components/task_summary_card.dart';
 import 'package:presentech/features/hrd/tasks/controller/hrd_task_controller.dart';
 import 'package:presentech/features/hrd/attendance/controller/hrd_attendance_controller.dart';
-import 'package:presentech/features/hrd/homepage/controller/hrd_homepage_controller.dart';
 import 'package:presentech/features/hrd/homepage/view/components/absence_list.dart';
 import 'package:presentech/features/hrd/homepage/view/components/menu.dart';
 import 'package:presentech/features/hrd/homepage/view/components/summary_card.dart';
 import 'package:presentech/configs/themes/themes.dart';
+import 'package:presentech/shared/controllers/profile_controller.dart';
 import 'package:presentech/shared/view/ui/coming_soon.dart';
 import 'package:presentech/shared/view/widgets/header.dart';
 
-class HrdHomepage extends GetView<HrdHomepageController> {
+class HrdHomepage extends GetView<ProfileController> {
   const HrdHomepage({super.key});
 
   @override
@@ -37,7 +37,8 @@ class HrdHomepage extends GetView<HrdHomepageController> {
                 onComingSoonTap: () {
                   Get.to(ComingSoon());
                 },
-                imageUrl: controller.profilePic.value,
+                imageUrl: controller.profilePictureUrl.value,
+                localImagePath: controller.localImagePath.value,
                 name: controller.name.value,
                 role: controller.role.value,
               ),
@@ -72,7 +73,7 @@ class HrdHomepage extends GetView<HrdHomepageController> {
                     SizedBox(height: 16),
                     GestureDetector(
                       onTap: () {
-                        Get.toNamed(Routes.HrdTaskToday);
+                        Get.toNamed(Routes.hrdTask);
                       },
                       child: Obx(
                         () => TaskSummaryCard(

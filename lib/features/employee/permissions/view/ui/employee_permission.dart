@@ -59,41 +59,44 @@ class EmployeePermission extends GetView<EmployeePermissionController> {
         ),
         openBuilder: (context, closeContainer) => const EmployeeAddPermission(),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              child: const PermissionFilterBtn(),
-            ),
-            SizedBox(height: 20),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: const PermissionFilterBtn(),
+              ),
+              const SizedBox(height: 20),
               Obx(() {
+                if (controller.isLoading.value &&
+                    controller.permissions.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
                 if (controller.permissions.isEmpty) {
                   return Center(
                     child: Column(
                       children: [
-                        SizedBox(height: 50),
+                        const SizedBox(height: 50),
                         Icon(
                           Icons.assignment_outlined,
                           size: 60,
                           color: Colors.grey[300],
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         const Text("No permissions found"),
                       ],
                     ),
                   );
                 }
-                return PermissionList();
+                return const PermissionList();
               }),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
     );
   }

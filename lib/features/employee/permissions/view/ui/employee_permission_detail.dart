@@ -9,6 +9,7 @@ import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
 import 'package:presentech/shared/view/components/textFields/text_field_normal.dart';
 import 'package:presentech/shared/styles/input_style.dart';
 import 'package:presentech/shared/view/components/component_badgets.dart';
+import 'package:presentech/utils/enum/permission_status.dart';
 import 'package:presentech/utils/enum/permission_type.dart';
 
 class EmployeePermissionDetail extends StatelessWidget {
@@ -189,16 +190,20 @@ class EmployeePermissionDetail extends StatelessWidget {
                     readOnly: true,
                     decoration: AppInputStyle.decoration(icon: Icons.feedback),
                   ),
-                  const SizedBox(height: 24),
-                  AppGradientButton(
-                    text: "Cancel request",
-                    onPressed: () {
-                      controller.cancelPermission(
-                        permission.id.toString(),
-                        permission.status,
-                      );
-                    },
-                  ),
+                  if (permission.status == PermissionStatus.pending) ...[
+                    const SizedBox(height: 24),
+                    AppGradientButton(
+                      text: "Cancel permission",
+                      onPressed: () {
+                        if (permission.id != null) {
+                          controller.cancelPermission(
+                            permission.id!,
+                            permission.status,
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ],
               ),
             ),

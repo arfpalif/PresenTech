@@ -3,6 +3,8 @@
 //     final users = usersFromJson(jsonString);
 
 import 'dart:convert';
+import 'package:drift/drift.dart' hide Column;
+import 'package:presentech/utils/database/database.dart';
 
 List<Users> usersFromJson(String str) =>
     List<Users>.from(json.decode(str).map((x) => Users.fromJson(x)));
@@ -60,4 +62,54 @@ class Users {
     "sync_action": syncAction,
     "local_image_path": localImagePath,
   };
+
+  factory Users.fromDrift(UsersTableData data) => Users(
+    id: data.id,
+    createdAt: data.createdAt?.toIso8601String() ?? "",
+    email: data.email ?? "",
+    role: data.role ?? "",
+    officeId: data.officeId ?? 0,
+    name: data.name ?? "",
+    profilePicture: data.profilePicture,
+    isSynced: data.isSynced,
+    syncAction: data.syncAction,
+    localImagePath: data.localImagePath,
+  );
+
+  factory Users.fromEmployeesDrift(EmployeesTableData data) => Users(
+    id: data.userId,
+    createdAt: data.createdAt?.toIso8601String() ?? "",
+    email: data.email,
+    role: data.roles,
+    officeId: data.officeId ?? 0,
+    name: data.name ?? "",
+    profilePicture: data.profilePicture,
+    isSynced: data.isSynced,
+    syncAction: data.syncAction,
+  );
+
+  UsersTableCompanion toDrift() => UsersTableCompanion(
+    id: Value(id),
+    name: Value(name),
+    email: Value(email),
+    role: Value(role),
+    profilePicture: Value(profilePicture?.toString()),
+    officeId: Value(officeId),
+    createdAt: Value(DateTime.tryParse(createdAt)),
+    isSynced: Value(isSynced ?? 1),
+    syncAction: Value(syncAction),
+    localImagePath: Value(localImagePath),
+  );
+
+  EmployeesTableCompanion toEmployeesDrift() => EmployeesTableCompanion(
+    userId: Value(id),
+    name: Value(name),
+    email: Value(email),
+    roles: Value(role),
+    profilePicture: Value(profilePicture?.toString()),
+    officeId: Value(officeId),
+    createdAt: Value(DateTime.tryParse(createdAt)),
+    isSynced: Value(isSynced ?? 1),
+    syncAction: Value(syncAction),
+  );
 }

@@ -7,6 +7,7 @@ import 'package:presentech/features/hrd/permission/controller/hrd_permission_con
 import 'package:presentech/features/hrd/profile/controllers/hrd_profile_controller.dart';
 import 'package:presentech/features/hrd/tasks/controller/hrd_task_controller.dart';
 import 'package:presentech/shared/controllers/navigation_controller.dart';
+import 'package:presentech/shared/controllers/profile_controller.dart';
 
 class HrdNavBinding extends Bindings {
   @override
@@ -19,5 +20,6 @@ class HrdNavBinding extends Bindings {
     Get.lazyPut(() => LocationController(), fenix: true);
     Get.lazyPut(() => NavigationController(), fenix: true);
     Get.lazyPut(() => HrdTaskController(), fenix: true);
+    Get.lazyPut(() => ProfileController(), fenix: true);
   }
 }

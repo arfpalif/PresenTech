@@ -2,7 +2,6 @@ import 'package:path/path.dart';
 import 'package:presentech/constants/api_constant.dart';
 import 'package:presentech/shared/models/absence.dart';
 import 'package:presentech/shared/models/permission.dart';
-import 'package:presentech/shared/models/tasks.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseService {
@@ -455,99 +454,7 @@ class DatabaseService {
   //   );
   // }
 
-  //Task Sync Queue
-  Future<int> addTaskToSyncQueue(
-    Map<String, dynamic> taskData,
-    String action,
-  ) async {
-    final db = await database;
-
-    taskData['is_synced'] = 0;
-    taskData['sync_action'] = action;
-
-    return await db.insert(
-      ApiConstant.tableTasks,
-      taskData,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  Future<List<Tasks>> getTasksLocally(String userId) async {
-    final db = await database;
-    final results = await db.query(
-      ApiConstant.tableTasks,
-      where: 'user_id = ? AND (sync_action IS NULL OR sync_action != ?)',
-      whereArgs: [userId, 'delete'],
-      orderBy: 'created_at DESC',
-    );
-    return results.map((e) => Tasks.fromJson(e)).toList();
-  }
-
-  Future<void> syncTasksToLocal(List<Tasks> tasks, String userId) async {
-    final db = await database;
-    final batch = db.batch();
-
-    for (var task in tasks) {
-      final taskData = task.toJson();
-      taskData['user_id'] = userId;
-      taskData['is_synced'] = 1;
-      taskData['sync_action'] = null;
-
-      if (task.id != null) {
-        taskData['id'] = task.id;
-      }
-
-      batch.insert(
-        ApiConstant.tableTasks,
-        taskData,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
-
-    await batch.commit(noResult: true);
-    print("Berhasil sinkronisasi ${tasks.length} task ke local.");
-  }
-
-  Future<void> deleteTaskLocally(int id) async {
-    final db = await database;
-    await db.delete(ApiConstant.tableTasks, where: 'id = ?', whereArgs: [id]);
-  }
-
-  Future<void> markTaskAsDeleted(int id) async {
-    final db = await database;
-    await db.update(
-      ApiConstant.tableTasks,
-      {'is_synced': 0, 'sync_action': 'delete'},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
-  Future<List<Tasks>> getUnsyncedTasks() async {
-    final db = await database;
-    final results = await db.query(
-      ApiConstant.tableTasks,
-      where: 'is_synced = ?',
-      whereArgs: [0],
-    );
-    print(results);
-
-    return results.map((e) => Tasks.fromJson(e)).toList();
-  }
-
-  Future<void> debugPrintTasks() async {
-    final db = await database;
-    final results = await db.query(ApiConstant.tableTasks);
-
-    print("--- ISI BUKU CATATAN (SQLITE) ---");
-    if (results.isEmpty) {
-      print("Kosong Melompong!");
-    } else {
-      for (var row in results) {
-        print(row);
-      }
-    }
-  }
+  //Profile Sync Queue
 
   Future<Map<String, dynamic>?> getProfileLocally(String userId) async {
     final db = await database;
@@ -612,6 +519,8 @@ class DatabaseService {
       whereArgs: [userId],
     );
   }
+
+  // Office Sync Queue
 
   Future<Map<String, dynamic>?> getOfficeLocallyById(int officeId) async {
     final db = await database;

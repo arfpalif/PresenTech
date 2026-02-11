@@ -102,13 +102,7 @@ class DetailLocationController extends GetxController {
   Future<void> fetchOffices() async {
     try {
       isLoading.value = true;
-
-      final response = await hrdLocationRepo.fetchOffices();
-
-      final data = (response as List).map((e) {
-        return Office.fromJson(e);
-      }).toList();
-
+      final data = await hrdLocationRepo.fetchOffices();
       offices.assignAll(data);
     } catch (e) {
       print("Error: $e");
@@ -144,22 +138,6 @@ class DetailLocationController extends GetxController {
       SuccessSnackbar.show('Lokasi kantor berhasil diperbarui');
     } catch (e) {
       FailedSnackbar.show('Gagal memperbarui lokasi: ${e.toString()}');
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> deleteOfficeLocation(String officeId) async {
-    try {
-      isLoading.value = true;
-
-      await hrdLocationRepo.deleteOfficeLocation(officeId);
-      await fetchOffices();
-
-      Get.back();
-      SuccessSnackbar.show('Lokasi kantor berhasil dihapus');
-    } catch (e) {
-      FailedSnackbar.show('Gagal menghapus lokasi: ${e.toString()}');
     } finally {
       isLoading.value = false;
     }

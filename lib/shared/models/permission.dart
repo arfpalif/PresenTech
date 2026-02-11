@@ -3,6 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:presentech/utils/enum/permission_status.dart';
 import 'package:presentech/utils/enum/permission_type.dart';
 
+import 'package:drift/drift.dart' hide Column;
+import 'package:presentech/utils/database/database.dart';
+
 extension PermissionTypeX on PermissionType {
   String get value => switch (this) {
     PermissionType.permission => 'permission',
@@ -26,6 +29,15 @@ extension PermissionTypeX on PermissionType {
   }
 }
 
+extension PermissionStatusX on PermissionStatus {
+  static PermissionStatus fromString(String? s) {
+    return PermissionStatus.values.firstWhere(
+      (e) => e.name == s,
+      orElse: () => PermissionStatus.pending,
+    );
+  }
+}
+
 List<Permission> permissionFromJson(String str) =>
     List<Permission>.from(json.decode(str).map((x) => Permission.fromJson(x)));
 
@@ -37,7 +49,7 @@ class Permission {
   DateTime createdAt;
   PermissionType type;
   String reason;
-  dynamic status;
+  PermissionStatus status;
   DateTime startDate;
   DateTime endDate;
   String? userId;
@@ -78,15 +90,12 @@ class Permission {
       createdAt: created,
       type: PermissionTypeX.fromString(json["type"]),
       reason: json["reason"],
-      status: PermissionStatus.values.firstWhere(
-        (e) => e.toString() == 'PermissionStatus.${json["status"]}',
-        orElse: () => PermissionStatus.pending,
-      ),
+      status: PermissionStatusX.fromString(json["status"]),
       startDate: toYmd(start),
       endDate: toYmd(end),
       userId: json["user_id"],
       feedback: json["feedback"],
-      isSynced: json["is_synced"],
+      isSynced: json["is_synced"] ?? 1,
       syncAction: json["sync_action"],
     );
   }
@@ -96,9 +105,7 @@ class Permission {
     "created_at": createdAt.toIso8601String(),
     "type": type.value,
     "reason": reason,
-    "status": status is PermissionStatus
-        ? (status as PermissionStatus).name
-        : status.toString(),
+    "status": (status).name,
     "start_date": DateFormat('yyyy-MM-dd').format(startDate),
     "end_date": DateFormat('yyyy-MM-dd').format(endDate),
     "user_id": userId,
@@ -106,6 +113,34 @@ class Permission {
     "is_synced": isSynced,
     "sync_action": syncAction,
   };
+
+  factory Permission.fromDrift(PermissionsTableData data) => Permission(
+    id: data.id,
+    createdAt: data.createdAt,
+    type: PermissionTypeX.fromString(data.type),
+    reason: data.reason,
+    status: PermissionStatusX.fromString(data.status),
+    startDate: data.startDate,
+    endDate: data.endDate,
+    userId: data.userId,
+    feedback: data.feedback,
+    isSynced: data.isSynced,
+    syncAction: data.syncAction,
+  );
+
+  PermissionsTableCompanion toDrift() => PermissionsTableCompanion(
+    id: id != null ? Value(id!) : const Value.absent(),
+    userId: Value(userId ?? ""),
+    type: Value(type.value),
+    reason: Value(reason),
+    status: Value((status).name),
+    startDate: Value(startDate),
+    endDate: Value(endDate),
+    feedback: Value(feedback),
+    createdAt: Value(createdAt),
+    isSynced: Value(isSynced ?? 0),
+    syncAction: Value(syncAction),
+  );
 
   String get createdAtYmd => DateFormat('dd-MMM-yyyy').format(createdAt);
   String get startDateYmd => DateFormat('yyyy-MM-dd').format(startDate);

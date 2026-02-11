@@ -1,16 +1,18 @@
 import 'package:get/get.dart';
 import 'package:presentech/constants/api_constant.dart';
 import 'package:presentech/shared/models/absence.dart';
+import 'package:presentech/utils/database/dao/absence_dao.dart';
 import 'package:presentech/utils/enum/absence_status.dart';
 import 'package:presentech/utils/services/connectivity_service.dart';
-import 'package:presentech/utils/services/database_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:presentech/utils/services/database_service.dart';
 
 class AbsenceRepository {
   final SupabaseClient supabase = Supabase.instance.client;
   final ConnectivityService connectivityService =
       Get.find<ConnectivityService>();
   final DatabaseService databaseService = Get.find<DatabaseService>();
+  final AbsenceDao _absenceDao = Get.find<AbsenceDao>();
 
   Future<List<Map<String, dynamic>>> getAbsencesByFilter({
     required String userId,
@@ -24,24 +26,30 @@ class AbsenceRepository {
           .eq('user_id', userId);
 
       if (startDate != null) {
-        query = query.gte('created_at', startDate.toIso8601String());
+        query = query.gte('date', startDate.toIso8601String().split('T')[0]);
       }
       if (endDate != null) {
-        query = query.lte('created_at', endDate.toIso8601String());
+        query = query.lte('date', endDate.toIso8601String().split('T')[0]);
       }
 
       final response = await query.order('created_at', ascending: false);
       final data = List<Map<String, dynamic>>.from(response);
 
-      await databaseService.syncAbsenceToLocal(
-        data.map((e) => Absence.fromJson(e)).toList(),
-        userId,
+      await _absenceDao.syncAbsenceToLocal(
+        data.map((e) => Absence.fromJson(e).toDrift()).toList(),
       );
 
       return data;
     } else {
-      final absences = await databaseService.getAbsencesLocally(userId);
-      return absences.map((e) => e.toJson()).toList();
+      print(
+        "AbsenceRepository: Fetching absences offline for $userId within range",
+      );
+      final localData = (startDate != null && endDate != null)
+          ? await _absenceDao.getAbsencesByRange(userId, startDate, endDate)
+          : await _absenceDao.getAbsencesByUser(userId);
+
+      print("AbsenceRepository: Found ${localData.length} records locally");
+      return localData.map((e) => Absence.fromDrift(e).toJson()).toList();
     }
   }
 
@@ -58,13 +66,21 @@ class AbsenceRepository {
           .maybeSingle();
 
       if (response != null) {
-        await databaseService.syncAbsenceToLocal([
-          Absence.fromJson(response),
-        ], userId);
+        await _absenceDao.syncAbsenceToLocal([
+          Absence.fromJson(response).toDrift(),
+        ]);
       }
       return response;
     } else {
-      return await databaseService.getAbsenceByDateLocally(userId, today);
+      final dateOnly = today.split(' ')[0]; // Ensure only date part
+      print(
+        "AbsenceRepository: Getting today's absence offline for $userId on $dateOnly",
+      );
+      final local = await _absenceDao.getAbsenceByDate(userId, dateOnly);
+      if (local == null) {
+        print("AbsenceRepository: No local absence found for $dateOnly");
+      }
+      return local != null ? Absence.fromDrift(local).toJson() : null;
     }
   }
 
@@ -162,7 +178,7 @@ class AbsenceRepository {
   }
 
   Future<Map<String, dynamic>?> getOfficeHours({required int officeId}) async {
-     if (connectivityService.isOnline.value) {
+    if (connectivityService.isOnline.value) {
       try {
         final response = await supabase
             .from('work_schedules')
@@ -245,7 +261,7 @@ class AbsenceRepository {
         });
 
         // Save to local as synced
-        await databaseService.syncAbsenceToLocal([
+        await _absenceDao.syncAbsenceToLocal([
           Absence(
             id: 0,
             createdAt: data['created_at'] as String,
@@ -253,14 +269,24 @@ class AbsenceRepository {
             status: AbsenceStatus.values.firstWhere((e) => e.name == status),
             userId: userId,
             clockIn: clockIn,
-          ),
-        ], userId);
+            isSynced: 1,
+            syncAction: null,
+          ).toDrift(),
+        ]);
       } catch (e) {
         print("Online clockIn failed, saving to local queue: $e");
-        await databaseService.addAbsenceToSyncQueue(data, 'insert');
+        await _absenceDao.insertAbsence(
+          Absence.fromJson(data)
+            ..isSynced = 0
+            ..syncAction = 'insert',
+        );
       }
     } else {
-      await databaseService.addAbsenceToSyncQueue(data, 'insert');
+      await _absenceDao.insertAbsence(
+        Absence.fromJson(data)
+          ..isSynced = 0
+          ..syncAction = 'insert',
+      );
       print("Internet Mati! Absen disimpan di HP dulu.");
     }
   }
@@ -270,13 +296,6 @@ class AbsenceRepository {
     required String date,
     required String clockOut,
   }) async {
-    final Map<String, dynamic> data = {
-      'user_id': userId,
-      'date': date,
-      'clock_out': clockOut,
-      'created_at': DateTime.now().toIso8601String(),
-    };
-
     if (connectivityService.isOnline.value == true) {
       try {
         await supabase
@@ -285,64 +304,59 @@ class AbsenceRepository {
             .eq('user_id', userId)
             .eq('date', date);
 
-        final local = await databaseService.getAbsenceByDateLocally(
-          userId,
-          date,
-        );
+        final local = await _absenceDao.getAbsenceByDate(userId, date);
         if (local != null) {
-          final updated = Map<String, dynamic>.from(local);
-          updated['clock_out'] = clockOut;
-          updated['is_synced'] = 1;
-          updated['sync_action'] = null;
-          await databaseService.syncAbsenceToLocal([
-            Absence.fromJson(updated),
-          ], userId);
+          final updated = Absence.fromDrift(local);
+          updated.clockOut = clockOut;
+          updated.isSynced = 1;
+          updated.syncAction = null;
+          await _absenceDao.syncAbsenceToLocal([updated.toDrift()]);
         }
       } catch (e) {
         print("Online clockOut failed, saving to local queue: $e");
-        final local = await databaseService.getAbsenceByDateLocally(
-          userId,
-          date,
-        );
+        final local = await _absenceDao.getAbsenceByDate(userId, date);
         if (local != null) {
-          final Map<String, dynamic> updated = Map<String, dynamic>.from(local);
-          updated['clock_out'] = clockOut;
-          await databaseService.addAbsenceToSyncQueue(updated, 'update');
+          final updated = Absence.fromDrift(local);
+          updated.clockOut = clockOut;
+          updated.isSynced = 0;
+          updated.syncAction = 'update';
+          await _absenceDao.updateAbsence(updated.toDrift());
         }
       }
     } else {
-      final local = await databaseService.getAbsenceByDateLocally(userId, date);
+      final local = await _absenceDao.getAbsenceByDate(userId, date);
       if (local != null) {
-        final Map<String, dynamic> updated = Map<String, dynamic>.from(local);
-        updated['clock_out'] = clockOut;
-        await databaseService.addAbsenceToSyncQueue(updated, 'update');
+        final updated = Absence.fromDrift(local);
+        updated.clockOut = clockOut;
+        updated.isSynced = 0;
+        updated.syncAction = 'update';
+        await _absenceDao.updateAbsence(updated.toDrift());
         print("Internet Mati! Clock out disimpan di HP dulu.");
-      } else {
-        print("Error: Record absensi hari ini tidak ditemukan di local.");
-        await databaseService.addAbsenceToSyncQueue(data, 'update');
       }
     }
   }
 
   Future<void> syncUnsyncedAbsences() async {
-    final unsynced = await databaseService.getUnsyncedAbsences();
+    final unsyncedData = await _absenceDao.getUnsyncedAbsences();
+    final unsynced = unsyncedData.map((e) => Absence.fromDrift(e)).toList();
+
     if (unsynced.isEmpty) return;
 
     for (var absence in unsynced) {
       try {
         final userId = absence.userId;
-        final date = absence.date.toIso8601String().split('T').first;
+        final dateStr = absence.date.toIso8601String().split('T').first;
 
         await supabase.from(ApiConstant.tableAbsences).upsert({
           'user_id': userId,
-          'date': date,
+          'date': dateStr,
           'status': absence.status?.name ?? 'hadir',
           'clock_in': absence.clockIn,
           'clock_out': absence.clockOut,
         }, onConflict: 'user_id,date');
 
-        await databaseService.markAbsenceAsSynced(userId, date);
-        print("Synced absence for $date");
+        await _absenceDao.markAbsenceAsSynced(userId, dateStr);
+        print("Synced absence for $dateStr");
       } catch (e) {
         print("Failed to sync absence for ${absence.date}: $e");
       }
@@ -356,12 +370,61 @@ class AbsenceRepository {
     String? clockIn,
     String? clockOut,
   }) async {
-    await supabase.from(ApiConstant.tableAbsences).upsert({
-      'user_id': userId,
-      'date': date,
-      'status': status,
-      'clock_in': clockIn,
-      'clock_out': clockOut,
-    }, onConflict: 'user_id,date');
+    if (connectivityService.isOnline.value) {
+      try {
+        await supabase
+            .from(ApiConstant.tableAbsences)
+            .update({
+              'status': status,
+              if (clockIn != null) 'clock_in': clockIn,
+              if (clockOut != null) 'clock_out': clockOut,
+            })
+            .eq('user_id', userId)
+            .eq('date', date);
+
+        final local = await _absenceDao.getAbsenceByDate(userId, date);
+        if (local != null) {
+          final updated = Absence.fromDrift(local);
+          updated.status = AbsenceStatus.values.firstWhere(
+            (e) => e.name == status,
+          );
+          if (clockIn != null) updated.clockIn = clockIn;
+          if (clockOut != null) updated.clockOut = clockOut;
+          updated.isSynced = 1;
+          updated.syncAction = null;
+          await _absenceDao.syncAbsenceToLocal([updated.toDrift()]);
+        }
+      } catch (e) {
+        print(
+          "Failed to update absence status online, saving to local queue: $e",
+        );
+        final local = await _absenceDao.getAbsenceByDate(userId, date);
+        if (local != null) {
+          final updated = Absence.fromDrift(local);
+          updated.status = AbsenceStatus.values.firstWhere(
+            (e) => e.name == status,
+          );
+          if (clockIn != null) updated.clockIn = clockIn;
+          if (clockOut != null) updated.clockOut = clockOut;
+          updated.isSynced = 0;
+          updated.syncAction = 'update';
+          await _absenceDao.updateAbsence(updated.toDrift());
+        }
+      }
+    } else {
+      final local = await _absenceDao.getAbsenceByDate(userId, date);
+      if (local != null) {
+        final updated = Absence.fromDrift(local);
+        updated.status = AbsenceStatus.values.firstWhere(
+          (e) => e.name == status,
+        );
+        if (clockIn != null) updated.clockIn = clockIn;
+        if (clockOut != null) updated.clockOut = clockOut;
+        updated.isSynced = 0;
+        updated.syncAction = 'update';
+        await _absenceDao.updateAbsence(updated.toDrift());
+        print("Internet Mati! Update absence status disimpan di HP dulu.");
+      }
+    }
   }
 }

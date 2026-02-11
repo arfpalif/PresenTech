@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:presentech/features/hrd/employee/controller/hrd_employee_controller.dart';
 import 'package:presentech/features/hrd/employee/controller/hrd_employee_detail_controller.dart';
+import 'package:presentech/features/hrd/employee/models/employee.dart';
 import 'package:presentech/features/hrd/location/model/office.dart';
-import 'package:presentech/shared/models/users.dart';
 import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
 import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
@@ -24,9 +24,9 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
   final TextEditingController joinDateController = TextEditingController();
   int? userId;
 
-  late final Users employee;
+  late final Employee employee;
   HrdEmployeeDetail({super.key}) {
-    employee = Get.arguments as Users;
+    employee = Get.arguments as Employee;
     nameController.text = employee.name;
     emailController.text = employee.email;
     roleController.text = employee.role;

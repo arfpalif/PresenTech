@@ -26,7 +26,7 @@ abstract class Routes {
   static const hrdProfile = '/hrd/hrd_profile';
   static const hrdTask = '/hrd/hrd_tasks';
   static const hrdTaskDetail = '/hrd/hrd_tasks/detail';
-  static const HrdTaskToday = '/hrd/hrd_tasks/today';
+  static const hrdTaskToday = '/hrd/hrd_tasks/today';
   static const hrdLocationDetail =
       '/features/hrd/location/view/hrd_location_detail';
   static const hrdAddLocation = '/hrd/hrd_add_location';

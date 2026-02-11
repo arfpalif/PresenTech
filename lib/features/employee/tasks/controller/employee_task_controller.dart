@@ -71,7 +71,7 @@ class EmployeeTaskController extends GetxController {
 
     ever(connectivityService.isOnline, (bool isOnline) {
       if (isOnline) {
-        fetchTasks();
+        _taskRepo.syncOfflineTasks();
       }
     });
   }

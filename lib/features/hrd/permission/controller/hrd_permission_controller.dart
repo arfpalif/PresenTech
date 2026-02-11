@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:presentech/features/employee/absence/repositories/absence_repository.dart';
+import 'package:presentech/utils/database/dao/permission_dao.dart';
 import 'package:presentech/utils/enum/permission_filter.dart';
 import 'package:presentech/shared/view/components/dialog/success_dialog.dart';
 import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
@@ -9,14 +10,21 @@ import 'package:presentech/features/hrd/permission/repositories/hrd_permission_r
 import 'package:presentech/shared/models/permission.dart';
 import 'package:presentech/utils/enum/absence_status.dart';
 import 'package:presentech/utils/enum/permission_type.dart';
+import 'package:presentech/utils/services/connectivity_service.dart';
 
 class HrdPermissionController extends GetxController {
   //repository
   final permissionRepo = HrdPermissionRepository();
   final absenceRepo = AbsenceRepository();
 
+  //connectivity service
+  final ConnectivityService connectivityService =
+      Get.find<ConnectivityService>();
+
+  //dao
+  final PermissionDao permissionDao = Get.find<PermissionDao>();
+
   //variables
-  late Permission permission;
   var isLoading = false.obs;
   var name = ''.obs;
   var reason = ''.obs;
@@ -31,16 +39,31 @@ class HrdPermissionController extends GetxController {
   void onInit() {
     super.onInit();
     fetchPermissions();
+    ever(connectivityService.isOnline, (bool isOnline) {
+      if (isOnline) {
+        fetchPermissions();
+      }
+    });
   }
 
   Future<void> fetchPermissions() async {
     try {
       final response = await permissionRepo.fetchPermissions();
-
       permissions.assignAll(response);
     } catch (e) {
       debugPrint('Error fetching permissions: $e');
       FailedSnackbar.show('Failed to fetch permissions');
+    }
+    if (permissions.isEmpty) {
+      try {
+        final localData = await permissionDao.getAllPermissions();
+        permissions.assignAll(
+          localData.map((e) => Permission.fromDrift(e)).toList(),
+        );
+      } catch (e) {
+        debugPrint("Gagal fetch local (Permissions): $e");
+        FailedSnackbar.show('Failed to fetch local permissions');
+      }
     }
   }
 
@@ -117,6 +140,27 @@ class HrdPermissionController extends GetxController {
             break;
         }
       }
+
+      if (permissions.isEmpty) {
+        final localData = await permissionDao.getAllPermissions();
+        permissions.assignAll(
+          localData.map((e) => Permission.fromDrift(e)).toList(),
+        );
+
+        if (selectedFilter.value != null) {
+          switch (selectedFilter.value!) {
+            case PermissionFilter.today:
+              permissions.assignAll(absenceToday);
+              break;
+            case PermissionFilter.week:
+              permissions.assignAll(absenceWeekly);
+              break;
+            case PermissionFilter.month:
+              permissions.assignAll(absenceMonthly);
+              break;
+          }
+        }
+      }
     } catch (e) {
       debugPrint('Error fetching permissions: $e');
     } finally {
@@ -124,10 +168,15 @@ class HrdPermissionController extends GetxController {
     }
   }
 
-  Future<void> approvePermission(int i) async {
+  Future<void> approvePermission(int permissionId) async {
     try {
       isLoading.value = true;
-      await permissionRepo.approvePermission(permission.id!);
+      final permission = permissions.firstWhere((p) => p.id == permissionId);
+
+      await permissionRepo.approvePermission(
+        permission.id!,
+        permission.feedback,
+      );
 
       if (permission.type == PermissionType.absence_error) {
         await absenceRepo.updateAbsenceStatus(
@@ -153,8 +202,10 @@ class HrdPermissionController extends GetxController {
       }
       SuccessDialog.show("Success", "Permission approved successfully", () {});
       Get.back(result: true);
+      fetchPermissions();
     } catch (e) {
-      FailedSnackbar.show('Failed to approve permission');
+      debugPrint('Error approving permission: $e');
+      FailedSnackbar.show('Failed to approve permission $e');
     } finally {
       isLoading.value = false;
     }

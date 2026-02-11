@@ -29,6 +29,7 @@ class HrdProfilePage extends GetView<HrdProfileController> {
                   Get.toNamed(Routes.comingSoon);
                 },
                 imageUrl: controller.profilePic.value,
+                localImagePath: controller.profilePicLocal.value,
                 name: controller.name.value,
                 role: controller.role.value,
               ),

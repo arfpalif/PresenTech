@@ -23,7 +23,7 @@ class HrdHomepageController extends GetxController {
         return;
       }
 
-      final response = await homeRepo.getUser(userId);
+      final response = await homeRepo.getUserProfile(userId);
 
       profilePic.value = response['profile_picture'] ?? '';
       name.value = response['name'] ?? '';

@@ -16,7 +16,7 @@ class UserModel {
   String email;
   String role;
   int officeId;
-  String profile_picture;
+  String? profile_picture;
   String? localImagePath;
 
   UserModel({
@@ -26,7 +26,7 @@ class UserModel {
     required this.email,
     required this.role,
     required this.officeId,
-    required this.profile_picture,
+    this.profile_picture,
     this.localImagePath,
   });
 
@@ -37,7 +37,10 @@ class UserModel {
     email: json["email"] ?? "",
     role: json["role"] ?? "employee",
     officeId: json["office_id"] ?? 0,
-    profile_picture: json["profile_picture"] ?? "",
+    profile_picture: (json["profile_picture"] != null &&
+            json["profile_picture"].toString().isNotEmpty)
+        ? json["profile_picture"]
+        : null,
     localImagePath: json["local_image_path"],
   );
 
@@ -59,7 +62,10 @@ class UserModel {
     email: data.email,
     role: data.roles,
     officeId: data.officeId ?? 0,
-    profile_picture: data.profilePicture ?? "",
+    profile_picture: (data.profilePicture != null &&
+            data.profilePicture!.isNotEmpty)
+        ? data.profilePicture
+        : null,
   );
 
   EmployeesTableCompanion toDrift() => EmployeesTableCompanion(

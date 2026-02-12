@@ -34,6 +34,14 @@ class UserDao extends DatabaseAccessor<AppDatabase> with _$UserDaoMixin {
   Future<bool> updateEmployee(EmployeesTableCompanion employee) =>
       update(employeesTable).replace(employee);
 
+  Future<void> updateEmployeeData(
+    String userId,
+    EmployeesTableCompanion companion,
+  ) async {
+    await (update(employeesTable)..where((t) => t.userId.equals(userId)))
+        .write(companion);
+  }
+
   Future<List<EmployeesTableData>> getUnsyncedEmployees() =>
       (select(employeesTable)..where((t) => t.isSynced.equals(0))).get();
 

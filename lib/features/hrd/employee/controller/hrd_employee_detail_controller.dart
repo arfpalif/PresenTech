@@ -70,11 +70,7 @@ class HrdEmployeeDetailController extends GetxController {
   Future<void> fetchOffices() async {
     try {
       isLoadingOffices.value = true;
-      final response = await employeeRepo.fetchOffices();
-
-      final data = (response as List)
-          .map<Office>((item) => Office.fromJson(item))
-          .toList();
+      final data = await employeeRepo.fetchOffices();
       offices.assignAll(data);
 
       Office? found;

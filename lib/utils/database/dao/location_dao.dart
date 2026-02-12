@@ -12,6 +12,8 @@ class LocationDao extends DatabaseAccessor<AppDatabase>
     return (select(locationsTable)..where((t) => t.isSynced.equals(false))).get();
   }
 
+  Future<List<LocationsTableData>> getAllLocations() => select(locationsTable).get();
+
   Future<void> markAsSynced(int oldId, int newId) async {
     await (update(locationsTable)..where((t) => t.id.equals(oldId))).write(
       LocationsTableCompanion(

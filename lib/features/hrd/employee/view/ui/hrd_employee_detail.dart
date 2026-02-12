@@ -5,6 +5,7 @@ import 'package:presentech/features/hrd/employee/controller/hrd_employee_control
 import 'package:presentech/features/hrd/employee/controller/hrd_employee_detail_controller.dart';
 import 'package:presentech/features/hrd/employee/models/employee.dart';
 import 'package:presentech/features/hrd/location/model/office.dart';
+import 'package:presentech/shared/styles/color_style.dart';
 import 'package:presentech/shared/view/components/buttons/gradient_btn.dart';
 import 'package:presentech/shared/view/components/snackbar/failed_snackbar.dart';
 import 'package:presentech/shared/view/components/snackbar/success_snackbar.dart';
@@ -79,6 +80,41 @@ class HrdEmployeeDetail extends GetView<HrdEmployeeDetailController> {
                     height: 120,
                     width: 120,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 120,
+                        width: 120,
+                        decoration: BoxDecoration(
+                          color: ColorStyle.greenPrimary.withOpacity(0.1),
+                        ),
+                        child: Center(
+                          child: Text(
+                            employee.name.isNotEmpty
+                                ? employee.name[0].toUpperCase()
+                                : '?',
+                            style: AppTextStyle.heading1.copyWith(
+                              color: ColorStyle.greenPrimary,
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 120,
+                        width: 120,
+                        color: ColorStyle.greyprimary,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: ColorStyle.greenPrimary,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),

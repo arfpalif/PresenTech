@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:presentech/configs/routes/app_routes.dart';
 import 'package:presentech/shared/controllers/auth_controller.dart';
 import 'package:presentech/shared/repositories/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -45,8 +44,7 @@ class HrdProfileController extends GetxController {
     }
   }
 
-  void signOut() async {
+  Future<void> signOut() async {
     await authC.signOut();
-    Get.offAllNamed(Routes.login);
   }
 }

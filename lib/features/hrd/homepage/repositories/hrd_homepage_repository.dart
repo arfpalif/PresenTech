@@ -8,7 +8,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class HrdHomepageRepository {
   final SupabaseClient _supabase = Supabase.instance.client;
   final ProfileDao _profileDao = Get.find<ProfileDao>();
-  final ConnectivityService _connectivityService = Get.find<ConnectivityService>();
+  final ConnectivityService _connectivityService =
+      Get.find<ConnectivityService>();
 
   Future<Map<String, dynamic>> getUserProfile(String userId) async {
     if (_connectivityService.isOnline.value) {
@@ -40,10 +41,10 @@ class HrdHomepageRepository {
     String userId,
   ) async {
     final existing = await _profileDao.getProfileLocally(userId);
-    
+
     // Create Users model from Supabase data
     final userModel = Users.fromJson(userData);
-    
+
     // Preserve local image path if it exists
     if (existing != null && existing.localImagePath != null) {
       userModel.localImagePath = existing.localImagePath;

@@ -4149,6 +4149,313 @@ class UsersTableCompanion extends UpdateCompanion<UsersTableData> {
   }
 }
 
+class $AuthTableTable extends AuthTable
+    with TableInfo<$AuthTableTable, AuthTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AuthTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+    'email',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _roleMeta = const VerificationMeta('role');
+  @override
+  late final GeneratedColumn<String> role = GeneratedColumn<String>(
+    'role',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastLoginMeta = const VerificationMeta(
+    'lastLogin',
+  );
+  @override
+  late final GeneratedColumn<String> lastLogin = GeneratedColumn<String>(
+    'last_login',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, email, role, lastLogin];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'auth_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AuthTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+        _emailMeta,
+        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
+      );
+    }
+    if (data.containsKey('role')) {
+      context.handle(
+        _roleMeta,
+        role.isAcceptableOrUnknown(data['role']!, _roleMeta),
+      );
+    }
+    if (data.containsKey('last_login')) {
+      context.handle(
+        _lastLoginMeta,
+        lastLogin.isAcceptableOrUnknown(data['last_login']!, _lastLoginMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AuthTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AuthTableData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      email: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}email'],
+      ),
+      role: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}role'],
+      ),
+      lastLogin: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_login'],
+      ),
+    );
+  }
+
+  @override
+  $AuthTableTable createAlias(String alias) {
+    return $AuthTableTable(attachedDatabase, alias);
+  }
+}
+
+class AuthTableData extends DataClass implements Insertable<AuthTableData> {
+  final String id;
+  final String? email;
+  final String? role;
+  final String? lastLogin;
+  const AuthTableData({
+    required this.id,
+    this.email,
+    this.role,
+    this.lastLogin,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || email != null) {
+      map['email'] = Variable<String>(email);
+    }
+    if (!nullToAbsent || role != null) {
+      map['role'] = Variable<String>(role);
+    }
+    if (!nullToAbsent || lastLogin != null) {
+      map['last_login'] = Variable<String>(lastLogin);
+    }
+    return map;
+  }
+
+  AuthTableCompanion toCompanion(bool nullToAbsent) {
+    return AuthTableCompanion(
+      id: Value(id),
+      email: email == null && nullToAbsent
+          ? const Value.absent()
+          : Value(email),
+      role: role == null && nullToAbsent ? const Value.absent() : Value(role),
+      lastLogin: lastLogin == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastLogin),
+    );
+  }
+
+  factory AuthTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AuthTableData(
+      id: serializer.fromJson<String>(json['id']),
+      email: serializer.fromJson<String?>(json['email']),
+      role: serializer.fromJson<String?>(json['role']),
+      lastLogin: serializer.fromJson<String?>(json['lastLogin']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'email': serializer.toJson<String?>(email),
+      'role': serializer.toJson<String?>(role),
+      'lastLogin': serializer.toJson<String?>(lastLogin),
+    };
+  }
+
+  AuthTableData copyWith({
+    String? id,
+    Value<String?> email = const Value.absent(),
+    Value<String?> role = const Value.absent(),
+    Value<String?> lastLogin = const Value.absent(),
+  }) => AuthTableData(
+    id: id ?? this.id,
+    email: email.present ? email.value : this.email,
+    role: role.present ? role.value : this.role,
+    lastLogin: lastLogin.present ? lastLogin.value : this.lastLogin,
+  );
+  AuthTableData copyWithCompanion(AuthTableCompanion data) {
+    return AuthTableData(
+      id: data.id.present ? data.id.value : this.id,
+      email: data.email.present ? data.email.value : this.email,
+      role: data.role.present ? data.role.value : this.role,
+      lastLogin: data.lastLogin.present ? data.lastLogin.value : this.lastLogin,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AuthTableData(')
+          ..write('id: $id, ')
+          ..write('email: $email, ')
+          ..write('role: $role, ')
+          ..write('lastLogin: $lastLogin')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, email, role, lastLogin);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AuthTableData &&
+          other.id == this.id &&
+          other.email == this.email &&
+          other.role == this.role &&
+          other.lastLogin == this.lastLogin);
+}
+
+class AuthTableCompanion extends UpdateCompanion<AuthTableData> {
+  final Value<String> id;
+  final Value<String?> email;
+  final Value<String?> role;
+  final Value<String?> lastLogin;
+  final Value<int> rowid;
+  const AuthTableCompanion({
+    this.id = const Value.absent(),
+    this.email = const Value.absent(),
+    this.role = const Value.absent(),
+    this.lastLogin = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AuthTableCompanion.insert({
+    required String id,
+    this.email = const Value.absent(),
+    this.role = const Value.absent(),
+    this.lastLogin = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id);
+  static Insertable<AuthTableData> custom({
+    Expression<String>? id,
+    Expression<String>? email,
+    Expression<String>? role,
+    Expression<String>? lastLogin,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (email != null) 'email': email,
+      if (role != null) 'role': role,
+      if (lastLogin != null) 'last_login': lastLogin,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AuthTableCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? email,
+    Value<String?>? role,
+    Value<String?>? lastLogin,
+    Value<int>? rowid,
+  }) {
+    return AuthTableCompanion(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      role: role ?? this.role,
+      lastLogin: lastLogin ?? this.lastLogin,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
+    if (role.present) {
+      map['role'] = Variable<String>(role.value);
+    }
+    if (lastLogin.present) {
+      map['last_login'] = Variable<String>(lastLogin.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AuthTableCompanion(')
+          ..write('id: $id, ')
+          ..write('email: $email, ')
+          ..write('role: $role, ')
+          ..write('lastLogin: $lastLogin, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4161,11 +4468,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $EmployeesTableTable employeesTable = $EmployeesTableTable(this);
   late final $LocationsTableTable locationsTable = $LocationsTableTable(this);
   late final $UsersTableTable usersTable = $UsersTableTable(this);
+  late final $AuthTableTable authTable = $AuthTableTable(this);
   late final TaskDao taskDao = TaskDao(this as AppDatabase);
   late final PermissionDao permissionDao = PermissionDao(this as AppDatabase);
   late final AbsenceDao absenceDao = AbsenceDao(this as AppDatabase);
+  late final UserDao userDao = UserDao(this as AppDatabase);
   late final LocationDao locationDao = LocationDao(this as AppDatabase);
   late final ProfileDao profileDao = ProfileDao(this as AppDatabase);
+  late final AuthDao authDao = AuthDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4178,6 +4488,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     employeesTable,
     locationsTable,
     usersTable,
+    authTable,
   ];
 }
 
@@ -6220,6 +6531,187 @@ typedef $$UsersTableTableProcessedTableManager =
       UsersTableData,
       PrefetchHooks Function()
     >;
+typedef $$AuthTableTableCreateCompanionBuilder =
+    AuthTableCompanion Function({
+      required String id,
+      Value<String?> email,
+      Value<String?> role,
+      Value<String?> lastLogin,
+      Value<int> rowid,
+    });
+typedef $$AuthTableTableUpdateCompanionBuilder =
+    AuthTableCompanion Function({
+      Value<String> id,
+      Value<String?> email,
+      Value<String?> role,
+      Value<String?> lastLogin,
+      Value<int> rowid,
+    });
+
+class $$AuthTableTableFilterComposer
+    extends Composer<_$AppDatabase, $AuthTableTable> {
+  $$AuthTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastLogin => $composableBuilder(
+    column: $table.lastLogin,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AuthTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $AuthTableTable> {
+  $$AuthTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastLogin => $composableBuilder(
+    column: $table.lastLogin,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AuthTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AuthTableTable> {
+  $$AuthTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumn<String> get role =>
+      $composableBuilder(column: $table.role, builder: (column) => column);
+
+  GeneratedColumn<String> get lastLogin =>
+      $composableBuilder(column: $table.lastLogin, builder: (column) => column);
+}
+
+class $$AuthTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AuthTableTable,
+          AuthTableData,
+          $$AuthTableTableFilterComposer,
+          $$AuthTableTableOrderingComposer,
+          $$AuthTableTableAnnotationComposer,
+          $$AuthTableTableCreateCompanionBuilder,
+          $$AuthTableTableUpdateCompanionBuilder,
+          (
+            AuthTableData,
+            BaseReferences<_$AppDatabase, $AuthTableTable, AuthTableData>,
+          ),
+          AuthTableData,
+          PrefetchHooks Function()
+        > {
+  $$AuthTableTableTableManager(_$AppDatabase db, $AuthTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AuthTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AuthTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AuthTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> email = const Value.absent(),
+                Value<String?> role = const Value.absent(),
+                Value<String?> lastLogin = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AuthTableCompanion(
+                id: id,
+                email: email,
+                role: role,
+                lastLogin: lastLogin,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> email = const Value.absent(),
+                Value<String?> role = const Value.absent(),
+                Value<String?> lastLogin = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AuthTableCompanion.insert(
+                id: id,
+                email: email,
+                role: role,
+                lastLogin: lastLogin,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AuthTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AuthTableTable,
+      AuthTableData,
+      $$AuthTableTableFilterComposer,
+      $$AuthTableTableOrderingComposer,
+      $$AuthTableTableAnnotationComposer,
+      $$AuthTableTableCreateCompanionBuilder,
+      $$AuthTableTableUpdateCompanionBuilder,
+      (
+        AuthTableData,
+        BaseReferences<_$AppDatabase, $AuthTableTable, AuthTableData>,
+      ),
+      AuthTableData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6238,4 +6730,6 @@ class $AppDatabaseManager {
       $$LocationsTableTableTableManager(_db, _db.locationsTable);
   $$UsersTableTableTableManager get usersTable =>
       $$UsersTableTableTableManager(_db, _db.usersTable);
+  $$AuthTableTableTableManager get authTable =>
+      $$AuthTableTableTableManager(_db, _db.authTable);
 }

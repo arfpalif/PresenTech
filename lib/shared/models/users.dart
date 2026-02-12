@@ -42,7 +42,9 @@ class Users {
     createdAt: json["created_at"] ?? "",
     email: json["email"] ?? "",
     role: json["role"] ?? "",
-    officeId: json["office_id"] is int ? json["office_id"] : (int.tryParse(json["office_id"]?.toString() ?? "") ?? 0),
+    officeId: json["office_id"] is int
+        ? json["office_id"]
+        : (int.tryParse(json["office_id"]?.toString() ?? "") ?? 0),
     name: json["name"] ?? "",
     profilePicture: json["profile_picture"],
     isSynced: json["is_synced"],

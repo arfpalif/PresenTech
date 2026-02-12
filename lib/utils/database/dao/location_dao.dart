@@ -40,4 +40,8 @@ class LocationDao extends DatabaseAccessor<AppDatabase>
   Future<void> updateLocation(int id, LocationsTableCompanion companion) {
     return (update(locationsTable)..where((t) => t.id.equals(id))).write(companion);
   }
+
+  Future<LocationsTableData?> getLocationById(int id) {
+    return (select(locationsTable)..where((t) => t.id.equals(id))).getSingleOrNull();
+  }
 }

@@ -3,7 +3,7 @@ import 'package:presentech/utils/services/database_service.dart';
 
 class SplashRepository {
   final SupabaseClient supabase = Supabase.instance.client;
-  final dbService = DatabaseService.instance;
+  final DatabaseService dbService = DatabaseService.instance;
 
   Session? getSession() {
     return supabase.auth.currentSession;

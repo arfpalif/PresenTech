@@ -49,11 +49,14 @@ class HrdEmployeeRepository {
 
       for (var emp in unsynced) {
         if (emp.syncAction == 'update') {
-          await supabase.from(ApiConstant.tableUsers).update({
-            'name': emp.name,
-            'email': emp.email,
-            'office_id': emp.officeId,
-          }).eq('id', emp.userId);
+          await supabase
+              .from(ApiConstant.tableUsers)
+              .update({
+                'name': emp.name,
+                'email': emp.email,
+                'office_id': emp.officeId,
+              })
+              .eq('id', emp.userId);
           await userDao.markEmployeeAsSynced(emp.userId);
           debugPrint("Synced offline update for employee: ${emp.userId}");
         }
@@ -101,15 +104,16 @@ class HrdEmployeeRepository {
             .from(ApiConstant.tableUsers)
             .update({'name': name, 'email': email, 'office_id': officeId})
             .eq('id', userId);
-        
+
         await userDao.markEmployeeAsSynced(userId);
       }
-      
+
       fetchEmployees();
       return true;
     } catch (e) {
       debugPrint('Error updating employee: $e');
-      if (e.toString().contains('SocketException') || e.toString().contains('ClientException')) {
+      if (e.toString().contains('SocketException') ||
+          e.toString().contains('ClientException')) {
         return true;
       }
       return false;
@@ -122,13 +126,15 @@ class HrdEmployeeRepository {
           .from('offices')
           .select('*')
           .order('id', ascending: true);
-      
-      final offices = (response as List).map((e) => Office.fromJson(e)).toList();
-      
+
+      final offices = (response as List)
+          .map((e) => Office.fromJson(e))
+          .toList();
+
       await locationDao.syncOfficesToLocal(
         offices.map((e) => e.toDrift()).toList(),
       );
-      
+
       return offices;
     } catch (e) {
       debugPrint('Error fetching offices online, falling back to local: $e');

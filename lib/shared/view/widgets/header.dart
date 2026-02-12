@@ -37,7 +37,6 @@ class Header extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Decorative Circles
           Positioned(
             top: -50,
             right: -50,
@@ -65,7 +64,7 @@ class Header extends StatelessWidget {
           SafeArea(
             bottom: false,
             child: Container(
-              height: height ?? 180, // Slightly taller default
+              height: height ?? 180, 
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
               child: Column(
@@ -122,16 +121,19 @@ class Header extends StatelessWidget {
                         ),
                         ),
                         SizedBox(width: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Hello, $name",
-                              style: AppTextStyle.heading1.copyWith(
-                                color: Colors.white,
-                                fontSize: 18,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Hello, $name",
+                                style: AppTextStyle.heading1.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
-                            ),
                             SizedBox(height: 4),
                             Container(
                               padding: EdgeInsets.symmetric(
@@ -151,7 +153,8 @@ class Header extends StatelessWidget {
                                 ),
                               ),
                             ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -168,7 +171,7 @@ class Header extends StatelessWidget {
   Widget _buildProfileImage() {
     if (localImagePath != null && localImagePath!.isNotEmpty) {
       final file = File(localImagePath!);
-      if (file.existsSync()) {
+      if (file.existsSync() && file.lengthSync() > 0) {
         return Image.file(
           file,
           width: 56,

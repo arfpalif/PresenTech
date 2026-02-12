@@ -1,18 +1,23 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:presentech/constants/api_constant.dart';
+import 'package:presentech/features/hrd/location/model/office.dart';
 import 'package:presentech/shared/models/absence.dart';
+import 'package:presentech/shared/models/users.dart';
 import 'package:presentech/utils/database/dao/absence_dao.dart';
+import 'package:presentech/utils/database/dao/location_dao.dart';
+import 'package:presentech/utils/database/dao/profile_dao.dart';
 import 'package:presentech/utils/enum/absence_status.dart';
 import 'package:presentech/utils/services/connectivity_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:presentech/utils/services/database_service.dart';
 
 class AbsenceRepository {
   final SupabaseClient supabase = Supabase.instance.client;
   final ConnectivityService connectivityService =
       Get.find<ConnectivityService>();
-  final DatabaseService databaseService = Get.find<DatabaseService>();
   final AbsenceDao _absenceDao = Get.find<AbsenceDao>();
+  final LocationDao _locationDao = Get.find<LocationDao>();
+  final ProfileDao _profileDao = Get.find<ProfileDao>();
 
   Future<List<Map<String, dynamic>>> getAbsencesByFilter({
     required String userId,
@@ -41,14 +46,16 @@ class AbsenceRepository {
 
       return data;
     } else {
-      print(
+      debugPrint(
         "AbsenceRepository: Fetching absences offline for $userId within range",
       );
       final localData = (startDate != null && endDate != null)
           ? await _absenceDao.getAbsencesByRange(userId, startDate, endDate)
           : await _absenceDao.getAbsencesByUser(userId);
 
-      print("AbsenceRepository: Found ${localData.length} records locally");
+      debugPrint(
+        "AbsenceRepository: Found ${localData.length} records locally",
+      );
       return localData.map((e) => Absence.fromDrift(e).toJson()).toList();
     }
   }
@@ -73,12 +80,12 @@ class AbsenceRepository {
       return response;
     } else {
       final dateOnly = today.split(' ')[0]; // Ensure only date part
-      print(
+      debugPrint(
         "AbsenceRepository: Getting today's absence offline for $userId on $dateOnly",
       );
       final local = await _absenceDao.getAbsenceByDate(userId, dateOnly);
       if (local == null) {
-        print("AbsenceRepository: No local absence found for $dateOnly");
+        debugPrint("AbsenceRepository: No local absence found for $dateOnly");
       }
       return local != null ? Absence.fromDrift(local).toJson() : null;
     }
@@ -104,22 +111,20 @@ class AbsenceRepository {
               .eq('id', userId)
               .maybeSingle();
           if (fullProfile != null) {
-            await databaseService.saveProfileLocally(fullProfile);
+            final user = Users.fromJson(fullProfile);
+            await _profileDao.saveProfile(user.toDrift());
           }
           return {'office_id': officeId};
         }
         return response;
       } catch (e) {
-        print("AbsenceRepository: Error fetching user office online: $e");
+        debugPrint("AbsenceRepository: Error fetching user office online: $e");
       }
     }
 
-    final localUser = await databaseService.getProfileLocally(userId);
-    if (localUser != null && localUser['office_id'] != null) {
-      final officeId = localUser['office_id'] is String
-          ? int.parse(localUser['office_id'])
-          : localUser['office_id'] as int;
-      return {'office_id': officeId};
+    final localUser = await _profileDao.getProfileLocally(userId);
+    if (localUser != null && localUser.officeId != null) {
+      return {'office_id': localUser.officeId};
     }
     return null;
   }
@@ -134,45 +139,20 @@ class AbsenceRepository {
             .maybeSingle();
 
         if (response != null) {
-          await databaseService.saveOfficeLocally(
+          final office = Office.fromJson(
             Map<String, dynamic>.from(response as Map),
           );
-          return {
-            ...response,
-            'latitude': response['latitude'] is String
-                ? double.parse(response['latitude'])
-                : response['latitude']?.toDouble(),
-            'longitude': response['longitude'] is String
-                ? double.parse(response['longitude'])
-                : response['longitude']?.toDouble(),
-            'radius': response['radius'] is String
-                ? double.parse(response['radius'])
-                : response['radius']?.toDouble(),
-            'start_time': response['start_time'],
-            'end_time': response['end_time'],
-          };
+          await _locationDao.insertLocation(office.toDrift());
+          return office.toJson();
         }
       } catch (e) {
-        print("AbsenceRepository: Error fetching office online: $e");
+        debugPrint("AbsenceRepository: Error fetching office online: $e");
       }
     }
 
-    final localOffice = await databaseService.getOfficeLocallyById(officeId);
+    final localOffice = await _locationDao.getLocationById(officeId);
     if (localOffice != null) {
-      return {
-        ...localOffice,
-        'latitude': localOffice['latitude'] is String
-            ? double.parse(localOffice['latitude'])
-            : localOffice['latitude']?.toDouble(),
-        'longitude': localOffice['longitude'] is String
-            ? double.parse(localOffice['longitude'])
-            : localOffice['longitude']?.toDouble(),
-        'radius': localOffice['radius'] is String
-            ? double.parse(localOffice['radius'])
-            : localOffice['radius']?.toDouble(),
-        'start_time': localOffice['start_time'],
-        'end_time': localOffice['end_time'],
-      };
+      return Office.fromDrift(localOffice).toJson();
     }
     return null;
   }
@@ -187,18 +167,18 @@ class AbsenceRepository {
             .maybeSingle();
         if (response != null) return response;
       } catch (e) {
-        print("AbsenceRepository: Error fetching office hours: $e");
+        debugPrint("AbsenceRepository: Error fetching office hours: $e");
       }
     }
 
     // Try to get from local offices table
-    final localOffice = await databaseService.getOfficeLocallyById(officeId);
+    final localOffice = await _locationDao.getLocationById(officeId);
     if (localOffice != null &&
-        localOffice['start_time'] != null &&
-        localOffice['end_time'] != null) {
+        localOffice.startTime != null &&
+        localOffice.endTime != null) {
       return {
-        'start_time': localOffice['start_time'],
-        'end_time': localOffice['end_time'],
+        'start_time': localOffice.startTime,
+        'end_time': localOffice.endTime,
       };
     }
 
@@ -209,7 +189,9 @@ class AbsenceRepository {
     if (!connectivityService.isOnline.value) return;
 
     try {
-      print("AbsenceRepository: Proactively syncing office data for $userId");
+      debugPrint(
+        "AbsenceRepository: Proactively syncing office data for $userId",
+      );
 
       // 1. Sync Profile & Get Office ID
       final officeData = await getUserOffice(userId: userId);
@@ -225,15 +207,18 @@ class AbsenceRepository {
       final hours = await getOfficeHours(officeId: officeId);
 
       // 4. Save combined data to local
-      await databaseService.saveOfficeLocally({
-        ...officeDetails,
-        'start_time': hours?['start_time'],
-        'end_time': hours?['end_time'],
-      });
+      if (hours != null) {
+        final updatedOffice = Office.fromJson({
+          ...officeDetails,
+          'start_time': hours['start_time'],
+          'end_time': hours['end_time'],
+        });
+        await _locationDao.insertLocation(updatedOffice.toDrift());
+      }
 
-      print("AbsenceRepository: Office data sync completed for $userId");
+      debugPrint("AbsenceRepository: Office data sync completed for $userId");
     } catch (e) {
-      print("AbsenceRepository: Error proactive sync office data: $e");
+      debugPrint("AbsenceRepository: Error proactive sync office data: $e");
     }
   }
 
@@ -274,7 +259,7 @@ class AbsenceRepository {
           ).toDrift(),
         ]);
       } catch (e) {
-        print("Online clockIn failed, saving to local queue: $e");
+        debugPrint("Online clockIn failed, saving to local queue: $e");
         await _absenceDao.insertAbsence(
           Absence.fromJson(data)
             ..isSynced = 0
@@ -287,7 +272,7 @@ class AbsenceRepository {
           ..isSynced = 0
           ..syncAction = 'insert',
       );
-      print("Internet Mati! Absen disimpan di HP dulu.");
+      debugPrint("Internet Mati! Absen disimpan di HP dulu.");
     }
   }
 
@@ -313,7 +298,7 @@ class AbsenceRepository {
           await _absenceDao.syncAbsenceToLocal([updated.toDrift()]);
         }
       } catch (e) {
-        print("Online clockOut failed, saving to local queue: $e");
+        debugPrint("Online clockOut failed, saving to local queue: $e");
         final local = await _absenceDao.getAbsenceByDate(userId, date);
         if (local != null) {
           final updated = Absence.fromDrift(local);
@@ -331,7 +316,7 @@ class AbsenceRepository {
         updated.isSynced = 0;
         updated.syncAction = 'update';
         await _absenceDao.updateAbsence(updated.toDrift());
-        print("Internet Mati! Clock out disimpan di HP dulu.");
+        debugPrint("Internet Mati! Clock out disimpan di HP dulu.");
       }
     }
   }
@@ -356,9 +341,9 @@ class AbsenceRepository {
         }, onConflict: 'user_id,date');
 
         await _absenceDao.markAbsenceAsSynced(userId, dateStr);
-        print("Synced absence for $dateStr");
+        debugPrint("Synced absence for $dateStr");
       } catch (e) {
-        print("Failed to sync absence for ${absence.date}: $e");
+        debugPrint("Failed to sync absence for ${absence.date}: $e");
       }
     }
   }
@@ -395,7 +380,7 @@ class AbsenceRepository {
           await _absenceDao.syncAbsenceToLocal([updated.toDrift()]);
         }
       } catch (e) {
-        print(
+        debugPrint(
           "Failed to update absence status online, saving to local queue: $e",
         );
         final local = await _absenceDao.getAbsenceByDate(userId, date);
@@ -423,7 +408,7 @@ class AbsenceRepository {
         updated.isSynced = 0;
         updated.syncAction = 'update';
         await _absenceDao.updateAbsence(updated.toDrift());
-        print("Internet Mati! Update absence status disimpan di HP dulu.");
+        debugPrint("Internet Mati! Update absence status disimpan di HP dulu.");
       }
     }
   }

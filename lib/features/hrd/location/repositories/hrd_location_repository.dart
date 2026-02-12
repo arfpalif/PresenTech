@@ -23,24 +23,31 @@ class HrdLocationRepository {
       final unsynced = await locationDao.getUnsyncedLocations();
       for (var row in unsynced) {
         if (row.syncAction == 'INSERT') {
-          final res = await supabase.from(ApiConstant.tableOffices).insert({
-            'name': row.name,
-            'address': row.address,
-            'latitude': row.latitude,
-            'longitude': row.longitude,
-            'radius': row.radius,
-          }).select().single();
-          
+          final res = await supabase
+              .from(ApiConstant.tableOffices)
+              .insert({
+                'name': row.name,
+                'address': row.address,
+                'latitude': row.latitude,
+                'longitude': row.longitude,
+                'radius': row.radius,
+              })
+              .select()
+              .single();
+
           await locationDao.markAsSynced(row.id, res['id']);
         } else if (row.syncAction == 'UPDATE') {
-          await supabase.from(ApiConstant.tableOffices).update({
-            'name': row.name,
-            'address': row.address,
-            'latitude': row.latitude,
-            'longitude': row.longitude,
-            'radius': row.radius,
-          }).eq('id', row.id);
-          
+          await supabase
+              .from(ApiConstant.tableOffices)
+              .update({
+                'name': row.name,
+                'address': row.address,
+                'latitude': row.latitude,
+                'longitude': row.longitude,
+                'radius': row.radius,
+              })
+              .eq('id', row.id);
+
           await locationDao.markAsSynced(row.id, row.id);
         }
       }
@@ -57,19 +64,25 @@ class HrdLocationRepository {
             .select('*')
             .order('id', ascending: true);
 
-        final remoteData = (response as List).map((e) => Office.fromJson(e)).toList();
-        
+        final remoteData = (response as List)
+            .map((e) => Office.fromJson(e))
+            .toList();
+
         await locationDao.syncOfficesToLocal(
           remoteData.map((e) => e.toDrift()).toList(),
         );
         return remoteData;
       } else {
-        final localData = await locationDao.db.select(locationDao.locationsTable).get();
+        final localData = await locationDao.db
+            .select(locationDao.locationsTable)
+            .get();
         return localData.map((e) => Office.fromDrift(e)).toList();
       }
     } catch (e) {
       debugPrint('Error fetching offices: $e');
-      final localData = await locationDao.db.select(locationDao.locationsTable).get();
+      final localData = await locationDao.db
+          .select(locationDao.locationsTable)
+          .get();
       return localData.map((e) => Office.fromDrift(e)).toList();
     }
   }
@@ -84,7 +97,6 @@ class HrdLocationRepository {
     try {
       isLoading.value = true;
 
-      // Save locally first
       final companion = LocationsTableCompanion(
         name: drift.Value(name),
         address: drift.Value(address),
@@ -94,19 +106,22 @@ class HrdLocationRepository {
         isSynced: const drift.Value(false),
         syncAction: const drift.Value('INSERT'),
       );
-      
+
       final tempId = await locationDao.insertLocation(companion);
 
-      // Try sync if online
       if (connectivityService.isOnline.value) {
-        final res = await supabase.from(ApiConstant.tableOffices).insert({
-          'name': name,
-          'address': address,
-          'latitude': latitude,
-          'longitude': longitude,
-          'radius': radius,
-        }).select().single();
-        
+        final res = await supabase
+            .from(ApiConstant.tableOffices)
+            .insert({
+              'name': name,
+              'address': address,
+              'latitude': latitude,
+              'longitude': longitude,
+              'radius': radius,
+            })
+            .select()
+            .single();
+
         await locationDao.markAsSynced(tempId, res['id']);
       }
     } catch (e) {
@@ -140,19 +155,22 @@ class HrdLocationRepository {
         isSynced: const drift.Value(false),
         syncAction: const drift.Value('UPDATE'),
       );
-      
+
       await locationDao.updateLocation(id, companion);
 
       // Try sync if online
       if (connectivityService.isOnline.value) {
-        await supabase.from(ApiConstant.tableOffices).update({
-          'latitude': latitude ?? office.latitude,
-          'longitude': longitude ?? office.longitude,
-          'radius': radius ?? office.radius,
-          'name': name ?? office.name,
-          'address': address ?? office.address,
-        }).eq('id', id);
-        
+        await supabase
+            .from(ApiConstant.tableOffices)
+            .update({
+              'latitude': latitude ?? office.latitude,
+              'longitude': longitude ?? office.longitude,
+              'radius': radius ?? office.radius,
+              'name': name ?? office.name,
+              'address': address ?? office.address,
+            })
+            .eq('id', id);
+
         await locationDao.markAsSynced(id, id);
       }
     } catch (e) {

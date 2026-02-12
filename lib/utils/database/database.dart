@@ -1,11 +1,13 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:presentech/utils/database/dao/auth_dao.dart';
 import 'package:presentech/utils/database/dao/location_dao.dart';
 import 'package:presentech/utils/database/dao/permission_dao.dart';
 import 'package:presentech/utils/database/dao/profile_dao.dart';
 import 'package:presentech/utils/database/dao/task_dao.dart';
 import 'package:presentech/utils/database/dao/absence_dao.dart';
+import 'package:presentech/utils/database/dao/hrd/user_dao.dart';
 
 part 'database.g.dart';
 
@@ -109,6 +111,16 @@ class EmployeesTable extends Table {
   Set<Column> get primaryKey => {userId};
 }
 
+class AuthTable extends Table {
+  TextColumn get id => text()();
+  TextColumn get email => text().nullable()();
+  TextColumn get role => text().nullable()();
+  TextColumn get lastLogin => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     TodoItems,
@@ -118,8 +130,17 @@ class EmployeesTable extends Table {
     EmployeesTable,
     LocationsTable,
     UsersTable,
+    AuthTable,
   ],
-  daos: [TaskDao, PermissionDao, AbsenceDao, LocationDao, ProfileDao],
+  daos: [
+    TaskDao,
+    PermissionDao,
+    AbsenceDao,
+    UserDao,
+    LocationDao,
+    ProfileDao,
+    AuthDao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());

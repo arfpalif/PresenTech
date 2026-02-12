@@ -6,7 +6,7 @@ part 'user_dao.g.dart';
 
 @DriftAccessor(tables: [EmployeesTable])
 class UserDao extends DatabaseAccessor<AppDatabase> with _$UserDaoMixin {
-  UserDao(AppDatabase db) : super(db);
+  UserDao(super.db);
 
   Future<List<EmployeesTableData>> getAllEmployees() => (select(
     employeesTable,
@@ -38,8 +38,9 @@ class UserDao extends DatabaseAccessor<AppDatabase> with _$UserDaoMixin {
     String userId,
     EmployeesTableCompanion companion,
   ) async {
-    await (update(employeesTable)..where((t) => t.userId.equals(userId)))
-        .write(companion);
+    await (update(
+      employeesTable,
+    )..where((t) => t.userId.equals(userId))).write(companion);
   }
 
   Future<List<EmployeesTableData>> getUnsyncedEmployees() =>

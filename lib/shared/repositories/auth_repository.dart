@@ -1,16 +1,20 @@
+import 'package:drift/drift.dart';
+import 'package:get/get.dart' hide Value;
+import 'package:presentech/utils/database/database.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:presentech/utils/services/database_service.dart';
+import 'package:presentech/utils/database/dao/auth_dao.dart';
 
 class AuthRepository {
   final supabase = Supabase.instance.client;
-  final dbService = DatabaseService.instance;
+  final _authDao = Get.find<AuthDao>();
 
   Future<void> signOut() async {
     try {
-      await supabase.auth.signOut();
-      await dbService.clearAuthData();
-    } catch (e) {
-      throw Exception('Error signing out: $e');
+      await supabase.auth.signOut().catchError((e) {
+        print("Supabase remote signout failed: $e");
+      });
+    } finally {
+      await _authDao.clearAuthData();
     }
   }
 
@@ -27,11 +31,25 @@ class AuthRepository {
 
   Future<void> saveAuthData(Map<String, dynamic> authData) async {
     print("AuthRepository: Calling saveAuthData for ${authData['email']}");
-    await dbService.saveAuthData(authData);
+    await _authDao.saveAuthData(
+      AuthTableCompanion(
+        id: Value(authData['id']),
+        email: Value(authData['email']),
+        role: Value(authData['role']),
+        lastLogin: Value(authData['last_login']),
+      ),
+    );
   }
 
   Future<Map<String, dynamic>?> getAuthData() async {
     print("AuthRepository: Calling getAuthData");
-    return await dbService.getAuthData();
+    final data = await _authDao.getAuthData();
+    if (data == null) return null;
+    return {
+      'id': data.id,
+      'email': data.email,
+      'role': data.role,
+      'last_login': data.lastLogin,
+    };
   }
 }

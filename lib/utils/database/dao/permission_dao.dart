@@ -6,7 +6,7 @@ part 'permission_dao.g.dart';
 @DriftAccessor(tables: [PermissionsTable])
 class PermissionDao extends DatabaseAccessor<AppDatabase>
     with _$PermissionDaoMixin {
-  PermissionDao(AppDatabase db) : super(db);
+  PermissionDao(super.db);
 
   Future<List<PermissionsTableData>> getPermissionsByUser(String userId) {
     return (select(permissionsTable)
@@ -19,7 +19,10 @@ class PermissionDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<List<PermissionsTableData>> getAllPermissions() {
-    return (select(permissionsTable)..orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)])).get();
+    return (select(permissionsTable)..orderBy([
+          (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
+        ]))
+        .get();
   }
 
   Future<List<PermissionsTableData>> getUnsyncedPermissions() {

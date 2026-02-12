@@ -5,7 +5,7 @@ part 'task_dao.g.dart';
 
 @DriftAccessor(tables: [TasksTable])
 class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
-  TaskDao(AppDatabase db) : super(db);
+  TaskDao(super.db);
 
   Future<List<TasksTableData>> getTasksByUser(String userId) {
     return (select(tasksTable)

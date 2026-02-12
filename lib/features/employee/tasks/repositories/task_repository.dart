@@ -212,4 +212,8 @@ class TaskRepository {
       _syncingIds.remove(id);
     }
   }
+
+  Future<void> syncPendingTasks() async {
+    await syncOfflineTasks();
+  }
 }

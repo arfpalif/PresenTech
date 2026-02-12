@@ -70,6 +70,13 @@ dev_dependencies:
   mockito: ^5.6.3
   mocktail: ^1.0.4
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "src/images/logo.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "src/images/logo.png"
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.
